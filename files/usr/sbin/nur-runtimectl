@@ -1,0 +1,304 @@
+#!/bin/sh
+
+set -eu
+
+RUNTIME_ROOT="/etc/nurrouter/runtime"
+BACKUP_ROOT="${RUNTIME_ROOT}/backups"
+PENDING_ROOT="${RUNTIME_ROOT}/pending"
+
+mkdir -p "${BACKUP_ROOT}" "${PENDING_ROOT}"
+
+command_name="${1:-}"
+shift || true
+
+overlay_dir=""
+operation_id=""
+safe_mode_seconds="0"
+
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+        --overlay)
+            overlay_dir="$2"
+            shift 2
+            ;;
+        --operation)
+            operation_id="$2"
+            shift 2
+            ;;
+        --safe-mode-seconds)
+            safe_mode_seconds="$2"
+            shift 2
+            ;;
+        *)
+            echo "unknown argument: $1" >&2
+            exit 1
+            ;;
+    esac
+done
+
+backup_config() {
+    backup_dir="${BACKUP_ROOT}/${operation_id}"
+    mkdir -p "${backup_dir}"
+
+    for config_name in network dhcp firewall; do
+        if [ -f "/etc/config/${config_name}" ]; then
+            cp "/etc/config/${config_name}" "${backup_dir}/${config_name}"
+        fi
+    done
+
+    if [ -f /etc/nurrouter/pppoe-shaping.json ]; then
+        cp /etc/nurrouter/pppoe-shaping.json "${backup_dir}/pppoe-shaping.json"
+    fi
+}
+
+restore_backup() {
+    backup_dir="${BACKUP_ROOT}/${operation_id}"
+
+    for config_name in network dhcp firewall; do
+        if [ -f "${backup_dir}/${config_name}" ]; then
+            cp "${backup_dir}/${config_name}" "/etc/config/${config_name}"
+        fi
+    done
+
+    if [ -f "${backup_dir}/pppoe-shaping.json" ]; then
+        mkdir -p /etc/nurrouter
+        cp "${backup_dir}/pppoe-shaping.json" /etc/nurrouter/pppoe-shaping.json
+    fi
+}
+
+reload_services() {
+    /etc/init.d/network restart
+    /etc/init.d/firewall restart
+    /etc/init.d/dnsmasq restart
+}
+
+observe_state() {
+    links="$(ip -j link show 2>/dev/null || echo '[]')"
+    addresses="$(ip -j addr show 2>/dev/null || echo '[]')"
+    routes="$(ip -j route show 2>/dev/null || echo '[]')"
+    bridge_vlans="$(bridge -j vlan show 2>/dev/null || echo '[]')"
+    firewall_ruleset="$(nft -j list ruleset 2>/dev/null || echo '{}')"
+    link_stats="$(ip -j -s link show 2>/dev/null || echo '[]')"
+    dnsmasq_running="false"
+    pppoe_interfaces="$(ip -j link show 2>/dev/null | jq '[.[] | select(.ifname | startswith("pppoe")) | .ifname]')"
+
+    if pgrep dnsmasq >/dev/null 2>&1; then
+        dnsmasq_running="true"
+    fi
+
+    dhcp_leases='[]'
+    if [ -f /tmp/dhcp.leases ]; then
+        dhcp_leases="$(
+            awk '
+                BEGIN { printf "[" }
+                NF >= 4 {
+                    if (n++) printf ","
+                    gsub(/"/, "", $4)
+                    printf "{\"expiry\":%s,\"mac\":\"%s\",\"ip\":\"%s\",\"hostname\":\"%s\"}", $1, $2, $3, $4
+                }
+                END { printf "]" }
+            ' /tmp/dhcp.leases
+        )"
+    fi
+
+    pppoe_sessions='[]'
+    if command -v ubus >/dev/null 2>&1 && command -v jq >/dev/null 2>&1; then
+        pppoe_sessions="$(
+            ubus list 2>/dev/null | awk -F. '/^network\.interface\./ { print $3 }' | while read -r iface; do
+                [ -n "${iface}" ] || continue
+                status="$(ubus call "network.interface.${iface}" status 2>/dev/null || true)"
+                [ -n "${status}" ] || continue
+                echo "${status}" | jq -c --arg name "${iface}" '
+                    select(.proto == "pppoe")
+                    | {
+                        name: $name,
+                        up: .up,
+                        device: .device,
+                        l3_device: .["l3_device"],
+                        uptime: .uptime,
+                        ipv4_address: (.["ipv4-address"] // []),
+                        dns_server: (.["dns-server"] // []),
+                        route: (.route // [])
+                    }
+                ' 2>/dev/null || true
+            done | jq -s '.'
+        )"
+        [ -n "${pppoe_sessions}" ] || pppoe_sessions='[]'
+    fi
+
+    shaping_status='[]'
+    if command -v tc >/dev/null 2>&1 && command -v jq >/dev/null 2>&1; then
+        shaping_status="$(
+            printf '%s\n' "${pppoe_sessions}" | jq -r '.[].l3_device // empty' 2>/dev/null | while read -r l3; do
+                [ -n "${l3}" ] || continue
+                qdisc="$(tc -j qdisc show dev "${l3}" 2>/dev/null || echo '[]')"
+                class="$(tc -j class show dev "${l3}" 2>/dev/null || echo '[]')"
+                filter="$(tc -j filter show dev "${l3}" 2>/dev/null || echo '[]')"
+                jq -n --arg iface "${l3}" --argjson qdisc "${qdisc}" --argjson class "${class}" --argjson filter "${filter}" \
+                    '{iface:$iface,qdisc:$qdisc,class:$class,filter:$filter}'
+            done | jq -s '.'
+        )"
+        [ -n "${shaping_status}" ] || shaping_status='[]'
+    fi
+
+    jq -n \
+        --argjson links "${links}" \
+        --argjson addresses "${addresses}" \
+        --argjson routes "${routes}" \
+        --argjson bridge_vlans "${bridge_vlans}" \
+        --argjson firewall "${firewall_ruleset}" \
+        --argjson link_stats "${link_stats}" \
+        --argjson pppoe_interfaces "${pppoe_interfaces}" \
+        --argjson dhcp_leases "${dhcp_leases}" \
+        --argjson pppoe_sessions "${pppoe_sessions}" \
+        --argjson shaping_status "${shaping_status}" \
+        --arg dnsmasq_running "${dnsmasq_running}" \
+        --arg ipv4 "$(cat /proc/sys/net/ipv4/ip_forward 2>/dev/null || echo 0)" \
+        --arg observed_at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+        '{
+            links: $links,
+            addresses: $addresses,
+            routes: $routes,
+            bridge_vlans: $bridge_vlans,
+            firewall: $firewall,
+            link_stats: $link_stats,
+            forwarding: {
+                ipv4: $ipv4
+            },
+            services: {
+                dnsmasq_running: ($dnsmasq_running == "true"),
+                pppoe_interfaces: $pppoe_interfaces,
+                dhcp_leases: $dhcp_leases,
+                pppoe_sessions: $pppoe_sessions,
+                shaping_status: $shaping_status
+            },
+            observed_at: $observed_at
+        }'
+}
+
+case "${command_name}" in
+    apply)
+        if [ -z "${overlay_dir}" ] || [ -z "${operation_id}" ]; then
+            echo "apply requires --overlay and --operation" >&2
+            exit 1
+        fi
+
+        backup_config
+
+        # Gate BEFORE mutating /etc/config so a refused apply leaves running config untouched.
+        entitlements_src=""
+        if [ -f "${overlay_dir}/etc/nurrouter/license-entitlements.json" ]; then
+            entitlements_src="${overlay_dir}/etc/nurrouter/license-entitlements.json"
+        elif [ -f /etc/nurrouter/license-entitlements.json ]; then
+            entitlements_src="/etc/nurrouter/license-entitlements.json"
+        fi
+
+        if [ -n "${entitlements_src}" ] && command -v jq >/dev/null 2>&1; then
+            max_sessions="$(jq -r '.max_pppoe_sessions // 0' "${entitlements_src}")"
+            if [ "${max_sessions}" -gt 0 ] 2>/dev/null; then
+                staged_pppoe=0
+                if [ -f "${overlay_dir}/etc/config/network" ]; then
+                    staged_pppoe="$(grep -c "option proto 'pppoe'" "${overlay_dir}/etc/config/network" 2>/dev/null || echo 0)"
+                fi
+                if [ "${staged_pppoe}" -gt "${max_sessions}" ] 2>/dev/null; then
+                    echo "PPPoE admission limit ${max_sessions}; staged config has ${staged_pppoe}. Established sessions are preserved; reduce profiles and re-apply." >&2
+                    exit 20
+                fi
+            fi
+        fi
+
+        # Refuse entitlement-gated mutations when the signed license policy blocks them.
+        if command -v nur-license-check >/dev/null 2>&1 && command -v jq >/dev/null 2>&1; then
+            license_state_json="$(nur-license-check 2>/dev/null || true)"
+            if [ -n "${license_state_json}" ]; then
+                allow_mutations="$(printf '%s' "${license_state_json}" | jq -r '.allow_entitlement_mutations // true')"
+                if [ "${allow_mutations}" = "false" ]; then
+                    echo "License policy blocks entitlement-gated configuration changes (allow_entitlement_mutations=false). Existing traffic and local recovery are preserved." >&2
+                    exit 21
+                fi
+            fi
+        fi
+
+        for config_name in network dhcp firewall; do
+            if [ -f "${overlay_dir}/etc/config/${config_name}" ]; then
+                temp_target="/etc/config/${config_name}.nurrouter.$$"
+                cp "${overlay_dir}/etc/config/${config_name}" "${temp_target}"
+                chmod 600 "${temp_target}"
+                mv "${temp_target}" "/etc/config/${config_name}"
+            fi
+        done
+
+        mkdir -p /etc/nurrouter
+        if [ -f "${overlay_dir}/etc/nurrouter/pppoe-shaping.json" ]; then
+            cp "${overlay_dir}/etc/nurrouter/pppoe-shaping.json" /etc/nurrouter/pppoe-shaping.json
+            chmod 600 /etc/nurrouter/pppoe-shaping.json
+        fi
+        if [ -f "${overlay_dir}/etc/nurrouter/license-entitlements.json" ]; then
+            cp "${overlay_dir}/etc/nurrouter/license-entitlements.json" /etc/nurrouter/license-entitlements.json
+            chmod 644 /etc/nurrouter/license-entitlements.json
+        fi
+
+        reload_services
+
+        # Apply PPPoE profile rate limits once L3 devices exist (skip when shaping feature absent).
+        allow_shape=1
+        if [ -f /etc/nurrouter/license-entitlements.json ] && command -v jq >/dev/null 2>&1; then
+            if ! jq -e '.features | index("shaping")' /etc/nurrouter/license-entitlements.json >/dev/null 2>&1; then
+                allow_shape=0
+            fi
+        fi
+        if [ "${allow_shape}" -eq 1 ] && [ -f /etc/nurrouter/pppoe-shaping.json ] && command -v jq >/dev/null 2>&1; then
+            sleep 2
+            jq -c '.[]?' /etc/nurrouter/pppoe-shaping.json 2>/dev/null | while read -r row; do
+                name="$(printf '%s' "${row}" | jq -r '.name // empty')"
+                download_kbps="$(printf '%s' "${row}" | jq -r '.download_kbps // 0')"
+                upload_kbps="$(printf '%s' "${row}" | jq -r '.upload_kbps // 0')"
+                [ -n "${name}" ] || continue
+                l3="$(ubus call "network.interface.${name}" status 2>/dev/null | jq -r '.["l3_device"] // empty')"
+                [ -n "${l3}" ] || continue
+                /usr/sbin/nur-pppoe-shape "${l3}" "${download_kbps}" "${upload_kbps}" >/dev/null 2>&1 || true
+            done
+        fi
+
+        if [ "${safe_mode_seconds}" -gt 0 ] 2>/dev/null; then
+            deadline_epoch="$(( $(date +%s) + safe_mode_seconds ))"
+            cat >"${PENDING_ROOT}/${operation_id}.env" <<EOF
+DEADLINE_EPOCH=${deadline_epoch}
+BACKUP_DIR=${BACKUP_ROOT}/${operation_id}
+EOF
+        fi
+
+        observe_state
+        ;;
+    confirm)
+        if [ -z "${operation_id}" ]; then
+            echo "confirm requires --operation" >&2
+            exit 1
+        fi
+
+        rm -f "${PENDING_ROOT}/${operation_id}.env"
+        observe_state
+        ;;
+    expire)
+        if [ -z "${operation_id}" ]; then
+            echo "expire requires --operation" >&2
+            exit 1
+        fi
+
+        if [ ! -f "${PENDING_ROOT}/${operation_id}.env" ]; then
+            exit 0
+        fi
+
+        restore_backup
+        reload_services
+        rm -f "${PENDING_ROOT}/${operation_id}.env"
+        observe_state
+        ;;
+    observe)
+        observe_state
+        ;;
+    *)
+        echo "usage: nur-runtimectl {apply|confirm|expire|observe} [--overlay dir] [--operation id] [--safe-mode-seconds seconds]" >&2
+        exit 1
+        ;;
+esac

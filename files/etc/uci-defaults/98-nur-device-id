@@ -1,0 +1,15 @@
+#!/bin/sh
+# Unique first-boot device identity for license binding.
+set -eu
+
+ID_FILE="/etc/nurrouter/device-id"
+mkdir -p /etc/nurrouter
+
+if [ ! -s "${ID_FILE}" ]; then
+    # Prefer machine-id / product UUID style entropy when present.
+    seed="$(cat /proc/sys/kernel/random/uuid 2>/dev/null || date +%s%N)"
+    printf 'nur-%s\n' "$(printf '%s' "${seed}" | sha256sum | awk '{print substr($1,1,32)}')" > "${ID_FILE}"
+    chmod 0644 "${ID_FILE}"
+fi
+
+exit 0

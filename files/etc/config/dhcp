@@ -1,0 +1,16 @@
+# Generated NUR WinControl DHCP and DNS preview
+config dnsmasq 'main'
+    option domainneeded '1'
+    option boguspriv '1'
+    option localservice '1'
+    option noresolv '1'
+    list server '203.0.113.1'
+    # search domain lab.nur
+
+config dhcp 'eth1'
+    option interface 'eth1'
+    option start '100'
+    option limit '50'
+    option leasetime '12h'
+    option domain 'lab.nur'
+    list dhcp_option '6,10.10.10.1'

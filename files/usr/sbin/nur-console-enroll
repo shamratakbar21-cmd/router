@@ -1,0 +1,111 @@
+#!/bin/sh
+# Local-console enrollment helper for NurRouterOS.
+# Run from the appliance serial/VGA console only (no remote endpoint).
+set -eu
+
+BOOTSTRAP_FILE="/etc/nurrouter/bootstrap/credentials"
+DEVICE_ID_FILE="/etc/nurrouter/device-id"
+IDENTITY_FILE="/etc/nurrouter/identity/device.json"
+MGMT_KEYS="/etc/nurrouter/mgmt/.ssh/authorized_keys"
+ENROLLED_MARKER="/etc/nurrouter/bootstrap/enrolled"
+
+say() { printf '%s\n' "$*"; }
+
+require_console() {
+    # Best-effort: refuse if stdin is clearly an SSH session.
+    if [ -n "${SSH_CONNECTION:-}" ] || [ -n "${SSH_CLIENT:-}" ]; then
+        say "ERROR: nur-console-enroll must be run from the local console, not over SSH."
+        exit 1
+    fi
+}
+
+show_status() {
+    device_id=""
+    [ -f "${DEVICE_ID_FILE}" ] && device_id="$(tr -d '\n' < "${DEVICE_ID_FILE}")"
+    [ -z "${device_id}" ] && [ -f "${IDENTITY_FILE}" ] && device_id="$(awk -F'"' '/device_id/ { print $4; exit }' "${IDENTITY_FILE}")"
+
+    say "NurRouterOS console enrollment"
+    say "  device_id : ${device_id:-unknown}"
+    if [ -f "${BOOTSTRAP_FILE}" ]; then
+        say "  bootstrap credentials file: ${BOOTSTRAP_FILE} (mode $(stat -c '%a' "${BOOTSTRAP_FILE}" 2>/dev/null || echo '?'))"
+    fi
+    if [ -f /etc/dropbear/dropbear_ed25519_host_key ]; then
+        if command -v dropbearkey >/dev/null 2>&1; then
+            say "  SSH host key (ed25519):"
+            dropbearkey -y -f /etc/dropbear/dropbear_ed25519_host_key 2>/dev/null | sed 's/^/    /' || true
+        fi
+    fi
+    if [ -f "${ENROLLED_MARKER}" ]; then
+        say "  enrollment : complete ($(cat "${ENROLLED_MARKER}"))"
+    else
+        say "  enrollment : pending (remote password SSH disabled; management keys empty or untrusted)"
+    fi
+    say ""
+    say "Remote administration requires a nur-mgmt forced-command key. PasswordAuth is off."
+}
+
+enroll_key() {
+    pubkey_file="${1:-}"
+    if [ -z "${pubkey_file}" ] || [ ! -f "${pubkey_file}" ]; then
+        say "usage: nur-console-enroll enroll-key /path/to/wincontrol.pub"
+        exit 2
+    fi
+
+    mkdir -p "$(dirname "${MGMT_KEYS}")"
+    chmod 0700 "$(dirname "${MGMT_KEYS}")" "$(dirname "$(dirname "${MGMT_KEYS}")")" 2>/dev/null || true
+    touch "${MGMT_KEYS}"
+    chmod 0600 "${MGMT_KEYS}"
+
+    # Strip any existing forced-command wrapper; always re-wrap.
+    key_line="$(tr -d '\r' < "${pubkey_file}" | sed '/^$/d;/^#/d' | head -n1)"
+    case "${key_line}" in
+        ssh-ed25519\ *|ssh-rsa\ *|ecdsa-sha2-*) ;;
+        command=*)
+            # Already has options; still force nur-mgmt-ssh.
+            key_line="$(printf '%s\n' "${key_line}" | sed 's/^command="[^"]*",*//')"
+            ;;
+        *)
+            say "ERROR: unrecognized public key format."
+            exit 1
+            ;;
+    esac
+
+    printf 'command="/usr/sbin/nur-mgmt-ssh",no-port-forwarding,no-agent-forwarding,no-X11-forwarding,no-pty %s\n' "${key_line}" >> "${MGMT_KEYS}"
+
+    date -u +%Y-%m-%dT%H:%M:%SZ > "${ENROLLED_MARKER}"
+    chmod 0644 "${ENROLLED_MARKER}"
+
+    # Keep password SSH disabled; WinControl uses key+forced-command only.
+    uci -q batch <<'EOF'
+set dropbear.main.PasswordAuth='off'
+set dropbear.main.RootPasswordAuth='off'
+set dropbear.main.Interface='management'
+commit dropbear
+EOF
+    /etc/init.d/dropbear restart 2>/dev/null || true
+
+    say "Enrolled management key into ${MGMT_KEYS}"
+    say "Host-key pin must be registered in WinControl out-of-band."
+    say "Enrollment marker written to ${ENROLLED_MARKER}"
+}
+
+show_bootstrap_secret() {
+    if [ ! -f "${BOOTSTRAP_FILE}" ]; then
+        say "No bootstrap credentials file."
+        exit 1
+    fi
+    say "Local bootstrap credentials (console disclosure only):"
+    sed 's/^/  /' "${BOOTSTRAP_FILE}"
+}
+
+require_console
+
+case "${1:-status}" in
+    status) show_status ;;
+    show-bootstrap) show_bootstrap_secret ;;
+    enroll-key) enroll_key "${2:-}" ;;
+    *)
+        say "usage: nur-console-enroll {status|show-bootstrap|enroll-key <pubkey-file>}"
+        exit 2
+        ;;
+esac

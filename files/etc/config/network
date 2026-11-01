@@ -1,0 +1,21 @@
+# Generated NUR WinControl network preview
+config interface 'management'
+    option proto 'static'
+    option device 'eth0'
+    option ipaddr '192.0.2.2'
+    option netmask '255.255.255.0'
+
+config interface 'eth1'
+    option device 'eth1'
+    option proto 'static'
+    option ipaddr '10.10.10.1'
+    option netmask '255.255.255.0'
+config interface 'wan_pppoe'
+    option proto 'pppoe'
+    option device 'eth2'
+    option username 'lab-user'
+    option password '***redacted***'
+    option service 'nur-isp'
+    option mtu '1492'
+    option defaultroute '1'
+

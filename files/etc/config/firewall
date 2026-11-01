@@ -1,0 +1,45 @@
+# Generated NUR WinControl firewall preview
+config defaults
+    option input 'DROP'
+    option output 'ACCEPT'
+    option forward 'DROP'
+    option synflood_protect '1'
+
+config zone
+    option name 'management'
+    list network 'management'
+    option input 'ACCEPT'
+    option output 'ACCEPT'
+    option forward 'DROP'
+
+config zone
+    option name 'lan'
+    list network 'eth1'
+    option input 'ACCEPT'
+    option output 'ACCEPT'
+    option forward 'ACCEPT'
+
+config zone
+    option name 'wan'
+    list network 'wan_pppoe'
+    option input 'DROP'
+    option output 'ACCEPT'
+    option forward 'DROP'
+    option mtu_fix '1'
+    option masq '1'
+
+config forwarding
+    option src 'lan'
+    option dest 'wan'
+
+config rule
+    option name 'nur-drop-7016f906'
+    option target 'DROP'
+    option src 'lan'
+    option dest 'management'
+
+config rule
+    option name 'nur-accept-91b34d3f'
+    option target 'ACCEPT'
+    option src 'lan'
+    option dest 'wan'

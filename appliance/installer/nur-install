@@ -1,0 +1,771 @@
+#!/bin/sh
+# NurRouterOS universal bare-metal installer.
+#
+# Design rules:
+#   * The target disk is never chosen automatically. It must be named on the
+#     kernel command line (nur.disk=/dev/xxx) or selected interactively, and it
+#     must be confirmed a second time before anything is written.
+#   * The installer refuses to run without an explicit, confirmed target.
+#   * Only the payload shipped on the installer media is written, and it is
+#     checksum-verified before and after the write.
+#
+# Kernel command line / CLI options:
+#   nur.disk=/dev/sdX        explicit target disk (required for unattended runs)
+#   nur.confirm=ERASE-sdX    unattended confirmation token for that disk
+#   nur.firmware=auto|bios|uefi
+#   nur.rootfs=ext4|squashfs
+#   nur.grow=yes|no          grow the rootfs to fill the disk (ext4 payload only)
+#   nur.interactive=0|1      default 1; 0 disables all prompts
+#   nur.autoreboot=0|1       default 0
+#   nur.dryrun=1             validate only, never write
+
+set -u
+# BusyBox ash supports pipefail; without it a failed gzip in a pipeline would
+# still look like a successful dd and the installer could report success.
+set -o pipefail
+
+PROGRAM_NAME="nur-install"
+PAYLOAD_DIR="/mnt/cdrom/payload"
+RECORD_DIR="/etc/nurrouter-installer"
+MOUNT_TARGET="/mnt/target"
+PROMPT_TIMEOUT="120"
+
+EXIT_NO_TARGET=2
+EXIT_NOT_CONFIRMED=3
+EXIT_BAD_PAYLOAD=4
+EXIT_WRITE_FAILED=5
+EXIT_VERIFY_FAILED=6
+EXIT_DISK_TOO_SMALL=7
+EXIT_UNSUPPORTED=8
+EXIT_SOURCE_DISK=9
+
+DISK=""
+CONFIRM=""
+FIRMWARE="auto"
+ROOTFS_VARIANT="ext4"
+GROW="yes"
+INTERACTIVE="1"
+AUTOROBOOT="0"
+DRYRUN="0"
+FAILED="0"
+WRITE_STARTED="0"
+ASK_ANSWER=""
+
+# ---------------------------------------------------------------------------
+# Output helpers
+# ---------------------------------------------------------------------------
+
+say() {
+    printf '%s\n' "$*"
+}
+
+rule() {
+    say "--------------------------------------------------------------"
+}
+
+fatal() {
+    FAILED="1"
+    say ""
+    say "ERROR: $*"
+    say ""
+}
+
+# ---------------------------------------------------------------------------
+# Option handling
+# ---------------------------------------------------------------------------
+
+parse_options() {
+    while [ "$#" -gt 0 ]; do
+        case "$1" in
+            --disk) DISK="$2"; shift 2 ;;
+            --disk=*) DISK="${1#--disk=}"; shift ;;
+            --confirm) CONFIRM="$2"; shift 2 ;;
+            --confirm=*) CONFIRM="${1#--confirm=}"; shift ;;
+            --firmware) FIRMWARE="$2"; shift 2 ;;
+            --firmware=*) FIRMWARE="${1#--firmware=}"; shift ;;
+            --rootfs) ROOTFS_VARIANT="$2"; shift 2 ;;
+            --rootfs=*) ROOTFS_VARIANT="${1#--rootfs=}"; shift ;;
+            --no-grow) GROW="no"; shift ;;
+            --non-interactive) INTERACTIVE="0"; shift ;;
+            --autoreboot) AUTOROBOOT="1"; shift ;;
+            --dry-run) DRYRUN="1"; shift ;;
+            -h|--help) usage; exit 0 ;;
+            *) say "WARNING: ignoring unknown argument '$1'"; shift ;;
+        esac
+    done
+}
+
+parse_cmdline() {
+    for argument in $(cat /proc/cmdline); do
+        case "${argument}" in
+            nur.disk=*) DISK="${argument#nur.disk=}" ;;
+            nur.confirm=*) CONFIRM="${argument#nur.confirm=}" ;;
+            nur.firmware=*) FIRMWARE="${argument#nur.firmware=}" ;;
+            nur.rootfs=*) ROOTFS_VARIANT="${argument#nur.rootfs=}" ;;
+            nur.grow=*) GROW="${argument#nur.grow=}" ;;
+            nur.interactive=*) INTERACTIVE="${argument#nur.interactive=}" ;;
+            nur.autoreboot=1|nur.autoreboot=yes|nur.autoreboot=true) AUTOROBOOT="1" ;;
+            nur.autoreboot=0|nur.autoreboot=no|nur.autoreboot=false) AUTOROBOOT="0" ;;
+            nur.dryrun=1|nur.dryrun=yes|nur.dryrun=true) DRYRUN="1" ;;
+        esac
+    done
+}
+
+usage() {
+    cat <<'EOF'
+NurRouterOS installer
+
+  nur-install --disk /dev/sdX --confirm ERASE-sdX [options]
+
+Options:
+  --disk /dev/sdX        Explicit target disk.
+  --confirm ERASE-sdX    Required unattended confirmation token.
+  --firmware auto|bios|uefi
+  --rootfs ext4|squashfs
+  --no-grow              Do not grow the rootfs partition to fill the disk.
+  --non-interactive      Never prompt; fail instead of asking.
+  --autoreboot           Reboot when the installation finished.
+  --dry-run              Validate everything, write nothing.
+EOF
+}
+
+# ---------------------------------------------------------------------------
+# Device nodes
+# ---------------------------------------------------------------------------
+
+# The appliance kernel has no devtmpfs and BusyBox has no mdev, so device nodes
+# are created from sysfs. This is re-run whenever a partition table changes.
+refresh_device_nodes() {
+    if [ -x /usr/sbin/nur-devnodes ]; then
+        /usr/sbin/nur-devnodes >/dev/null 2>&1
+    fi
+    return 0
+}
+
+# ---------------------------------------------------------------------------
+# Disk discovery
+# ---------------------------------------------------------------------------
+
+parent_disk() {
+    device="$1"
+    case "${device}" in
+        /dev/nvme*|/dev/mmcblk*) printf '%s\n' "${device%p[0-9]*}" ;;
+        /dev/*[0-9]) printf '%s\n' "${device%[0-9]*}" ;;
+        *) printf '%s\n' "${device}" ;;
+    esac
+}
+
+media_disk() {
+    source_device="$(awk '$2 == "/mnt/cdrom" { print $1; exit }' /proc/mounts)"
+    [ -n "${source_device}" ] || return 1
+    parent_disk "${source_device}"
+}
+
+candidate_disks() {
+    media="$(media_disk 2>/dev/null)"
+    for sysfs_path in /sys/block/*; do
+        [ -d "${sysfs_path}" ] || continue
+        name="${sysfs_path##*/}"
+        case "${name}" in
+            loop*|ram*|sr*|zram*|dm-*|md*|nbd*|fd*) continue ;;
+        esac
+        [ -e "${sysfs_path}/device" ] || continue
+        [ -r "${sysfs_path}/size" ] || continue
+        device="/dev/${name}"
+        # Never offer the disk that carries the installer media.
+        [ -n "${media}" ] && [ "${device}" = "${media}" ] && continue
+        printf '%s\n' "${device}"
+    done
+}
+
+disk_bytes() {
+    name="${1##*/}"
+    sectors="$(cat "/sys/block/${name}/size" 2>/dev/null || echo 0)"
+    printf '%s\n' "$((sectors * 512))"
+}
+
+human_size() {
+    bytes="$1"
+    if [ "${bytes}" -ge 1000000000000 ]; then
+        printf '%s TB' "$((bytes / 1000000000000))"
+    elif [ "${bytes}" -ge 1000000000 ]; then
+        printf '%s GB' "$((bytes / 1000000000))"
+    elif [ "${bytes}" -ge 1000000 ]; then
+        printf '%s MB' "$((bytes / 1000000))"
+    else
+        printf '%s KB' "$((bytes / 1000))"
+    fi
+}
+
+disk_description() {
+    name="${1##*/}"
+    vendor="$(cat "/sys/block/${name}/device/vendor" 2>/dev/null | tr -d '\n')"
+    model="$(cat "/sys/block/${name}/device/model" 2>/dev/null | tr -d '\n')"
+    description="$(printf '%s %s' "${vendor}" "${model}" | tr -s ' ' | sed 's/^ *//; s/ *$//')"
+    [ -n "${description}" ] || description="unknown model"
+    printf '%s\n' "${description}"
+}
+
+disk_is_mounted() {
+    disk="$1"
+    while read -r source _mountpoint _rest; do
+        case "${source}" in
+            "${disk}"|"${disk}"*) 
+                [ "$(parent_disk "${source}")" = "${disk}" ] && return 0
+                ;;
+        esac
+    done < /proc/mounts
+    return 1
+}
+
+# ---------------------------------------------------------------------------
+# Interactive prompting
+# ---------------------------------------------------------------------------
+
+# The answer is returned in ASK_ANSWER instead of on stdout: a command
+# substitution would otherwise capture the prompt text as well.
+ask() {
+    prompt="$1"
+    default_value="${2:-}"
+    ASK_ANSWER=""
+    [ "${INTERACTIVE}" = "1" ] || return 1
+    if [ -n "${default_value}" ]; then
+        printf '%s [%s]: ' "${prompt}" "${default_value}"
+    else
+        printf '%s: ' "${prompt}"
+    fi
+    if ! read -r -t "${PROMPT_TIMEOUT}" answer; then
+        say ""
+        say "No answer within ${PROMPT_TIMEOUT}s; refusing to continue unattended."
+        return 1
+    fi
+    [ -n "${answer}" ] || answer="${default_value}"
+    ASK_ANSWER="${answer}"
+    return 0
+}
+
+require_confirmation() {
+    device="$1"
+    expected="ERASE-${device##*/}"
+
+    if [ "${INTERACTIVE}" != "1" ]; then
+        if [ "${CONFIRM}" != "${expected}" ]; then
+            fatal "unattended installation requires --confirm ${expected} (or nur.confirm=${expected})."
+            return 1
+        fi
+        return 0
+    fi
+
+    say ""
+    rule
+    say " LAST CHANCE"
+    rule
+    say " Every partition table and filesystem on ${device} will be destroyed."
+    say " Type EXACTLY the following to continue:  ${expected}"
+    say ""
+    printf 'confirmation: '
+    if ! read -r -t "${PROMPT_TIMEOUT}" typed; then
+        say ""
+        fatal "no confirmation received within ${PROMPT_TIMEOUT}s; nothing was written."
+        return 1
+    fi
+    if [ "${typed}" != "${expected}" ]; then
+        fatal "confirmation mismatch (got '${typed}', expected '${expected}'); nothing was written."
+        return 1
+    fi
+    return 0
+}
+
+select_disk() {
+    available="$(candidate_disks)"
+
+    if [ -z "${available}" ]; then
+        fatal "no installable disk found. Attach a target disk and retry."
+        return 1
+    fi
+
+    if [ -n "${DISK}" ]; then
+        for candidate in ${available}; do
+            [ "${candidate}" = "${DISK}" ] && return 0
+        done
+        fatal "requested disk '${DISK}' is not an installable target on this system."
+        return 1
+    fi
+
+    say "Available target disks:"
+    index=1
+    for candidate in ${available}; do
+        bytes="$(disk_bytes "${candidate}")"
+        size="$(human_size "${bytes}")"
+        say "  ${index}) ${candidate}  ${size}  $(disk_description "${candidate}")"
+        index=$((index + 1))
+    done
+    say ""
+
+    if [ "${INTERACTIVE}" != "1" ]; then
+        fatal "no target disk specified. Pass nur.disk=/dev/xxx on the kernel command line."
+        return 1
+    fi
+
+    ask 'Select the target disk number (nothing is written yet)' || return 1
+    choice="${ASK_ANSWER}"
+    case "${choice}" in
+        ''|*[!0-9]*)
+            fatal "'${choice}' is not a disk number; nothing was written."
+            return 1
+            ;;
+    esac
+
+    index=1
+    for candidate in ${available}; do
+        if [ "${index}" = "${choice}" ]; then
+            DISK="${candidate}"
+            return 0
+        fi
+        index=$((index + 1))
+    done
+
+    fatal "disk number ${choice} is out of range; nothing was written."
+    return 1
+}
+
+# ---------------------------------------------------------------------------
+# Payload handling
+# ---------------------------------------------------------------------------
+
+resolve_firmware() {
+    case "${FIRMWARE}" in
+        auto)
+            if [ -d /sys/firmware/efi ]; then
+                FIRMWARE="uefi"
+            else
+                FIRMWARE="bios"
+            fi
+            ;;
+        bios|uefi) ;;
+        *)
+            fatal "unsupported firmware '${FIRMWARE}' (expected auto, bios or uefi)."
+            return 1
+            ;;
+    esac
+}
+
+payload_path() {
+    printf '%s\n' "${PAYLOAD_DIR}/nurrouteros-${FIRMWARE}-${ROOTFS_VARIANT}.img.gz"
+}
+
+payload_uncompressed_bytes() {
+    path="$1"
+    name="${path##*/}"
+    recorded="$(awk -v target="${name}" '$2 == target { print $1; exit }' "${PAYLOAD_DIR}/SIZES" 2>/dev/null)"
+    if [ -n "${recorded}" ]; then
+        printf '%s\n' "${recorded}"
+        return 0
+    fi
+
+    # Fall back to a streaming count when SIZES is missing from older media.
+    gzip -dc "${path}" | wc -c
+}
+
+verify_payload() {
+    path="$1"
+
+    if [ ! -f "${path}" ]; then
+        fatal "payload '${path}' is missing from the installer media."
+        return 1
+    fi
+
+    name="${path##*/}"
+    expected="$(awk -v target="${name}" '$2 == target || $2 == "*"target { print $1; exit }' "${PAYLOAD_DIR}/SHA256SUMS" 2>/dev/null)"
+    if [ -z "${expected}" ]; then
+        fatal "no recorded checksum for '${name}' in ${PAYLOAD_DIR}/SHA256SUMS."
+        return 1
+    fi
+
+    say "Verifying ${name} ..."
+    # sha256sum is the authoritative integrity check. BusyBox gzip -t is not
+    # used here because it can false-fail on iso9660/virtio-backed installer
+    # media even when the payload hashes correctly.
+    actual="$(sha256sum "${path}" | awk '{ print $1 }')"
+    if [ "${actual}" != "${expected}" ]; then
+        fatal "payload checksum mismatch for ${name} (expected ${expected}, got ${actual})."
+        return 1
+    fi
+    say "  checksum OK: ${actual}"
+    return 0
+}
+
+refuse_source_disk() {
+    disk="$1"
+    media="$(media_disk 2>/dev/null)" || media=""
+    if [ -n "${media}" ] && [ "${disk}" = "${media}" ]; then
+        fatal "refusing to install onto the installer media disk (${disk})."
+        return 1
+    fi
+    return 0
+}
+
+refuse_undersized_disk() {
+    disk="$1"
+    path="$2"
+    need="$(payload_uncompressed_bytes "${path}")"
+    have="$(disk_bytes "${disk}")"
+
+    if [ -z "${need}" ] || [ "${need}" -le 0 ]; then
+        fatal "unable to determine the uncompressed payload size for ${path##*/}."
+        return 1
+    fi
+
+    if [ "${have}" -lt "${need}" ]; then
+        fatal "target ${disk} is too small ($(human_size "${have}")) for ${path##*/} ($(human_size "${need}"))."
+        return 1
+    fi
+
+    say "  target capacity OK: $(human_size "${have}") (payload $(human_size "${need}"))"
+    return 0
+}
+
+refuse_unsupported_growth() {
+    if [ "${GROW}" != "yes" ]; then
+        return 0
+    fi
+    if [ "${ROOTFS_VARIANT}" = "squashfs" ]; then
+        fatal "squashfs payloads do not support rootfs growth; pass nur.grow=no or --no-grow."
+        return 1
+    fi
+    return 0
+}
+
+# ---------------------------------------------------------------------------
+# Writing and verification
+# ---------------------------------------------------------------------------
+
+write_payload() {
+    disk="$1"
+    path="$2"
+
+    say "Writing ${path##*/} to ${disk} ..."
+    # pipefail is set globally so a gzip short-read / decompression failure
+    # cannot be masked by a successful dd exit status.
+    if ! gzip -dc "${path}" | dd of="${disk}" bs=1M conv=fsync 2>/tmp/nur-install-dd.err; then
+        fatal "writing the payload to ${disk} failed (decompression, short read, or write error)."
+        if [ -s /tmp/nur-install-dd.err ]; then
+            sed 's/^/  dd: /' /tmp/nur-install-dd.err
+        fi
+        return 1
+    fi
+    sync
+    say "  write finished"
+    return 0
+}
+
+verify_written_payload() {
+    disk="$1"
+    path="$2"
+    bytes="$(payload_uncompressed_bytes "${path}")"
+
+    say "Verifying the full written image (${bytes} bytes) against the payload ..."
+    # Compare every payload byte. -n stops at the image size so a larger target
+    # disk (normal for bare metal) does not look like a mismatch.
+    if ! gzip -dc "${path}" | cmp -s -n "${bytes}" - "${disk}"; then
+        fatal "full payload verification failed; the target does not match ${path##*/}."
+        return 1
+    fi
+    say "  full payload matches the target disk"
+    return 0
+}
+
+repair_partition_table() {
+    disk="$1"
+
+    if [ "${FIRMWARE}" != "uefi" ]; then
+        return 0
+    fi
+
+    # The GPT payload is written to a disk that is usually larger than the build
+    # image, so the secondary GPT ends up at the wrong offset. parted relocates
+    # it to the end of the device when it is allowed to fix problems.
+    if command -v parted >/dev/null 2>&1; then
+        say "Relocating the secondary GPT to the end of ${disk} ..."
+        if parted -s -f "${disk}" print >/dev/null 2>&1; then
+            say "  secondary GPT relocated"
+            return 0
+        fi
+        say "  parted could not relocate the secondary GPT; trying sgdisk."
+    fi
+
+    if command -v sgdisk >/dev/null 2>&1; then
+        if sgdisk --move-second-header "${disk}" >/dev/null 2>&1; then
+            say "  secondary GPT relocated with sgdisk"
+            return 0
+        fi
+    fi
+
+    if command -v gdisk >/dev/null 2>&1; then
+        if printf 'x\ne\nw\nY\n' | gdisk "${disk}" >/dev/null 2>&1; then
+            say "  secondary GPT relocated with gdisk"
+            return 0
+        fi
+    fi
+
+    say "WARNING: the secondary GPT could not be relocated on this media."
+    return 0
+}
+
+last_partition_number() {
+    disk="$1"
+    parted -m -s "${disk}" unit MiB print 2>/dev/null \
+        | awk -F: '$1 ~ /^[0-9]+$/ { number = $1 } END { print number }'
+}
+
+grow_rootfs() {
+    disk="$1"
+
+    # squashfs growth is rejected earlier by refuse_unsupported_growth when
+    # GROW=yes. This branch is only reached for ext4 payloads.
+    if [ "${ROOTFS_VARIANT}" != "ext4" ]; then
+        fatal "internal error: grow_rootfs called for unsupported rootfs '${ROOTFS_VARIANT}'."
+        return 1
+    fi
+
+    if ! command -v parted >/dev/null 2>&1 || ! command -v resize2fs >/dev/null 2>&1; then
+        fatal "parted/resize2fs unavailable; cannot grow the rootfs. Re-run with nur.grow=no."
+        return 1
+    fi
+
+    number="$(last_partition_number "${disk}")"
+    if [ -z "${number}" ]; then
+        fatal "unable to determine the rootfs partition; refusing to claim a successful grow."
+        return 1
+    fi
+
+    say "Growing partition ${number} on ${disk} to use the whole device ..."
+    if ! parted -s "${disk}" resizepart "${number}" 100% >/dev/null 2>&1; then
+        fatal "parted could not grow partition ${number}."
+        return 1
+    fi
+
+    # make the kernel pick up the new partition size
+    partx -u "${disk}" >/dev/null 2>&1
+    attempt=0
+    partition="$(partition_device "${disk}" "${number}")"
+    while [ ! -b "${partition}" ] && [ "${attempt}" -lt 10 ]; do
+        attempt=$((attempt + 1))
+        partx -a "${disk}" >/dev/null 2>&1
+        refresh_device_nodes
+        sleep 1
+    done
+
+    if [ ! -b "${partition}" ]; then
+        fatal "partition device ${partition} did not appear after grow; install is incomplete."
+        return 1
+    fi
+
+    say "  partition device: ${partition}"
+    e2fsck -f -y "${partition}" >/dev/null 2>&1
+    if ! resize2fs "${partition}" >/dev/null 2>&1; then
+        fatal "resize2fs failed on ${partition}; install is incomplete."
+        return 1
+    fi
+    say "  rootfs grown to the full device size"
+    sync
+    return 0
+}
+
+partition_device() {
+    disk="$1"
+    number="$2"
+    case "${disk}" in
+        /dev/nvme*|/dev/mmcblk*) printf '%s\n' "${disk}p${number}" ;;
+        *) printf '%s\n' "${disk}${number}" ;;
+    esac
+}
+
+write_install_record() {
+    disk="$1"
+    path="$2"
+    number="$(last_partition_number "${disk}")"
+    [ -n "${number}" ] || return 0
+
+    partition="$(partition_device "${disk}" "${number}")"
+    [ -b "${partition}" ] || return 0
+
+    mkdir -p "${MOUNT_TARGET}"
+    if ! mount -t ext4 "${partition}" "${MOUNT_TARGET}" 2>/dev/null; then
+        say "WARNING: unable to mount ${partition} to record the installation."
+        return 0
+    fi
+
+    mkdir -p "${MOUNT_TARGET}/etc/nurrouter-installer"
+    cat > "${MOUNT_TARGET}/etc/nurrouter-installer/install-record.json" <<EOF
+{
+  "installed_at_utc": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+  "installer_version": "$(cat "${RECORD_DIR}/version" 2>/dev/null || echo unknown)",
+  "target_disk": "${disk}",
+  "firmware": "${FIRMWARE}",
+  "rootfs_variant": "${ROOTFS_VARIANT}",
+  "partition_table": "$([ "${FIRMWARE}" = "uefi" ] && echo gpt || echo msdos)",
+  "payload": "${path##*/}",
+  "payload_sha256": "$(awk -v target="${path##*/}" '$2 == target { print $1 }' "${PAYLOAD_DIR}/SHA256SUMS")",
+  "boot_mode_detected": "$([ -d /sys/firmware/efi ] && echo uefi || echo bios)"
+}
+EOF
+    sync
+    umount "${MOUNT_TARGET}" 2>/dev/null
+    say "  installation record written to ${partition}:/etc/nurrouter-installer/install-record.json"
+    return 0
+}
+
+finish() {
+    if [ "${AUTOROBOOT}" = "1" ]; then
+        say "Rebooting ..."
+        sync
+        reboot -f
+        return 0
+    fi
+
+    if [ "${INTERACTIVE}" = "1" ]; then
+        say ""
+        say "Remove the installation media, then press Enter to reboot."
+        printf 'press Enter: '
+        read -r -t "${PROMPT_TIMEOUT}" _ignored
+        sync
+        reboot -f
+        return 0
+    fi
+
+    say ""
+    say "Installation finished. Remove the installation media, then power off the machine."
+    return 0
+}
+
+# ---------------------------------------------------------------------------
+# Main
+# ---------------------------------------------------------------------------
+
+main() {
+    parse_cmdline
+    parse_options "$@"
+
+    refresh_device_nodes
+
+    say ""
+    say "=============================================================="
+    say " NurRouterOS bare-metal installer"
+    say "=============================================================="
+
+    if ! resolve_firmware; then
+        say "Refusing to continue."
+        return "${EXIT_BAD_PAYLOAD}"
+    fi
+
+    if ! select_disk; then
+        say "Refusing to continue without an explicit target disk."
+        return "${EXIT_NO_TARGET}"
+    fi
+
+    if ! refuse_source_disk "${DISK}"; then
+        return "${EXIT_SOURCE_DISK}"
+    fi
+
+    if ! refuse_unsupported_growth; then
+        return "${EXIT_UNSUPPORTED}"
+    fi
+
+    bytes="$(disk_bytes "${DISK}")"
+    payload="$(payload_path)"
+
+    say ""
+    rule
+    say " Installation plan"
+    rule
+    say "  target disk     : ${DISK}"
+    say "  disk size       : $(human_size "${bytes}")"
+    say "  disk model      : $(disk_description "${DISK}")"
+    say "  firmware        : ${FIRMWARE} (detected: $([ -d /sys/firmware/efi ] && echo uefi || echo bios))"
+    say "  rootfs variant  : ${ROOTFS_VARIANT}"
+    say "  grow rootfs     : ${GROW}"
+    say "  payload         : ${payload##*/}"
+    say "  dry run         : ${DRYRUN}"
+    rule
+    say ""
+
+    if disk_is_mounted "${DISK}"; then
+        fatal "${DISK} or one of its partitions is in use; unmount it first."
+        return "${EXIT_WRITE_FAILED}"
+    fi
+
+    # Capacity is checked before the expensive checksum so undersized targets
+    # fail fast and interactive confirmation is not delayed by hashing.
+    if ! refuse_undersized_disk "${DISK}" "${payload}"; then
+        return "${EXIT_DISK_TOO_SMALL}"
+    fi
+
+    if ! require_confirmation "${DISK}"; then
+        say "Nothing was written to ${DISK}."
+        return "${EXIT_NOT_CONFIRMED}"
+    fi
+
+    if ! verify_payload "${payload}"; then
+        say "Refusing to continue with an unverified payload."
+        return "${EXIT_BAD_PAYLOAD}"
+    fi
+
+    if [ "${DRYRUN}" = "1" ]; then
+        say ""
+        say "Dry run requested: every safety check passed, nothing was written."
+        return 0
+    fi
+
+    WRITE_STARTED="1"
+    if ! write_payload "${DISK}" "${payload}"; then
+        return "${EXIT_WRITE_FAILED}"
+    fi
+
+    if ! verify_written_payload "${DISK}" "${payload}"; then
+        say "The target disk does not match the payload. Treat it as unusable."
+        return "${EXIT_VERIFY_FAILED}"
+    fi
+
+    repair_partition_table "${DISK}"
+    refresh_device_nodes
+
+    if [ "${GROW}" = "yes" ]; then
+        if ! grow_rootfs "${DISK}"; then
+            return "${EXIT_UNSUPPORTED}"
+        fi
+    fi
+
+    write_install_record "${DISK}" "${payload}"
+
+    sync
+    say ""
+    say "=============================================================="
+    say " NurRouterOS ${FIRMWARE} installation completed on ${DISK}"
+    say "=============================================================="
+    say ""
+
+    finish
+}
+
+main "$@"
+exit_code=$?
+if [ "${FAILED}" = "1" ] && [ "${exit_code}" = "0" ]; then
+    exit_code=1
+fi
+say ""
+say "${PROGRAM_NAME} exiting with status ${exit_code}."
+if [ "${FAILED}" = "1" ]; then
+    if [ "${WRITE_STARTED}" = "1" ]; then
+        say "A write was attempted; treat the target disk as incomplete until reinstalled."
+    else
+        say "No changes were made to the target disk."
+    fi
+fi
+say "This environment is an initramfs with no root filesystem to return to, so a"
+say "shell is kept open. Type 'poweroff' or 'reboot' when you are finished."
+
+while true; do
+    /bin/ash -l
+    say "Shell exited; restarting because the installer is PID 1."
+done

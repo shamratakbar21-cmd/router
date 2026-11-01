@@ -1,0 +1,11 @@
+[Unit]
+Description=NUR WinControl Safe Mode watchdog every minute
+
+[Timer]
+OnBootSec=45s
+OnUnitActiveSec=60s
+AccuracySec=1s
+Unit=nur-wincontrol-safemode.service
+
+[Install]
+WantedBy=timers.target

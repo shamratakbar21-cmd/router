@@ -1,0 +1,17 @@
+[Unit]
+Description=NurRouterOS Safe Mode watchdog sweep
+After=network-online.target
+Wants=network-online.target
+ConditionPathExists=/var/www/nurrouter.com/nurrouteros/management/artisan
+
+[Service]
+Type=oneshot
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/nurrouter.com/nurrouteros/management
+ExecStart=/usr/bin/php artisan nur:safe-mode-watchdog
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+ReadWritePaths=/var/www/nurrouter.com/nurrouteros/management/database /var/www/nurrouter.com/nurrouteros/management/storage /var/www/nurrouter.com/nurrouteros/management/bootstrap/cache

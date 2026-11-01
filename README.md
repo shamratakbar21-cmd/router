@@ -4,7 +4,7 @@
 
 QEMU/KVM pilot release. **Not production-ready or bare-metal qualified.**
 
-The reviewed source is published as `nurrouteros-0.4.0-rc.4-source.zip` in this repository. Download and extract it to inspect the source tree. This browser-based publication uses an archive; the repository does not contain an expanded source tree.
+The reviewed source is browsable directly in this repository under `agent/`, `appliance/`, `files/`, `management/`, and `docs/`. The unchanged `nurrouteros-0.4.0-rc.4-source.zip` remains available in the rc.4 release. The 211 expanded files match the archive manifest hashes and executable modes; this expansion does not rebuild or replace the installer.
 
 The archive derives from original source commit `53385154ecfb5e2c13adba4ca03cf6c12a2ee823`, with compiled executables and a generated lab overlay manifest excluded. Nine separately identified Go agent source/service files were captured from the existing working tree. They were untracked at the original commit. See `SOURCE-PROVENANCE.json` inside the archive for every file's origin, hash and mode.
 

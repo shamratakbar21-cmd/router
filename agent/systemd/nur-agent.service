@@ -1,0 +1,31 @@
+[Unit]
+Description=NurRouterOS privileged agent
+After=network-online.target
+Wants=network-online.target
+ConditionPathExists=/var/www/nurrouter.com/nurrouteros/agent/bin/nur-agent
+
+[Service]
+Type=simple
+User=root
+Group=root
+WorkingDirectory=/var/www/nurrouter.com/nurrouteros/agent
+UMask=0007
+ExecStart=/var/www/nurrouter.com/nurrouteros/agent/bin/nur-agent --socket=/var/www/nurrouter.com/nurrouteros/agent/run/nur-agent.sock --socket-mode=0660 --socket-group=www-data --allowed-peer-uids=0 --allowed-peer-gids=www-data --operation-timeout=10s
+Restart=on-failure
+RestartSec=2s
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectControlGroups=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+RestrictAddressFamilies=AF_UNIX AF_NETLINK AF_INET AF_INET6
+CapabilityBoundingSet=CAP_CHOWN CAP_NET_ADMIN CAP_NET_RAW
+ReadWritePaths=/var/www/nurrouter.com/nurrouteros/agent/run /run/netns
+
+[Install]
+WantedBy=multi-user.target

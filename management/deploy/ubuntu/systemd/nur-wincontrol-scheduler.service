@@ -1,0 +1,10 @@
+[Unit]
+Description=NUR WinControl scheduler tick
+After=network.target
+
+[Service]
+Type=oneshot
+User=__APP_USER__
+Group=__APP_USER__
+WorkingDirectory=__APP_ROOT__
+ExecStart=/usr/bin/php__PHP_VERSION__ artisan schedule:run --no-interaction

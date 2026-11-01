@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "keys": [
+    {
+      "key_id": "update-dev-placeholder",
+      "purpose": "update",
+      "algorithm": "Ed25519",
+      "public_key": "REPLACE_WITH_RELEASE_UPDATE_PUBLIC_KEY_BASE64",
+      "not_before": "2026-11-01T00:00:00Z",
+      "status": "placeholder"
+    }
+  ],
+  "notes": "Update-signing keys must never be the license-signing keys. Replace placeholder before enabling production OTA."
+}

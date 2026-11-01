@@ -1,0 +1,35 @@
+#!/bin/sh
+# Apply or clear HTB rate limits on a PPPoE L3 device.
+# Usage: nur-pppoe-shape <ifname> <download_kbps> <upload_kbps>
+# download = ingress toward LAN (IFB/ingress policer simplified as ingress police)
+# upload   = egress toward WAN (HTB root on device)
+set -eu
+
+IFACE="${1:-}"
+DOWNLOAD_KBPS="${2:-0}"
+UPLOAD_KBPS="${3:-0}"
+
+[ -n "${IFACE}" ] || { echo "usage: $0 <ifname> <download_kbps> <upload_kbps>" >&2; exit 1; }
+
+command -v tc >/dev/null 2>&1 || { echo "tc not available" >&2; exit 1; }
+
+# Clear existing qdiscs best-effort
+tc qdisc del dev "${IFACE}" root 2>/dev/null || true
+tc qdisc del dev "${IFACE}" ingress 2>/dev/null || true
+
+if [ "${UPLOAD_KBPS}" -gt 0 ] 2>/dev/null; then
+    RATE="${UPLOAD_KBPS}kbit"
+    tc qdisc add dev "${IFACE}" root handle 1: htb default 10
+    tc class add dev "${IFACE}" parent 1: classid 1:10 htb rate "${RATE}" ceil "${RATE}"
+    tc qdisc add dev "${IFACE}" parent 1:10 handle 10: fq_codel 2>/dev/null \
+        || tc qdisc add dev "${IFACE}" parent 1:10 handle 10: sfq
+fi
+
+if [ "${DOWNLOAD_KBPS}" -gt 0 ] 2>/dev/null; then
+    RATE="${DOWNLOAD_KBPS}kbit"
+    tc qdisc add dev "${IFACE}" handle ffff: ingress
+    tc filter add dev "${IFACE}" parent ffff: protocol ip u32 match u32 0 0 \
+        police rate "${RATE}" burst 32k drop flowid :1
+fi
+
+echo "{\"iface\":\"${IFACE}\",\"download_kbps\":${DOWNLOAD_KBPS},\"upload_kbps\":${UPLOAD_KBPS}}"

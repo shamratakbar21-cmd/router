@@ -1,0 +1,75 @@
+#!/bin/sh
+# Constrained management entrypoint for the nur-mgmt SSH identity.
+# Dropbear authorized_keys should use:
+# command="/usr/sbin/nur-mgmt-ssh",no-port-forwarding,no-agent-forwarding,no-X11-forwarding,no-pty
+set -eu
+
+ORIGINAL_COMMAND="${SSH_ORIGINAL_COMMAND:-}"
+
+reject() {
+    printf 'nur-mgmt-ssh: rejected: %s\n' "$*" >&2
+    exit 1
+}
+
+[ -n "${ORIGINAL_COMMAND}" ] || reject 'empty command'
+
+run_privileged() {
+    # Prefer the tiny setuid elevator (no sudo package required), then sudo, then root.
+    if [ -u /usr/sbin/nur-mgmt-elev ] || [ -x /usr/sbin/nur-mgmt-elev ]; then
+        exec /usr/sbin/nur-mgmt-elev "$@"
+    fi
+    if command -v sudo >/dev/null 2>&1; then
+        exec sudo -n "$@"
+    fi
+    if [ "$(id -u)" -eq 0 ]; then
+        exec "$@"
+    fi
+    reject 'privileged helper unavailable (nur-mgmt-elev/sudo missing and not root)'
+}
+
+# Allow legacy SCP of overlays into /tmp/nurrouter-overlay-* only.
+# OpenSSH "scp -O" commonly sends flags such as "-r -t <path>" or "-v -r -t <path>".
+is_overlay_scp=0
+case "${ORIGINAL_COMMAND}" in
+    scp\ *)
+        case "${ORIGINAL_COMMAND}" in
+            *\ -t\ /tmp/nurrouter-overlay-*|*\ -f\ /tmp/nurrouter-overlay-*|*\ -t\ --\ /tmp/nurrouter-overlay-*|*\ -f\ --\ /tmp/nurrouter-overlay-*)
+                is_overlay_scp=1
+                ;;
+        esac
+        ;;
+esac
+
+if [ "${is_overlay_scp}" -eq 1 ]; then
+    overlay_path="$(printf '%s\n' "${ORIGINAL_COMMAND}" | awk '{print $NF}')"
+    case "${overlay_path}" in
+        /tmp/nurrouter-overlay-[A-Za-z0-9._-]*)
+            exec /bin/sh -c "${ORIGINAL_COMMAND}"
+            ;;
+        *)
+            reject 'scp target not an allowed overlay path'
+            ;;
+    esac
+fi
+
+case "${ORIGINAL_COMMAND}" in
+    /usr/sbin/nur-runtimectl\ observe)
+        run_privileged /usr/sbin/nur-runtimectl observe
+        ;;
+    /usr/sbin/nur-runtimectl\ apply\ --overlay\ /tmp/nurrouter-overlay-*\ --operation\ *\ --safe-mode-seconds\ *)
+        # Re-parse into argv for the elevator (avoid shell as root).
+        # shellcheck disable=SC2086
+        set -- ${ORIGINAL_COMMAND}
+        run_privileged "$@"
+        ;;
+    /usr/sbin/nur-runtimectl\ confirm\ --operation\ *)
+        set -- ${ORIGINAL_COMMAND}
+        run_privileged "$@"
+        ;;
+    /bin/rm\ -rf\ --\ /tmp/nurrouter-overlay-*|/bin/rm\ -rf\ /tmp/nurrouter-overlay-*)
+        exec /bin/sh -c "${ORIGINAL_COMMAND}"
+        ;;
+    *)
+        reject "unsupported command"
+        ;;
+esac

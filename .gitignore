@@ -1,0 +1,64 @@
+downloads/
+output/
+work/
+
+agent/bin/
+agent/run/
+agent/state/
+agent/*.log
+
+management/.env
+management/.env.backup
+management/.env.production
+management/vendor/
+management/node_modules/
+management/public/build/
+management/public/hot
+management/storage/*.key
+management/storage/pail/
+management/database/*.sqlite
+management/database/*.sqlite-journal
+management/database/*.sqlite-shm
+management/database/*.sqlite-wal
+management/.phpunit.result.cache
+
+.DS_Store
+Thumbs.db
+
+# evidence may contain lab paths; keep secrets out
+**/known_hosts
+**/*_ed25519
+**/*.pem
+
+# Lab / local secrets and credentials
+**/.env
+**/.env.*
+!**/.env.example
+!**/*.env.example
+**/authorized_keys
+**/id_ed25519*
+**/id_rsa*
+**/*_ed25519
+**/*_rsa
+**/*.qcow2
+**/*.img
+**/*.iso
+**/known_hosts
+**/known_hosts.old
+
+# Management runtime
+management/storage/logs/
+management/storage/framework/
+management/storage/app/private/
+management/storage/app/nurrouter/
+management/bootstrap/cache/*.php
+
+# Evidence may include lab host keys / redacted dumps — keep local unless curated
+evidence/**/ssh/
+evidence/**/*unredacted*
+evidence/**/*.sqlite
+
+# Worktrees
+work/
+downloads/
+evidence/.local-private/

@@ -1,0 +1,33 @@
+/var/log/nginx/nur-wincontrol.*.log {
+    daily
+    missingok
+    rotate 14
+    compress
+    delaycompress
+    notifempty
+    create 0640 www-data adm
+    sharedscripts
+    postrotate
+        [ -x /usr/sbin/nginx ] && nginx -s reload >/dev/null 2>&1 || true
+    endscript
+}
+
+/opt/nur-wincontrol/storage/logs/*.log {
+    daily
+    missingok
+    rotate 14
+    compress
+    delaycompress
+    notifempty
+    copytruncate
+    create 0640 www-data www-data
+}
+
+/var/log/nur-wincontrol-backup.log {
+    weekly
+    missingok
+    rotate 8
+    compress
+    notifempty
+    copytruncate
+}

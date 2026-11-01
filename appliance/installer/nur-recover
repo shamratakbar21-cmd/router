@@ -1,0 +1,367 @@
+#!/bin/sh
+# NurRouterOS local recovery console.
+#
+# Runs from the installer media when the appliance cannot be reached over the
+# network. Everything here is deliberately explicit: no disk is ever modified
+# without the operator naming it and confirming the wipe token.
+#
+# Kernel command line switch:
+#   nur.mode=recovery
+
+set -u
+
+PROGRAM_NAME="nur-recover"
+PAYLOAD_DIR="/mnt/cdrom/payload"
+MOUNT_TARGET="/mnt/target"
+PROMPT_TIMEOUT="300"
+EXPECTED_CONFIRM_PREFIX="ERASE-"
+
+say() {
+    printf '%s\n' "$*"
+}
+
+rule() {
+    say "--------------------------------------------------------------"
+}
+
+pause() {
+    printf 'press Enter to continue: '
+    read -r -t "${PROMPT_TIMEOUT}" _ignored || say ""
+}
+
+parent_disk() {
+    device="$1"
+    case "${device}" in
+        /dev/nvme*|/dev/mmcblk*) printf '%s\n' "${device%p[0-9]*}" ;;
+        /dev/*[0-9]) printf '%s\n' "${device%[0-9]*}" ;;
+        *) printf '%s\n' "${device}" ;;
+    esac
+}
+
+partition_device() {
+    disk="$1"
+    number="$2"
+    case "${disk}" in
+        /dev/nvme*|/dev/mmcblk*) printf '%s\n' "${disk}p${number}" ;;
+        *) printf '%s\n' "${disk}${number}" ;;
+    esac
+}
+
+candidate_disks() {
+    media="$(awk '$2 == "/mnt/cdrom" { print $1; exit }' /proc/mounts 2>/dev/null)"
+    [ -n "${media}" ] && media="$(parent_disk "${media}")"
+    for sysfs_path in /sys/block/*; do
+        [ -d "${sysfs_path}" ] || continue
+        name="${sysfs_path##*/}"
+        case "${name}" in
+            loop*|ram*|sr*|zram*|dm-*|md*|nbd*|fd*) continue ;;
+        esac
+        [ -e "${sysfs_path}/device" ] || continue
+        device="/dev/${name}"
+        [ -n "${media}" ] && [ "${device}" = "${media}" ] && continue
+        printf '%s\n' "${device}"
+    done
+}
+
+disk_bytes() {
+    name="${1##*/}"
+    sectors="$(cat "/sys/block/${name}/size" 2>/dev/null || echo 0)"
+    printf '%s\n' "$((sectors * 512))"
+}
+
+human_size() {
+    bytes="$1"
+    if [ "${bytes}" -ge 1000000000000 ]; then
+        printf '%s TB' "$((bytes / 1000000000000))"
+    elif [ "${bytes}" -ge 1000000000 ]; then
+        printf '%s GB' "$((bytes / 1000000000))"
+    elif [ "${bytes}" -ge 1000000 ]; then
+        printf '%s MB' "$((bytes / 1000000))"
+    else
+        printf '%s KB' "$((bytes / 1000))"
+    fi
+}
+
+# ---------------------------------------------------------------------------
+# Actions
+# ---------------------------------------------------------------------------
+
+show_media_manifest() {
+    rule
+    say " Installer media manifest"
+    rule
+    if [ -r /etc/nurrouter-installer/manifest ]; then
+        cat /etc/nurrouter-installer/manifest
+    else
+        say " (no manifest on this media)"
+    fi
+    say ""
+}
+
+inspect_install_record() {
+    partition="$1"
+    record="${MOUNT_TARGET}/etc/nurrouter-installer/install-record.json"
+
+    if [ ! -r "${record}" ]; then
+        return 1
+    fi
+
+    if ! grep -q '"installed_at_utc"' "${record}" 2>/dev/null \
+        || ! grep -q '"payload_sha256"' "${record}" 2>/dev/null; then
+        say "      CORRUPT installation record on ${partition}:"
+        sed 's/^/      /' "${record}"
+        say "      diagnostic only — nothing was modified."
+        return 0
+    fi
+
+    sed 's/^/      /' "${record}"
+
+    # Interrupted installs often leave the record but no matching payload hash
+    # material, or a missing expected overlay marker.
+    if [ ! -d "${MOUNT_TARGET}/etc/nurrouter" ] && [ ! -f "${MOUNT_TARGET}/etc/openwrt_release" ]; then
+        say "      WARNING: record present but the rootfs does not look like a complete NurRouterOS install."
+        say "      Treat this disk as an interrupted installation; reinstall after confirmation."
+    fi
+    return 0
+}
+
+list_disks() {
+    rule
+    say " Attached disks and recorded installations"
+    rule
+    say " Inspection is read-only. Repairs that write to disk require an explicit"
+    say " confirmation token in a later menu action."
+    say ""
+
+    found=0
+    for disk in $(candidate_disks); do
+        found=1
+        say "  ${disk}  $(human_size "$(disk_bytes "${disk}")")"
+        say "    partitions:"
+        if ! parted -m -s "${disk}" unit MiB print 2>/dev/null \
+            | awk -F: '$1 ~ /^[0-9]+$/ { printf "      %s  %s -> %s\n", $1, $4, $5 }'
+        then
+            say "      (partition table unreadable — possible interrupted write)"
+        fi
+        say ""
+        say "    installation record:"
+        shown=0
+        for partition in "${disk}"*; do
+            [ -b "${partition}" ] || continue
+            [ "$(parent_disk "${partition}")" = "${disk}" ] || continue
+            mkdir -p "${MOUNT_TARGET}"
+            if mount -t ext4 -o ro "${partition}" "${MOUNT_TARGET}" 2>/dev/null; then
+                if inspect_install_record "${partition}"; then
+                    shown=1
+                fi
+                umount "${MOUNT_TARGET}" 2>/dev/null
+            fi
+        done
+        [ "${shown}" = "1" ] || say "      (none recorded)"
+        say ""
+    done
+
+    [ "${found}" = "1" ] || say "  no disks found (attach a disk or check cabling)"
+    say ""
+}
+
+verify_media() {
+    rule
+    say " Verifying installer media integrity"
+    rule
+    if [ ! -r "${PAYLOAD_DIR}/SHA256SUMS" ]; then
+        say "ERROR: ${PAYLOAD_DIR}/SHA256SUMS is missing."
+        return 1
+    fi
+    status=0
+    while read -r expected name; do
+        [ -n "${expected}" ] || continue
+        path="${PAYLOAD_DIR}/${name}"
+        if [ ! -f "${path}" ]; then
+            say "  MISSING  ${name}"
+            status=1
+            continue
+        fi
+        actual="$(sha256sum "${path}" | awk '{ print $1 }')"
+        if [ "${actual}" = "${expected}" ]; then
+            say "  OK       ${name}"
+        else
+            say "  CORRUPT  ${name}"
+            status=1
+        fi
+    done < "${PAYLOAD_DIR}/SHA256SUMS"
+    say ""
+    return "${status}"
+}
+
+reset_root_password() {
+    # LOCAL RECOVERY ONLY.
+    # This action is reachable solely from the installer/recovery serial or
+    # console that owns PID 1 on the boot media. There is no network listener,
+    # HTTP endpoint, or WinControl API that can clear an appliance root
+    # password. Physical (or equivalently authorized console) access to the
+    # recovery environment is the authorization boundary.
+    rule
+    say " Reset the root password of an installed NurRouterOS disk"
+    rule
+    say " LOCAL CONSOLE ONLY — this recovery media does not expose a remote"
+    say " password-reset service. Clearing the password requires the operator"
+    say " to sit at this console and type the ERASE-<disk> confirmation."
+    say " This writes /etc/shadow (and /etc/shadow.nur-backup) on the target"
+    say " rootfs. Remote password SSH remains disabled by Dropbear policy;"
+    say " the cleared password is for local console login / re-enrollment only."
+    say ""
+
+    index=1
+    disks="$(candidate_disks)"
+    [ -n "${disks}" ] || { say "ERROR: no disks found."; return 1; }
+
+    for disk in ${disks}; do
+        say "  ${index}) ${disk}  $(human_size "$(disk_bytes "${disk}")")"
+        index=$((index + 1))
+    done
+    printf 'Select the disk number (or Enter to cancel): '
+    if ! read -r -t "${PROMPT_TIMEOUT}" choice; then
+        say ""
+        say "No answer; cancelling."
+        return 1
+    fi
+    [ -n "${choice}" ] || { say "Cancelled."; return 1; }
+
+    case "${choice}" in
+        ''|*[!0-9]*) say "ERROR: '${choice}' is not a disk number."; return 1 ;;
+    esac
+
+    disk=""
+    index=1
+    for candidate in ${disks}; do
+        if [ "${index}" = "${choice}" ]; then
+            disk="${candidate}"
+            break
+        fi
+        index=$((index + 1))
+    done
+    [ -n "${disk}" ] || { say "ERROR: disk number out of range."; return 1; }
+
+    expected="${EXPECTED_CONFIRM_PREFIX}${disk##*/}"
+    say ""
+    say " Type EXACTLY '${expected}' to clear the root password on ${disk}:"
+    printf 'confirmation: '
+    if ! read -r -t "${PROMPT_TIMEOUT}" typed; then
+        say ""
+        say "No confirmation; nothing was changed."
+        return 1
+    fi
+    if [ "${typed}" != "${expected}" ]; then
+        say "Confirmation mismatch; nothing was changed."
+        return 1
+    fi
+
+    number="$(parted -m -s "${disk}" unit MiB print 2>/dev/null \
+        | awk -F: '$1 ~ /^[0-9]+$/ { n = $1 } END { print n }')"
+    if [ -z "${number}" ]; then
+        say "ERROR: unable to determine the rootfs partition on ${disk}."
+        return 1
+    fi
+
+    partition="$(partition_device "${disk}" "${number}")"
+    if [ ! -b "${partition}" ]; then
+        say "ERROR: partition device ${partition} is missing."
+        return 1
+    fi
+
+    mkdir -p "${MOUNT_TARGET}"
+    if ! mount -t ext4 "${partition}" "${MOUNT_TARGET}" 2>/dev/null; then
+        say "ERROR: unable to mount ${partition}; nothing was changed."
+        return 1
+    fi
+
+    shadow="${MOUNT_TARGET}/etc/shadow"
+    if [ ! -f "${shadow}" ]; then
+        say "ERROR: ${partition} has no /etc/shadow; not a NurRouterOS rootfs."
+        umount "${MOUNT_TARGET}" 2>/dev/null
+        return 1
+    fi
+
+    cp "${shadow}" "${shadow}.nur-backup"
+    if awk -F: 'BEGIN { OFS = ":" } $1 == "root" { $2 = "" } { print }' \
+        "${shadow}.nur-backup" > "${shadow}"; then
+        chmod 0600 "${shadow}" 2>/dev/null
+        say "  root password cleared on ${partition}"
+        say "  previous /etc/shadow kept as /etc/shadow.nur-backup"
+    else
+        say "ERROR: failed to rewrite ${shadow}; restoring the backup."
+        cp "${shadow}.nur-backup" "${shadow}"
+    fi
+
+    sync
+    umount "${MOUNT_TARGET}" 2>/dev/null
+    say ""
+    return 0
+}
+
+emergency_shell() {
+    say ""
+    say "Starting an emergency shell. The installer media is mounted read-only"
+    say "at /mnt/cdrom. Type 'exit' to return to this menu."
+    say ""
+    /bin/sh -l
+}
+
+install_appliance() {
+    say ""
+    say "Handing over to the NurRouterOS installer."
+    say ""
+    /usr/sbin/nur-install
+}
+
+show_menu() {
+    clear 2>/dev/null || true
+    say ""
+    say "=============================================================="
+    say " NurRouterOS recovery console"
+    say "=============================================================="
+    if [ -r /etc/nurrouter-installer/version ]; then
+        say " installer version: $(cat /etc/nurrouter-installer/version)"
+    fi
+    say ""
+    say " 1) Emergency shell"
+    say " 2) List attached disks and installation records"
+    say " 3) Verify installer media integrity"
+    say " 4) Reset the root password of an installed disk"
+    say " 5) Install / reinstall NurRouterOS"
+    say " r) Reboot"
+    say " p) Power off"
+    say ""
+}
+
+main() {
+    # The kernel provides no devtmpfs and BusyBox no mdev, so /dev is built
+    # from sysfs before anything is listed or mounted.
+    [ -x /usr/sbin/nur-devnodes ] && /usr/sbin/nur-devnodes >/dev/null 2>&1
+
+    while true; do
+        show_menu
+        printf 'recovery> '
+        if ! read -r -t "${PROMPT_TIMEOUT}" choice; then
+            say ""
+            say "No input; dropping to an emergency shell."
+            emergency_shell
+            continue
+        fi
+
+        case "${choice}" in
+            1) emergency_shell ;;
+            2) show_media_manifest; list_disks; pause ;;
+            3) verify_media; pause ;;
+            4) reset_root_password; pause ;;
+            5) install_appliance; pause ;;
+            r|R) sync; reboot -f ;;
+            p|P) sync; poweroff -f ;;
+            '') continue ;;
+            *) say "Unknown selection '${choice}'."; pause ;;
+        esac
+    done
+}
+
+main

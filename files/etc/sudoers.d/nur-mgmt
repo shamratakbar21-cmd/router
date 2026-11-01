@@ -1,0 +1,3 @@
+# NurRouterOS: constrained elevation for the WinControl management identity.
+# Keep this list tight — nur-mgmt-ssh still allowlists exact remote commands.
+nur-mgmt ALL=(root) NOPASSWD: /usr/sbin/nur-runtimectl, /bin/rm

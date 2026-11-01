@@ -1,0 +1,153 @@
+#!/bin/sh
+# First-boot NurRouterOS defaults.
+#
+# - Unique device identity and SSH host keys per instance
+# - Unique random root password (console only); never a universal default
+# - No packaged authorized_keys
+# - Remote password SSH disabled until/unless operators explicitly change policy
+# - Dropbear bound to the management interface for bootstrap
+# - LuCI/uhttpd disabled until local enrollment completes
+# - Local enrollment path: nur-console-enroll
+
+IDENTITY_DIR="/etc/nurrouter/identity"
+BOOTSTRAP_DIR="/etc/nurrouter/bootstrap"
+IDENTITY_FILE="${IDENTITY_DIR}/device.json"
+BOOTSTRAP_FILE="${BOOTSTRAP_DIR}/credentials"
+DEVICE_ID_FILE="/etc/nurrouter/device-id"
+ENROLLED_MARKER="${BOOTSTRAP_DIR}/enrolled"
+
+mkdir -p "${IDENTITY_DIR}" "${BOOTSTRAP_DIR}" /etc/nurrouter
+chmod 0700 "${IDENTITY_DIR}" "${BOOTSTRAP_DIR}"
+
+# Canonical device-id for licensing + identity JSON.
+if [ ! -s "${DEVICE_ID_FILE}" ]; then
+    seed="$(cat /proc/sys/kernel/random/uuid 2>/dev/null || date +%s%N)"
+    printf 'nur-%s\n' "$(printf '%s' "${seed}" | sha256sum | awk '{print substr($1,1,32)}')" > "${DEVICE_ID_FILE}"
+    chmod 0644 "${DEVICE_ID_FILE}"
+fi
+device_id="$(tr -d '\n' < "${DEVICE_ID_FILE}")"
+
+if [ ! -f "${IDENTITY_FILE}" ]; then
+    installed_at="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+    product_version="$(cat /etc/nurrouter/product-version 2>/dev/null || echo unknown)"
+    cat > "${IDENTITY_FILE}" <<EOF
+{
+  "device_id": "${device_id}",
+  "product": "NurRouterOS",
+  "product_version": "${product_version}",
+  "generated_at_utc": "${installed_at}",
+  "hostname": "NurRouterOS"
+}
+EOF
+    chmod 0600 "${IDENTITY_FILE}"
+fi
+
+# Unique root password for local console login. Never empty. Never universal.
+# Stored once in the local bootstrap credentials file (mode 0600).
+root_password=""
+if [ ! -f "${BOOTSTRAP_FILE}" ]; then
+    root_password="$(hexdump -n 12 -e '12/1 "%02x"' /dev/urandom 2>/dev/null || date +%s)"
+    bootstrap_token="$(hexdump -n 16 -e '16/1 "%02x"' /dev/urandom 2>/dev/null || date +%s)"
+    umask 077
+    cat > "${BOOTSTRAP_FILE}" <<EOF
+# NurRouterOS first-boot bootstrap credentials (local console only)
+# Remote password SSH is disabled. Use nur-console-enroll on the console.
+device_id=${device_id}
+bootstrap_token=${bootstrap_token}
+root_password=${root_password}
+generated_at_utc=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+EOF
+    chmod 0600 "${BOOTSTRAP_FILE}"
+
+    if command -v chpasswd >/dev/null 2>&1; then
+        printf 'root:%s\n' "${root_password}" | chpasswd
+    elif command -v passwd >/dev/null 2>&1; then
+        printf '%s\n%s\n' "${root_password}" "${root_password}" | passwd root >/dev/null 2>&1 || true
+    fi
+fi
+
+# Dropbear host keys (unique per instance) and remove any slipped-in authorized_keys.
+rm -f /etc/dropbear/authorized_keys
+mkdir -p /etc/dropbear
+chmod 0700 /etc/dropbear
+if command -v dropbearkey >/dev/null 2>&1; then
+    [ -f /etc/dropbear/dropbear_ed25519_host_key ] || dropbearkey -t ed25519 -f /etc/dropbear/dropbear_ed25519_host_key >/dev/null 2>&1
+    [ -f /etc/dropbear/dropbear_rsa_host_key ] || dropbearkey -t rsa -s 2048 -f /etc/dropbear/dropbear_rsa_host_key >/dev/null 2>&1
+fi
+
+# Harden remote administration before enrollment.
+uci -q batch <<'EOF'
+set system.@system[0].hostname='NurRouterOS'
+set system.@system[0].zonename='UTC'
+set system.@system[0].timezone='UTC'
+set network.lan.ipaddr='10.10.10.1'
+set network.lan.netmask='255.255.255.0'
+set dropbear.main.PasswordAuth='off'
+set dropbear.main.RootPasswordAuth='off'
+set dropbear.main.Interface='management'
+set dropbear.main.enable='1'
+delete uhttpd.main.listen_http
+delete uhttpd.main.listen_https
+set uhttpd.main.redirect_https='1'
+set uhttpd.main.home='/www'
+commit system
+commit network
+commit dropbear
+commit uhttpd
+EOF
+
+# Keep LuCI/uhttpd off until an operator enrolls and explicitly enables it.
+if command -v /etc/init.d/uhttpd >/dev/null 2>&1; then
+    /etc/init.d/uhttpd disable 2>/dev/null || true
+    /etc/init.d/uhttpd stop 2>/dev/null || true
+fi
+
+if command -v /etc/init.d/collectd >/dev/null 2>&1; then
+    /etc/init.d/collectd enable
+fi
+
+if command -v /etc/init.d/frr >/dev/null 2>&1; then
+    /etc/init.d/frr enable
+fi
+
+if command -v /etc/init.d/nur-runtime-watchdog >/dev/null 2>&1; then
+    /etc/init.d/nur-runtime-watchdog enable
+fi
+
+if command -v /etc/init.d/nur-agent >/dev/null 2>&1; then
+    /etc/init.d/nur-agent enable
+fi
+
+# Console-visible enrollment instructions (no secrets in motd).
+cat <<'EOF' >/etc/motd
+Welcome to NurRouterOS.
+
+First boot generates a unique device ID, SSH host keys, and a unique root
+password stored only in /etc/nurrouter/bootstrap/credentials (mode 0600).
+
+Remote password authentication is DISABLED.
+Dropbear listens on the management interface only.
+LuCI/uhttpd is disabled until you enroll from the local console.
+
+Local console enrollment:
+  nur-console-enroll status
+  nur-console-enroll show-bootstrap
+  nur-console-enroll enroll-key /path/to/wincontrol.pub
+
+Claim the appliance from external NUR WinControl after registering the
+SSH host-key pin out-of-band. Laravel does not run inside the appliance.
+
+Recovery: boot the installer ISO with nur.mode=recovery.
+EOF
+
+# One-time console banner with pointer to bootstrap file (not the password itself in clear if banner is networked).
+cat <<EOF >/etc/banner
+NurRouterOS first-boot
+device_id=${device_id}
+enrollment=pending (see nur-console-enroll)
+bootstrap_file=${BOOTSTRAP_FILE}
+EOF
+
+[ -f "${ENROLLED_MARKER}" ] || true
+
+exit 0

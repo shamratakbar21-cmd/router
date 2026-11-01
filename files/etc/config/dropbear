@@ -1,0 +1,10 @@
+# Pre-enrollment Dropbear defaults for NurRouterOS.
+# Password authentication is disabled. Listen only on the management interface.
+# Local console login remains available via getty after first-boot sets a unique root password.
+
+config dropbear 'main'
+	option enable '1'
+	option PasswordAuth 'off'
+	option RootPasswordAuth 'off'
+	option Port '22'
+	option Interface 'management'

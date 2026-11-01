@@ -1,0 +1,48 @@
+# NUR WinControl — dedicated ports so this VM never steals :80/:443 from other sites.
+server {
+    listen __HTTP_PORT__;
+    listen [::]:__HTTP_PORT__;
+    server_name __DOMAIN__;
+    return 301 https://$host:__HTTPS_PORT__$request_uri;
+}
+
+server {
+    listen __HTTPS_PORT__ ssl;
+    listen [::]:__HTTPS_PORT__ ssl;
+    server_name __DOMAIN__;
+
+    root __APP_ROOT__/public;
+    index index.php;
+
+    ssl_certificate     __CERT_DIR__/fullchain.pem;
+    ssl_certificate_key __CERT_DIR__/privkey.pem;
+    ssl_protocols       TLSv1.2 TLSv1.3;
+    ssl_prefer_server_ciphers off;
+
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header Referrer-Policy "no-referrer-when-downgrade" always;
+
+    client_max_body_size 32m;
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    location = /favicon.ico { access_log off; log_not_found off; }
+    location = /robots.txt  { access_log off; log_not_found off; }
+
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/run/php/php__PHP_VERSION__-fpm.sock;
+        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+        include fastcgi_params;
+    }
+
+    location ~ /\.(?!well-known).* {
+        deny all;
+    }
+
+    access_log /var/log/nginx/nur-wincontrol.access.log;
+    error_log  /var/log/nginx/nur-wincontrol.error.log;
+}

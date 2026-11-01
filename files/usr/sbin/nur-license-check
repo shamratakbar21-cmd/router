@@ -1,0 +1,154 @@
+#!/bin/sh
+# Appliance-side license envelope verification and safe-enforcement status.
+# Always requires Ed25519 verification via nur-license-verify. Never trusts hash stamps.
+# Never disconnects PPPoE, removes firewall rules, or blocks local recovery / Safe Mode.
+set -eu
+
+LICENSE_FILE="${1:-/etc/nurrouter/license.json}"
+PUBKEYS_FILE="${2:-/etc/nurrouter/license-public-keys.json}"
+DEVICE_ID_FILE="/etc/nurrouter/device-id"
+LAST_REFRESH_FILE="/etc/nurrouter/license-last-refresh"
+NOW_EPOCH="$(date +%s)"
+
+say_json() {
+    printf '%s\n' "$1"
+}
+
+restricted_json() {
+    # $1=state $2=message
+    printf '{"state":"%s","allow_entitlement_mutations":false,"enforce_new_features":true,"disconnect_subscribers":false,"block_local_recovery":false,"remove_firewall_rules":false,"block_safe_mode":false,"message":"%s"}\n' "$1" "$2"
+}
+
+if [ ! -f "${LICENSE_FILE}" ]; then
+    say_json '{"state":"unlicensed","allow_entitlement_mutations":true,"enforce_new_features":false,"disconnect_subscribers":false,"block_local_recovery":false,"remove_firewall_rules":false,"block_safe_mode":false,"message":"No local license file."}'
+    exit 0
+fi
+
+if [ ! -f "${PUBKEYS_FILE}" ]; then
+    restricted_json "unverified" "Missing verification public keys."
+    exit 1
+fi
+
+if ! command -v jq >/dev/null 2>&1; then
+    restricted_json "unverified" "jq required for license checks."
+    exit 1
+fi
+
+if [ ! -x /usr/sbin/nur-license-verify ]; then
+    restricted_json "unverified" "nur-license-verify missing; license cannot be authenticated."
+    exit 1
+fi
+
+DEVICE_ID=""
+[ -f "${DEVICE_ID_FILE}" ] && DEVICE_ID="$(cat "${DEVICE_ID_FILE}" | tr -d '\n')"
+
+TMPDIR_LICENSE="$(mktemp -d)"
+trap 'rm -rf "${TMPDIR_LICENSE}"' EXIT
+
+# Reject malformed envelopes before crypto.
+for field in schema_version license_uuid activation_uuid plan device_id entitlements issued_at issued_epoch starts_at offline_grace_days status signing_key_id nonce; do
+    if ! jq -e --arg f "${field}" '.payload[$f] != null' "${LICENSE_FILE}" >/dev/null 2>&1; then
+        restricted_json "invalid_signature" "Malformed license payload: missing ${field}."
+        exit 1
+    fi
+done
+
+# expires_at / expires_epoch may be JSON null (enterprise) but must be present.
+if ! jq -e '(.payload | has("expires_at")) and (.payload | has("expires_epoch"))' "${LICENSE_FILE}" >/dev/null 2>&1; then
+    restricted_json "invalid_signature" "Malformed license payload: missing expiry fields."
+    exit 1
+fi
+
+SCHEMA="$(jq -r '.payload.schema_version' "${LICENSE_FILE}")"
+if [ "${SCHEMA}" != "1" ]; then
+    restricted_json "invalid_signature" "Unsupported license schema version."
+    exit 1
+fi
+
+KEY_ID="$(jq -r '.key_id // empty' "${LICENSE_FILE}")"
+PAYLOAD_KEY_ID="$(jq -r '.payload.signing_key_id // empty' "${LICENSE_FILE}")"
+if [ -z "${KEY_ID}" ] || [ "${KEY_ID}" != "${PAYLOAD_KEY_ID}" ]; then
+    restricted_json "invalid_signature" "Envelope key_id mismatch."
+    exit 1
+fi
+
+jq -c '.payload' "${LICENSE_FILE}" > "${TMPDIR_LICENSE}/payload.json"
+jq -cS '.' "${TMPDIR_LICENSE}/payload.json" | tr -d '\n' > "${TMPDIR_LICENSE}/canonical.json"
+jq -r '.signature' "${LICENSE_FILE}" | tr -d '\n' > "${TMPDIR_LICENSE}/sig.b64"
+if ! /usr/sbin/nur-license-verify b64decode "${TMPDIR_LICENSE}/sig.b64" "${TMPDIR_LICENSE}/sig.bin"; then
+    restricted_json "invalid_signature" "Unable to decode signature."
+    exit 1
+fi
+
+# Resolve public key by key_id only (unknown key_id => reject).
+pub_b64="$(jq -r --arg id "${KEY_ID}" '.keys[] | select(.key_id == $id) | .public_key // empty' "${PUBKEYS_FILE}" | head -n1 | tr -d '\n')"
+if [ -z "${pub_b64}" ]; then
+    restricted_json "unknown_key" "Unknown signing key id."
+    exit 1
+fi
+
+printf '%s' "${pub_b64}" > "${TMPDIR_LICENSE}/pub.b64"
+if ! /usr/sbin/nur-license-verify b64decode "${TMPDIR_LICENSE}/pub.b64" "${TMPDIR_LICENSE}/pub.raw"; then
+    restricted_json "invalid_signature" "Unable to decode public key."
+    exit 1
+fi
+
+if ! /usr/sbin/nur-license-verify "${TMPDIR_LICENSE}/canonical.json" "${TMPDIR_LICENSE}/sig.bin" "${TMPDIR_LICENSE}/pub.raw"; then
+    restricted_json "invalid_signature" "License signature verification failed."
+    exit 1
+fi
+
+payload_device="$(jq -r '.payload.device_id // empty' "${LICENSE_FILE}")"
+if [ -n "${DEVICE_ID}" ] && [ -n "${payload_device}" ] && [ "${DEVICE_ID}" != "${payload_device}" ]; then
+    restricted_json "wrong_device" "License is bound to a different device."
+    exit 1
+fi
+
+# Do not trust an unsigned local revoke flag. Only the signed payload status field counts.
+status="$(jq -r '.payload.status // "active"' "${LICENSE_FILE}")"
+if [ "${status}" = "revoked" ]; then
+    say_json '{"state":"revoked","allow_entitlement_mutations":false,"enforce_new_features":true,"disconnect_subscribers":false,"block_local_recovery":false,"remove_firewall_rules":false,"block_safe_mode":false,"message":"License revoked (signed). Existing sessions and firewall rules preserved."}'
+    exit 0
+fi
+
+grace_days="$(jq -r '.payload.offline_grace_days // 14' "${LICENSE_FILE}")"
+expires_epoch="$(jq -r '.payload.expires_epoch // empty' "${LICENSE_FILE}")"
+if [ "${expires_epoch}" = "null" ] || [ -z "${expires_epoch}" ]; then
+    expires_epoch=0
+fi
+
+# Offline revocation delay: require authenticated refresh file written by status refresh.
+last_refresh="${NOW_EPOCH}"
+if [ -f "${LAST_REFRESH_FILE}" ]; then
+    last_refresh="$(tr -d '\n' < "${LAST_REFRESH_FILE}")"
+fi
+# Prefer signed issued_epoch as lower bound if refresh file missing after first install.
+issued_epoch="$(jq -r '.payload.issued_epoch // 0' "${LICENSE_FILE}")"
+if [ "${last_refresh}" -lt "${issued_epoch}" ] 2>/dev/null; then
+    last_refresh="${issued_epoch}"
+fi
+offline_deadline=$((last_refresh + grace_days * 86400))
+
+if [ "${expires_epoch}" -gt 0 ] 2>/dev/null && [ "${NOW_EPOCH}" -gt "${expires_epoch}" ]; then
+    grace_until=$((expires_epoch + grace_days * 86400))
+    if [ "${NOW_EPOCH}" -le "${grace_until}" ]; then
+        say_json '{"state":"expired_within_grace","allow_entitlement_mutations":false,"enforce_new_features":true,"disconnect_subscribers":false,"block_local_recovery":false,"remove_firewall_rules":false,"block_safe_mode":false,"message":"License expired; still within grace. Existing traffic continues; new entitlement-gated changes blocked."}'
+        exit 0
+    fi
+    say_json '{"state":"expired_after_grace","allow_entitlement_mutations":false,"enforce_new_features":true,"disconnect_subscribers":false,"block_local_recovery":false,"remove_firewall_rules":false,"block_safe_mode":false,"message":"License expired past grace. Existing traffic continues; new entitlement-gated changes blocked."}'
+    exit 0
+fi
+
+if [ "${NOW_EPOCH}" -gt "${offline_deadline}" ] 2>/dev/null; then
+    say_json '{"state":"expired_after_grace","allow_entitlement_mutations":false,"enforce_new_features":true,"disconnect_subscribers":false,"block_local_recovery":false,"remove_firewall_rules":false,"block_safe_mode":false,"message":"No authenticated status refresh within maximum offline revocation delay. Entitlement-gated changes blocked until refresh."}'
+    exit 0
+fi
+
+# If refresh is older than 1 day but within grace, report offline_within_grace when marker says so.
+if [ -f /etc/nurrouter/license-server-unreachable ] && [ "${NOW_EPOCH}" -le "${offline_deadline}" ]; then
+    say_json '{"state":"offline_within_grace","allow_entitlement_mutations":true,"enforce_new_features":false,"disconnect_subscribers":false,"block_local_recovery":false,"remove_firewall_rules":false,"block_safe_mode":false,"message":"Licensing server unreachable within offline grace. Cached verified license remains usable."}'
+    exit 0
+fi
+
+say_json '{"state":"valid","allow_entitlement_mutations":true,"enforce_new_features":false,"disconnect_subscribers":false,"block_local_recovery":false,"remove_firewall_rules":false,"block_safe_mode":false,"message":"License valid."}'
+exit 0

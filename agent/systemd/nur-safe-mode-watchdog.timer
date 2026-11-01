@@ -1,0 +1,11 @@
+[Unit]
+Description=Run the NurRouterOS Safe Mode watchdog
+
+[Timer]
+OnBootSec=1min
+OnUnitActiveSec=15s
+Unit=nur-safe-mode-watchdog.service
+Persistent=true
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,140 @@
+#!/bin/sh
+# NurRouterOS installer / recovery init.
+#
+# This file becomes /init inside the installer initramfs. The kernel executes it
+# as PID 1 instead of the OpenWrt procd init, so the installer owns the console
+# and nothing from the appliance runtime starts automatically.
+#
+# Kernel command line switches consumed here:
+#   nur.mode=install|recovery   which userland program to hand the console to
+#   nur.autoreboot=1            reboot automatically once the installer finishes
+
+export PATH=/usr/sbin:/usr/bin:/sbin:/bin
+export HOME=/root
+
+# This script is PID 1 and the initramfs is the whole root filesystem, so a
+# shell must never be allowed to exit. Keep one running instead of panicking.
+keep_alive_shell() {
+    echo
+    echo "Starting an interactive shell. This is PID 1, so the shell is restarted"
+    echo "if you type 'exit'. Type 'poweroff' or 'reboot' when you are finished."
+    echo
+    while true; do
+        /bin/ash -l
+        echo "Shell exited; restarting to keep the installer environment alive."
+    done
+}
+
+/bin/mount -t proc proc /proc 2>/dev/null
+/bin/mount -t sysfs sysfs /sys 2>/dev/null
+/bin/mount -t devtmpfs devtmpfs /dev 2>/dev/null
+[ -e /dev/console ] || /bin/mount -t tmpfs tmpfs /dev
+/bin/mkdir -p /dev/pts /dev/shm /tmp /run /var/run /var/lock /var/log /mnt/cdrom /mnt/target
+/bin/mount -t devpts devpts /dev/pts 2>/dev/null
+/bin/mount -t tmpfs tmpfs /run 2>/dev/null
+
+# Storage and filesystem drivers. The OpenWrt x86_64 generic kernel builds the
+# virtio, SATA, SCSI CD-ROM and ext4 stacks in, so a failure here is not fatal.
+for module in virtio_pci virtio_blk virtio_scsi sd_mod nvme nvme_core ahci ata_piix sr_mod cdrom ext4 vfat; do
+    /sbin/modprobe "${module}" 2>/dev/null
+done
+
+# The appliance kernel is built without devtmpfs and BusyBox without mdev, so
+# /dev would otherwise be empty and no disk or optical drive would be visible.
+# Every node is derived from sysfs.
+/bin/sh /usr/sbin/nur-devnodes
+
+NUR_MODE=install
+for argument in $(cat /proc/cmdline); do
+    case "${argument}" in
+        nur.mode=*) NUR_MODE="${argument#nur.mode=}" ;;
+    esac
+done
+
+echo
+echo "=============================================================="
+echo " NurRouterOS installer environment"
+echo "=============================================================="
+echo " kernel  : $(uname -r)"
+if [ -r /etc/nurrouter-installer/manifest ]; then
+    sed 's/^/ /' /etc/nurrouter-installer/manifest
+fi
+echo
+
+# Probe candidate devices for the installer payload. Optical drives are tried
+# first; under some UEFI/direct-kernel QEMU setups the ISO is only visible as a
+# plain block device, so every non-RAM block node is also checked. Nothing is
+# written here.
+try_mount_payload() {
+    device="$1"
+
+    [ -b "${device}" ] || return 1
+    /bin/umount /mnt/cdrom 2>/dev/null
+
+    if /bin/mount -t iso9660 -o ro "${device}" /mnt/cdrom 2>/dev/null \
+        || /bin/mount -t iso9660 -o ro,norock "${device}" /mnt/cdrom 2>/dev/null \
+        || /bin/mount -o ro "${device}" /mnt/cdrom 2>/dev/null; then
+        if [ -d /mnt/cdrom/payload ] && [ -f /mnt/cdrom/payload/SHA256SUMS ]; then
+            echo " installer media : ${device}"
+            return 0
+        fi
+        /bin/umount /mnt/cdrom 2>/dev/null
+    fi
+    return 1
+}
+
+mount_installer_media() {
+    for device in /dev/sr*; do
+        try_mount_payload "${device}" && return 0
+    done
+
+    for sysfs_path in /sys/class/block/*; do
+        [ -e "${sysfs_path}/dev" ] || continue
+        name="${sysfs_path##*/}"
+        case "${name}" in
+            loop*|ram*|zram*|fd*|dm-*|md*|nbd*) continue ;;
+            *[0-9])
+                # Prefer whole disks; partitions are still accepted as a fallback.
+                ;;
+        esac
+        try_mount_payload "/dev/${name}" && return 0
+    done
+
+    return 1
+}
+
+# Give storage a moment to appear before complaining about missing media.
+attempt=0
+while [ "${attempt}" -lt 20 ]; do
+    /bin/sh /usr/sbin/nur-devnodes
+    if mount_installer_media; then
+        break
+    fi
+    attempt=$((attempt + 1))
+    sleep 1
+done
+
+[ -d /mnt/cdrom/payload ] || mount_installer_media || true
+
+if ! [ -d /mnt/cdrom/payload ]; then
+    echo "ERROR: installer payload media is not available at /mnt/cdrom."
+    echo "       The appliance cannot be installed without the original media."
+    echo
+    keep_alive_shell
+fi
+
+case "${NUR_MODE}" in
+    recovery)
+        /usr/sbin/nur-recover
+        ;;
+    install)
+        /usr/sbin/nur-install
+        ;;
+    *)
+        echo "ERROR: unknown nur.mode='${NUR_MODE}'. Expected install or recovery."
+        ;;
+esac
+
+echo
+echo "The ${NUR_MODE} program exited."
+keep_alive_shell

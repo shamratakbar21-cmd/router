@@ -1,0 +1,58 @@
+#!/bin/sh
+# Create the constrained management identity used by external NUR WinControl.
+# Operators enroll public keys with a forced command pointing at nur-mgmt-ssh.
+
+MGMT_USER="nur-mgmt"
+MGMT_HOME="/etc/nurrouter/mgmt"
+MGMT_SSH_DIR="${MGMT_HOME}/.ssh"
+
+# Dropbear rejects pubkey auth for shells such as /bin/false. Use ash; the
+# authorized_keys forced-command still constrains remote execution to nur-mgmt-ssh.
+MGMT_SHELL="/bin/ash"
+MGMT_GECOS="NurRouter management"
+
+if ! grep -q "^${MGMT_USER}:" /etc/passwd 2>/dev/null; then
+    # Explicit field assembly — never embed unescaped colons in GECOS.
+    printf '%s:x:900:900:%s:%s:%s\n' "${MGMT_USER}" "${MGMT_GECOS}" "${MGMT_HOME}" "${MGMT_SHELL}" >> /etc/passwd
+else
+    # Repair prior images that wrote home as "://etc/..." or shell as /bin/false.
+    sed -i "s|^${MGMT_USER}:.*|${MGMT_USER}:x:900:900:${MGMT_GECOS}:${MGMT_HOME}:${MGMT_SHELL}|" /etc/passwd
+fi
+
+if ! grep -q "^${MGMT_USER}:" /etc/shadow 2>/dev/null; then
+    echo "${MGMT_USER}:*:0:0:99999:7:::" >> /etc/shadow
+fi
+
+if ! grep -q "^${MGMT_USER}:" /etc/group 2>/dev/null; then
+    echo "${MGMT_USER}:x:900:" >> /etc/group
+fi
+
+mkdir -p "${MGMT_SSH_DIR}"
+chmod 0755 /etc/nurrouter 2>/dev/null || true
+chmod 0700 "${MGMT_HOME}" "${MGMT_SSH_DIR}"
+touch "${MGMT_SSH_DIR}/authorized_keys"
+chown -R 900:900 "${MGMT_HOME}" 2>/dev/null || true
+chmod 0600 "${MGMT_SSH_DIR}/authorized_keys"
+
+# Preserve setuid on the elev helper (image overlays can drop the bit).
+if [ -x /usr/sbin/nur-mgmt-elev ]; then
+    chown root:root /usr/sbin/nur-mgmt-elev 2>/dev/null || true
+    chmod 4755 /usr/sbin/nur-mgmt-elev 2>/dev/null || true
+fi
+
+# Ensure Dropbear can resolve the home directory for authorized_keys.
+if [ ! -e /home ]; then
+    mkdir -p /home
+fi
+ln -sfn "${MGMT_HOME}" "/home/${MGMT_USER}" 2>/dev/null || true
+
+cat > /etc/nurrouter/mgmt/README <<'EOF'
+Enroll WinControl management keys with a forced command, for example:
+
+  command="/usr/sbin/nur-mgmt-ssh",no-port-forwarding,no-agent-forwarding,no-X11-forwarding,no-pty ssh-ed25519 AAAA... wincontrol@lab
+
+Rotate by replacing the line in /etc/nurrouter/mgmt/.ssh/authorized_keys and
+revoking the previous public key. Host-key pins are enforced by WinControl.
+EOF
+
+exit 0

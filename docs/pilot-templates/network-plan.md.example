@@ -1,0 +1,11 @@
+# Pilot network plan (placeholders)
+
+| Role | Interface | Address/CIDR | Notes |
+| --- | --- | --- | --- |
+| Management | `{{MGMT_IFACE}}` | `{{MGMT_IPV4}}/{{MGMT_PREFIX}}` | WinControl SSH path |
+| LAN | `{{LAN_IFACE}}` | `{{LAN_CIDR}}` | Customer LAN placeholder |
+| WAN/PPPoE | `{{WAN_IFACE}}` | PPPoE client | Not BRAS |
+
+VLANs: `{{VLAN_LIST}}`  
+DNS forwarders: `{{DNS_FORWARDERS}}`  
+PPPoE profiles (max per entitlement): `{{PPPOE_PROFILE_COUNT}}`

@@ -1,0 +1,172 @@
+#!/bin/sh
+# NurRouterOS device node builder.
+#
+# The OpenWrt x86_64 kernel used by the appliance is built without devtmpfs and
+# BusyBox is built without mdev, so /dev starts out as an empty directory in the
+# installer initramfs. Every node the installer needs is created here.
+#
+# sysfs is the authoritative source for major/minor numbers, which keeps the
+# program correct on any host: IDE/SATA/USB disks, virtio disks, NVMe namespaces
+# and any partition layout are all derived from /sys/class/block.
+#
+# The program is idempotent. Existing nodes are never replaced, so it can be run
+# again after a disk has been written to and its partition table has changed.
+# Only intentionally listed character nodes and validated block nodes from sysfs
+# are created, always with restrictive modes.
+
+set -u
+
+export PATH=/usr/sbin:/usr/bin:/sbin:/bin
+
+DEV_DIR="/dev"
+
+if [ ! -d "${DEV_DIR}" ]; then
+    mkdir -p "${DEV_DIR}" 2>/dev/null
+fi
+
+if [ ! -w "${DEV_DIR}" ]; then
+    printf '%s\n' "nur-devnodes: ${DEV_DIR} is not writable" >&2
+    exit 1
+fi
+
+is_uint() {
+    case "$1" in
+        ''|*[!0-9]*) return 1 ;;
+        *) return 0 ;;
+    esac
+}
+
+# Reject path traversal and unexpected characters in device names from sysfs.
+# A single slash is allowed so intentional nodes like net/tun can be created.
+valid_devname() {
+    name="$1"
+    case "${name}" in
+        ''|/*|*/|.*|*..*|*/*/*) return 1 ;;
+    esac
+    case "${name}" in
+        */*)
+            left="${name%/*}"
+            right="${name#*/}"
+            case "${left}" in ''|*[!A-Za-z0-9._-]*) return 1 ;; esac
+            case "${right}" in ''|*[!A-Za-z0-9._-]*) return 1 ;; esac
+            ;;
+        *)
+            case "${name}" in *[!A-Za-z0-9._-]*) return 1 ;; esac
+            ;;
+    esac
+    return 0
+}
+
+make_node() {
+    # make_node <b|c> <major> <minor> <name> <mode>
+    type="$1"
+    major="$2"
+    minor="$3"
+    name="$4"
+    mode="${5:-0600}"
+
+    case "${type}" in
+        b|c) ;;
+        *) return 0 ;;
+    esac
+
+    is_uint "${major}" || return 0
+    is_uint "${minor}" || return 0
+    valid_devname "${name}" || return 0
+
+    if [ -e "${DEV_DIR}/${name}" ]; then
+        # Keep a correct existing node. Replace only mismatched types (for
+        # example a regular file created early as a /dev/null stand-in) or
+        # wrong major/minor pairs; never clobber an unrelated directory.
+        if [ -d "${DEV_DIR}/${name}" ]; then
+            return 0
+        fi
+
+        current_type=""
+        if [ -b "${DEV_DIR}/${name}" ]; then
+            current_type="b"
+        elif [ -c "${DEV_DIR}/${name}" ]; then
+            current_type="c"
+        fi
+
+        if [ "${current_type}" = "${type}" ]; then
+            chmod "${mode}" "${DEV_DIR}/${name}" 2>/dev/null
+            return 0
+        fi
+
+        # Never redirect stderr to /dev/null here: removing/recreating null while
+        # a redirection target is open makes the shell recreate it as a regular file.
+        rm -f "${DEV_DIR}/${name}" 2>/dev/console
+    fi
+
+    directory="${name%/*}"
+    if [ "${directory}" != "${name}" ]; then
+        mkdir -p -m 0755 "${DEV_DIR}/${directory}" 2>/dev/console
+    fi
+
+    mknod -m "${mode}" "${DEV_DIR}/${name}" "${type}" "${major}" "${minor}" 2>/dev/console
+    return 0
+}
+
+# ---------------------------------------------------------------------------
+# Character devices (fixed, intentional set only)
+# ---------------------------------------------------------------------------
+
+make_node c 5 1   console  0600
+make_node c 1 3   null     0666
+make_node c 1 5   zero     0666
+make_node c 1 7   full     0666
+make_node c 1 8   random   0666
+make_node c 1 9   urandom  0666
+make_node c 1 11  kmsg     0600
+make_node c 5 0   tty      0666
+make_node c 5 2   ptmx     0666
+make_node c 4 0   tty0     0600
+make_node c 4 1   tty1     0600
+make_node c 4 64  ttyS0    0600
+# kvm / tun are optional; create only when the host kernel exposes them.
+if [ -e /sys/class/misc/kvm ]; then
+    make_node c 10 232 kvm 0600
+fi
+if [ -e /sys/class/misc/tun ]; then
+    make_node c 10 200 net/tun 0660
+fi
+
+mkdir -p -m 0755 "${DEV_DIR}/pts" "${DEV_DIR}/shm" 2>/dev/null
+mount -t devpts -o mode=0620,gid=5 devpts "${DEV_DIR}/pts" 2>/dev/null
+
+# ---------------------------------------------------------------------------
+# Block devices from validated sysfs entries only
+# ---------------------------------------------------------------------------
+
+for sysfs_path in /sys/class/block/*; do
+    [ -e "${sysfs_path}/dev" ] || continue
+    [ -f "${sysfs_path}/dev" ] || continue
+
+    name="${sysfs_path##*/}"
+    valid_devname "${name}" || continue
+
+    case "${name}" in
+        loop*|ram*|zram*|md*|fd*|nbd*)
+            continue
+            ;;
+    esac
+
+    # Require a real block backing (size) so we never invent nodes for stubs.
+    [ -f "${sysfs_path}/size" ] || continue
+
+    dev="$(cat "${sysfs_path}/dev" 2>/dev/null)"
+    case "${dev}" in
+        [0-9]*:[0-9]*) ;;
+        *) continue ;;
+    esac
+
+    major="${dev%%:*}"
+    minor="${dev##*:}"
+    is_uint "${major}" || continue
+    is_uint "${minor}" || continue
+
+    make_node b "${major}" "${minor}" "${name}" 0660
+done
+
+exit 0

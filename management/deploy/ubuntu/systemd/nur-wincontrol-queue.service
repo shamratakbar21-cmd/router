@@ -1,0 +1,16 @@
+[Unit]
+Description=NUR WinControl queue worker
+After=network.target
+
+[Service]
+Type=simple
+User=__APP_USER__
+Group=__APP_USER__
+WorkingDirectory=__APP_ROOT__
+ExecStart=/usr/bin/php__PHP_VERSION__ artisan queue:work --sleep=1 --tries=3 --max-time=3600
+Restart=always
+RestartSec=3
+Nice=5
+
+[Install]
+WantedBy=multi-user.target

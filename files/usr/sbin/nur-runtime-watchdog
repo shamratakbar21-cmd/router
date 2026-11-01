@@ -1,0 +1,27 @@
+#!/bin/sh
+
+set -eu
+
+PENDING_ROOT="/etc/nurrouter/runtime/pending"
+
+mkdir -p "${PENDING_ROOT}"
+
+while true; do
+    now_epoch="$(date +%s)"
+
+    for state_file in "${PENDING_ROOT}"/*.env; do
+        if [ ! -f "${state_file}" ]; then
+            continue
+        fi
+
+        unset DEADLINE_EPOCH BACKUP_DIR
+        . "${state_file}"
+        operation_id="$(basename "${state_file}" .env)"
+
+        if [ "${DEADLINE_EPOCH:-0}" -le "${now_epoch}" ]; then
+            /usr/sbin/nur-runtimectl expire --operation "${operation_id}" >/tmp/nur-runtime-expire.log 2>&1 || true
+        fi
+    done
+
+    sleep 5
+done
