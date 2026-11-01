@@ -1,0 +1,1280 @@
+{
+  "original_commit": "53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+  "original_reachable_commits": 1,
+  "excluded_tracked_files": [
+    "files/usr/sbin/nur-agent",
+    "files/usr/sbin/nur-license-verify",
+    "files/usr/sbin/nur-mgmt-elev",
+    "files/etc/nurrouter/overlay-manifest.json"
+  ],
+  "files": [
+    {
+      "path": ".gitignore",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "971a58b81f51daa55efce09346dbb4534d3dcd34fa6e82963380c1f145d44705"
+    },
+    {
+      "path": "agent/cmd/nur-agent/main.go",
+      "origin": "working-tree:untracked agent source captured during publication",
+      "mode": "0o644",
+      "sha256": "00539a4dfc5d7c8a43725666436ef10276b62bbc1ccdb986a13d93f359d85a98"
+    },
+    {
+      "path": "agent/cmd/nur-license-verify/main.go",
+      "origin": "working-tree:untracked agent source captured during publication",
+      "mode": "0o644",
+      "sha256": "ddcb4b8d0340959a154262176d0d9dfc663d59c41de6c5003547525d93345510"
+    },
+    {
+      "path": "agent/go.mod",
+      "origin": "working-tree:untracked agent source captured during publication",
+      "mode": "0o644",
+      "sha256": "c5103b9407d6d6795ebb6f863789e71157d71cb2804301ded83c26521fc65633"
+    },
+    {
+      "path": "agent/internal/agent/routing_lab_test.go",
+      "origin": "working-tree:untracked agent source captured during publication",
+      "mode": "0o644",
+      "sha256": "338d3cba6d84740a8896b6267e3d67373460a0abd42aca588fb4947ea71bddb3"
+    },
+    {
+      "path": "agent/internal/agent/server.go",
+      "origin": "working-tree:untracked agent source captured during publication",
+      "mode": "0o644",
+      "sha256": "b131a94f1d19c00217ffc49bf28820ce38fafd1ee64ec8dc0115095ea1f79a09"
+    },
+    {
+      "path": "agent/internal/agent/server_test.go",
+      "origin": "working-tree:untracked agent source captured during publication",
+      "mode": "0o644",
+      "sha256": "5dd19c69b00f8f1629661e2844c8771bb582d9c7df335ca34e3dda287b299149"
+    },
+    {
+      "path": "agent/systemd/nur-agent.service",
+      "origin": "working-tree:untracked agent source captured during publication",
+      "mode": "0o644",
+      "sha256": "13576f874bcfaef8f4e62eaad4588794ae5414b7756b03cefe7db8ce48ba75f2"
+    },
+    {
+      "path": "agent/systemd/nur-safe-mode-watchdog.service",
+      "origin": "working-tree:untracked agent source captured during publication",
+      "mode": "0o644",
+      "sha256": "d3929f1acd686966ffc807022de4073e7461703d9080fd9279f5f0a6add232db"
+    },
+    {
+      "path": "agent/systemd/nur-safe-mode-watchdog.timer",
+      "origin": "working-tree:untracked agent source captured during publication",
+      "mode": "0o644",
+      "sha256": "39abd8d84df7b988ec66997d5fd4b2ddc681faa94f27f4c2e87b468bfe3dc584"
+    },
+    {
+      "path": "appliance/installer/grub.cfg",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "dc1b58c971840d9c86e20a100e8c6af79b3f9299cc98db5d75063009db7db96f"
+    },
+    {
+      "path": "appliance/installer/init",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o775",
+      "sha256": "206ed2dacb63da6198650d79e9d63da993ee347d7cadc5f6a0decd0bac376bcd"
+    },
+    {
+      "path": "appliance/installer/nur-devnodes",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o775",
+      "sha256": "7407de01e233ee4bccfad6dadbf8c060a85c75b993dd2151460f677ed680f736"
+    },
+    {
+      "path": "appliance/installer/nur-install",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o775",
+      "sha256": "8f360c2b01821705c96deb2657661b72c18b099f1be3d43d429bbbc19291102c"
+    },
+    {
+      "path": "appliance/installer/nur-recover",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o775",
+      "sha256": "64c868b520d3c33eeb82519ecd9b653bc8c2708d743bf577de9f36393551d1fe"
+    },
+    {
+      "path": "appliance/installer/VERSION",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "4c549393e77124884e2151cd617e4711926c108703488c5294d0de9a6ed52fa6"
+    },
+    {
+      "path": "appliance/make-images.sh",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o775",
+      "sha256": "6f1264c751a0b36ab5a45c94b57aa8e8eb6a293719809f7363b88552dc1675e3"
+    },
+    {
+      "path": "appliance/make-installer-iso.sh",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o775",
+      "sha256": "565b54779c4d0dc930032ea9ad0d8e9f5770017fc82839d617bf301ce3ca5092"
+    },
+    {
+      "path": "appliance/VERSION",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "4c549393e77124884e2151cd617e4711926c108703488c5294d0de9a6ed52fa6"
+    },
+    {
+      "path": "ARCHITECTURE.md",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "a3221fd6a611fb608f4c83ac1f98d0b5f1065cbdfb93f943b2763029944c29fa"
+    },
+    {
+      "path": "build.sh",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o775",
+      "sha256": "6dc9d8da5ae6f7f910b2bf44bcd9ee50697d238eb6a206cc8fe3abf930bd54e6"
+    },
+    {
+      "path": "docs/APPLIANCE-UPDATES.md",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "7fc7d26db59ef8f8e9bdc19aade32b0e1be5f2c0a452116b09ed464e3cea457d"
+    },
+    {
+      "path": "docs/BACKUP-RESTORE.md",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "930a228b78e77f588576d94191f3cdb185064fc71f29391e9084a1b1c1963b2e"
+    },
+    {
+      "path": "docs/DEPLOYMENT.md",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "e3a55a42654a3121745ea7f18800e441916e60f4d503cadee39c05f26f52de71"
+    },
+    {
+      "path": "docs/FEATURE-GAP-MATRIX.md",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "3efc97c4919d7c903b8bb2ef960bb5100176945de535cfc3cf61e7cb5c28ec9b"
+    },
+    {
+      "path": "docs/FEATURE-MATRIX.md",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "e6101dd7c9d82536b95f91b3baa0fac53e990a58ad395e4400eb776721b8072e"
+    },
+    {
+      "path": "docs/HANDOVER-0.4.0-rc.3.md",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "58d451b1f3853a55d87b83ac5418b68a5927523332d2738125bf45e5cc0ad5b5"
+    },
+    {
+      "path": "docs/INSTALL-AND-RECOVERY.md",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "79f84a2126e26631ca5669ee7339beed0228750a3731b0b7b1e4ac18a5f3e1f5"
+    },
+    {
+      "path": "docs/PILOT-RUNBOOK.md",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "e110f3e2d242c5512fea192fde50ff5b3c1c0f06b23622cda4f8d665e126a504"
+    },
+    {
+      "path": "docs/pilot-templates/network-plan.md.example",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "8d9cbbbd1c7efacb65cef186622d925136210c5f9575c5eaadc46d65b98915a2"
+    },
+    {
+      "path": "docs/pilot-templates/router.env.example",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "c4c85daa89e465c8039ef1fe9c7512673103d0b720adc83042c10838b5f56219"
+    },
+    {
+      "path": "docs/pilot-templates/wincontrol.env.example",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "539771a078cd40312c74140e955f84726021041c441901852ec3daaf44b326f1"
+    },
+    {
+      "path": "docs/RELEASE-0.4.0-rc.1.md",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "49a25e6cd62cbfb6c33d30d061c35177a9861361cf40e421ed515f72aab9edbb"
+    },
+    {
+      "path": "docs/RELEASE-0.4.0-rc.2.md",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "a084a207481fc9fe54af8938b241506d7ef7c7fb6d226054477414798fb97688"
+    },
+    {
+      "path": "docs/RELEASE-0.4.0-rc.3.md",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "e68c7feda5f2ef9f9cdce3d5572d7e8043a262c8d25b536f6c088e3af8224892"
+    },
+    {
+      "path": "docs/RELEASE-0.4.0-rc.4.md",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "f2a95b13be219f1bdfb6a2f4549fd748a77a31b48aff1e4777bab95cd6813cd0"
+    },
+    {
+      "path": "files/etc/banner",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "9c58f8b87283781bdfd36b7fae45fa13a449fe117fb7454bde6a4f735a2aecc1"
+    },
+    {
+      "path": "files/etc/config/dhcp",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "67525a023e2382a247d1fa3841d3bc15b2dd0c8333aa0f3b972eb196b434c034"
+    },
+    {
+      "path": "files/etc/config/dropbear",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "df7bc29df28942b5715cdc976cc0c035eb1af3e01d1e3b51aeff8c6027bf5e63"
+    },
+    {
+      "path": "files/etc/config/firewall",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "5240019bf301841297337676e7ac9c33a30afef959e81577b54eb6cd7519a89a"
+    },
+    {
+      "path": "files/etc/config/network",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "bc7c54b6203ce4486ddca8b093ea17d1862fc14f031d7bb154e6d2d31a5e45ed"
+    },
+    {
+      "path": "files/etc/init.d/nur-agent",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o775",
+      "sha256": "021fc671cba929b8b637add0ce0a89d66b40e6d4037d98de0556416b38ebb129"
+    },
+    {
+      "path": "files/etc/init.d/nur-runtime-watchdog",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o775",
+      "sha256": "01c8053c02b0455f54e1345a1f7964188577f019bd1735a189130759885bec16"
+    },
+    {
+      "path": "files/etc/nurrouter/license-public-keys.json",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "1c9134708d847f2d3f173263635a7dc17e1acd999941be40b2c297c8cc6cc3ab"
+    },
+    {
+      "path": "files/etc/nurrouter/product-version",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "4c549393e77124884e2151cd617e4711926c108703488c5294d0de9a6ed52fa6"
+    },
+    {
+      "path": "files/etc/nurrouter/update-public-keys.json",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "ceea7e7c10ed7c39e76506ebff7e3337ba7082c33b3de5c7239e858a521bc0e1"
+    },
+    {
+      "path": "files/etc/sudoers.d/nur-mgmt",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "1bc3397dce5796c8c0db97671caad32a4bfaf9ea7baccefd87cf018cc8e1f678"
+    },
+    {
+      "path": "files/etc/sysctl.d/99-nurrouteros.conf",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "eb46331fd1b69dfe59dad9699217d1a7d38561b65889843edb360785c5d8fe57"
+    },
+    {
+      "path": "files/etc/uci-defaults/98-nur-device-id",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o775",
+      "sha256": "8f2f32b4e5909b67547ed304711ec76c6b950a031c4ff4440ecec2a351274b7a"
+    },
+    {
+      "path": "files/etc/uci-defaults/99-nur-mgmt-user",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o775",
+      "sha256": "5ce9ba76451f168f74993ac42511e06d64bb12de450132ea7c2b912bdbb1942b"
+    },
+    {
+      "path": "files/etc/uci-defaults/99-nurrouteros",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o775",
+      "sha256": "2fab3494e06f46f57b421bc64e929db85168d2790cb37f1efe0449180ac12703"
+    },
+    {
+      "path": "files/usr/sbin/nur-console-enroll",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o775",
+      "sha256": "9d418cc7f18efe43b4de655555eee2bdb55b74f71108e0dc0343da3f30ba3e65"
+    },
+    {
+      "path": "files/usr/sbin/nur-license-check",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o775",
+      "sha256": "23691f26d705cde3991071a2e6c47c4866deecba3c7103ec81956452946b2c6f"
+    },
+    {
+      "path": "files/usr/sbin/nur-license-verify.openssl",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o775",
+      "sha256": "61908ee0a0020da6d5b7aabd439c35c9a0409c0f26a8b018ffd7b637ed2b420c"
+    },
+    {
+      "path": "files/usr/sbin/nur-mgmt-elev.c",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "bd7bff193eaabe691d0322984dee5c6e76a5cddaf387895d0b5c3a11683ea043"
+    },
+    {
+      "path": "files/usr/sbin/nur-mgmt-ssh",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o775",
+      "sha256": "cbfc280859533308738dbce6e54e96dec184589abc23f0d4249ceff246199e9b"
+    },
+    {
+      "path": "files/usr/sbin/nur-pppoe-shape",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o775",
+      "sha256": "884b2839db43deaa1c7f1af70135c33a7fe2c65f6b298e84202875de7636e226"
+    },
+    {
+      "path": "files/usr/sbin/nur-runtime-watchdog",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o775",
+      "sha256": "a964bc67caedb53a10029a85b76c453bd406d2d1196a0d154173738e42d1c54c"
+    },
+    {
+      "path": "files/usr/sbin/nur-runtimectl",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o775",
+      "sha256": "d7f67c461c8dbbdf6073e6292bf961cf2354d56f3722150719d80574e04315a4"
+    },
+    {
+      "path": "files/usr/sbin/nur-update",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o775",
+      "sha256": "b354f1f881a16e49fa071930c32581ab0f698ab0619749925a04b355784a8f39"
+    },
+    {
+      "path": "LICENSING.md",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "d27207b7e993652ce5a46244a8c63c4b2c8fe65683d9d532a831d98cb4e5ffb7"
+    },
+    {
+      "path": "management/.env.example",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "d55e9ceb9a9eebb7b2517eea0e06a10b4448a2fcbbce618b1a55608ed23b9d1b"
+    },
+    {
+      "path": "management/app/Console/Commands/CreateAdminUserCommand.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "a26faeff15cb89e27f59c930244d827f2e8fb81204546936c3aa2eff33a9d677"
+    },
+    {
+      "path": "management/app/Console/Commands/ExportOpenWrtOverlayCommand.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "5136c884d1e152b5b78f9b0c2871cdf24d973930635a8f4f7121fbfc68c26627"
+    },
+    {
+      "path": "management/app/Console/Commands/GenerateLicenseSigningKeyCommand.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "2b999cfe03ac74d8b43b33c16c3f146491a263f31b15e639b297af5a03f114c2"
+    },
+    {
+      "path": "management/app/Console/Commands/RegisterApplianceSshCommand.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "7cfbab87aa6e1c6549ed2a503a83f52a00db7cc26f9bc760ce1eb1c715972a68"
+    },
+    {
+      "path": "management/app/Console/Commands/SafeModeWatchdogCommand.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "1bd2398e832dc360393295692fca339436d9eb64d40ede4ccc7df1db9799af7d"
+    },
+    {
+      "path": "management/app/Exceptions/ApplianceTransportException.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "94e8538425ffccde80b99fc5612715259d09ecd32d0422fc70c0f56750b4134f"
+    },
+    {
+      "path": "management/app/Http/Controllers/AuthenticatedSessionController.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "c41e15b3c0e2d51dddccf412801a703c8f7c206a854c5fe212256266a39bf2f8"
+    },
+    {
+      "path": "management/app/Http/Controllers/Controller.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "e5ddafa07059bfc9f8310767b0fc04dd3b8a1f50bcec1fd693b19f5555697825"
+    },
+    {
+      "path": "management/app/Http/Controllers/DashboardController.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "6bcc83c41ed7e7034140150fd89be60bee4e49e3e77f0cdc1c6dcc52707fe866"
+    },
+    {
+      "path": "management/app/Http/Controllers/LicenseActivationController.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "f7509a78b6e52a0725374f6f50d7cf04b4cef3a85637d8cff3f73bc93145e7ef"
+    },
+    {
+      "path": "management/app/Http/Controllers/LicenseAdminController.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "96b1b98a766c8ba68d99a6cd4a60f9bc93e39b7ca11925723cdcafcb828f0bed"
+    },
+    {
+      "path": "management/app/Http/Controllers/PasswordRotationController.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "0e5b6783d02b0e9a15b305cdfe4ba46cfc7fb80c450b7a1931e18fa035d2c5d9"
+    },
+    {
+      "path": "management/app/Http/Controllers/RouterBackupController.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "59c8997b784e1e1b29ac15567894fe0cbfd9b5dea8d6cf584a86eaef7fc1ae38"
+    },
+    {
+      "path": "management/app/Http/Controllers/RouterDesiredStateController.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "849fef0e048d61c8dbcacbd6053b9f85d06ef227c350acd03cf5ed5bbc515030"
+    },
+    {
+      "path": "management/app/Http/Controllers/RouterNodeController.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "9da498681c52ebdfca65bbab833d180e766ced83d22f482842a5e4353b796b09"
+    },
+    {
+      "path": "management/app/Http/Controllers/RouterRevisionController.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "ae30636c4e0bcc018b607e4cf2485b1edd07194998b7f4e3de5327ddcf786d93"
+    },
+    {
+      "path": "management/app/Http/Controllers/RouterStateController.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "eee245f9a8d316c2ab14e17d0a68cdc95efdf1bc6f1224adda6aeace59d2b8fb"
+    },
+    {
+      "path": "management/app/Http/Middleware/RequirePasswordRotation.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "d24c9ff3122408f3953714a3da75cdcd517caf4aae59c9b06b43150977596563"
+    },
+    {
+      "path": "management/app/Http/Requests/ApplyRouterRevisionRequest.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "743d1e64f576324e9edec6de0d09a51b6b4521908ec7f85282fe7f7340a33290"
+    },
+    {
+      "path": "management/app/Http/Requests/RotatePasswordRequest.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "37108612ec8e417677f279b294dd6eac18c86a6eb9d09eab7cd17e9b82f992a7"
+    },
+    {
+      "path": "management/app/Http/Requests/StoreRouterNodeRequest.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "28fd56e45f33077bb95104794b0b2181a7b767fd58a6ae41bc29b64b7cfe20be"
+    },
+    {
+      "path": "management/app/Http/Requests/UpdateRouterDesiredStateRequest.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "a2ee788b318cc89ca2e67a519c7ffad4615ae10e42aea54462cb3230f6dd6330"
+    },
+    {
+      "path": "management/app/Http/Requests/UpdateRouterNodeRequest.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "1a6afa543f23353a2e6b4942ddf3d06c6857a675684e454cb7c10f5dc7804b56"
+    },
+    {
+      "path": "management/app/Models/AuditLog.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "e0cbf7c77782872dfceb82b8750bf9b9c95d9044bda32dd1f12a6888f7992e45"
+    },
+    {
+      "path": "management/app/Models/ConfigurationRevision.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "6732d85c65129ccc5c665975e4ab82bf48993da970547d149b967c0805794ba8"
+    },
+    {
+      "path": "management/app/Models/License.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "388602556725ce8d929c9b6b7439690f7af61d47257cd349062fcd1efc479cd5"
+    },
+    {
+      "path": "management/app/Models/LicenseActivation.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "7c7c889e26d5fd3c42e1c125c4f014789467601217438e15e1259ce80b472a11"
+    },
+    {
+      "path": "management/app/Models/LicenseActivationKey.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "906e6eeae1aec53b6a59641761eda81ff8fb34d55fef04979dfd07f759806f04"
+    },
+    {
+      "path": "management/app/Models/LicensePlan.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "13f5432903c4288549a6a9561c2db2eaeadd73cf841ef9ca6768843299452fb9"
+    },
+    {
+      "path": "management/app/Models/LicenseRevocation.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "aed3d7dbd5b1abb642311b9f0a0e19e62a7c85e9d8527c11c2b89fb53f68e02f"
+    },
+    {
+      "path": "management/app/Models/LicenseTransfer.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "2f6743f2dc3da01954149eb845dc2d3540a52ef6a25b5bac2b522cc4fcc4b2ca"
+    },
+    {
+      "path": "management/app/Models/ObservedState.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "a209cf68ddb4e1a638c3d5ac881f3d8b0d258cec61820b39866e2dbbcdfd1704"
+    },
+    {
+      "path": "management/app/Models/RouterNode.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "1b380a3b8ff249e7f8ac3d2a63982ba044b35d58949cf08f5bb1793c9f078176"
+    },
+    {
+      "path": "management/app/Models/User.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "8dac257a70de20805750b225fece1a41df8c93dc50fa1d9259f8c23856765b86"
+    },
+    {
+      "path": "management/app/Policies/LicensePolicy.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "4e9abae9a44a57962cff2ae09d3fa6bdc37565b942b17ea8289e3570b06c37e2"
+    },
+    {
+      "path": "management/app/Policies/RouterNodePolicy.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "48e82354f1bb542ecd7fdd19c2739bcd23f8dbb8d5c7e590f9023d278bedfda5"
+    },
+    {
+      "path": "management/app/Providers/AppServiceProvider.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "df4ebfee310c1d3fa63bd8bb2f73ee295dd36311807fc6919c353dbdfcc3949d"
+    },
+    {
+      "path": "management/app/Services/ApplianceSshOperation.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "26ab62f4e4c75f5139364182cb5554a3c0c1e0ba934a1d2a7430bea3706cd7ab"
+    },
+    {
+      "path": "management/app/Services/AuditLogWriter.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "aca408a929afee5cf99d4be6e08b93c5c2ca8700a7c547279f5f55c9f6a246aa"
+    },
+    {
+      "path": "management/app/Services/ConfigurationBackupService.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "1dab87b250415f7432e812856a82a4ab73059fbff9f3abda95bc8a0af35d9ff3"
+    },
+    {
+      "path": "management/app/Services/Licensing/CapabilityRegistry.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "41dc6ff3c6951ed83974a3bc0b257ad6da641d86203c110ca0fffe203cd9a646"
+    },
+    {
+      "path": "management/app/Services/Licensing/EntitlementGate.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "ee9dc9592b91b97fbc5a030c68e7dbc497ef71acf46052fcb02589355015bba6"
+    },
+    {
+      "path": "management/app/Services/Licensing/LicenseCrypto.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "c63d2203cd831d01960a1c66da8d921e5e9219d6d04b74824678d92033317c68"
+    },
+    {
+      "path": "management/app/Services/Licensing/LicenseEnforcement.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "6f43480f3b7e0baa841710ab71ad853d20eab808a12c7c42d0871c257d1a11e0"
+    },
+    {
+      "path": "management/app/Services/Licensing/LicensePolicyMatrix.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "0b5a875ed6b98ef2d0776cfb70e7b1d1bbe069a807dc8f9ea8254e701548a1a3"
+    },
+    {
+      "path": "management/app/Services/Licensing/LicenseService.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "597ff1dc0879cbc808b4f97a1a85156aca955c4d6b9cae784d201bb9ac4b7934"
+    },
+    {
+      "path": "management/app/Services/OpenWrtApplianceClient.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "98a55c981dc9afbcbd7a2863d62ff05953d7731f1b1a7f80712296f12ce440a8"
+    },
+    {
+      "path": "management/app/Services/OpenWrtOverlayExporter.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "4010f88b93bffe7b35eb05481afa37fae2d921b55267fd5b83ddf324acfbc970"
+    },
+    {
+      "path": "management/app/Services/OpenWrtRuntimeConfigRenderer.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "ee5bb97b418de4fbd1bdf6f9d88fb48189bde76c5f2f898e2836db0ad35ded73"
+    },
+    {
+      "path": "management/app/Services/RouterAgentClient.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "db58cdc5c00b30fbfb021a47424acf6d880407fd554b1c40f87e724c3ac069fc"
+    },
+    {
+      "path": "management/app/Services/RouterConfigurationManager.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "88f93df464dacbd699d46f24112d75ac8c7974ac19469d2f674ae481187dd892"
+    },
+    {
+      "path": "management/app/Services/RouterStateProjector.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "3d3056ed4783c68a94cbd4314c1cc10a056e497c623ee5d0b0a3506dc717ce02"
+    },
+    {
+      "path": "management/app/Support/DestructiveMigrationGuard.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "64090cddc7e44cd653e738db440cdebb25cef89f23a78cb30f663560214fe20a"
+    },
+    {
+      "path": "management/artisan",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o775",
+      "sha256": "f91a517c0c5d3a904c3f390933964a5e08ec1fc68146882730daac4aca4ffcec"
+    },
+    {
+      "path": "management/bootstrap/app.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "fbd259147669d6300752b5bad364d6f416e15919614510212402e40882d1eebf"
+    },
+    {
+      "path": "management/bootstrap/cache/.gitignore",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "240a3e0d37d2e86b614063f5347eb02d4f99ca6c254de6b82871ff8d95532a7d"
+    },
+    {
+      "path": "management/bootstrap/providers.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "f720e185207a343d4c19fc99dbb317a4187efbcd7d38a303a695bbdd77ffb943"
+    },
+    {
+      "path": "management/composer.json",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "dc30862e917de4ddf6866056c83eeabcac72c078e5ed604ddcecc73147a1ceaa"
+    },
+    {
+      "path": "management/composer.lock",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "a7380e3e939f27830cfef2e351face511f9abbcd15e18fa7f79e530a133d7490"
+    },
+    {
+      "path": "management/config/app.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "b4b25e15efa76846a7f2e19fd1044fec4945e4e928c4098126a2b0042b034383"
+    },
+    {
+      "path": "management/config/auth.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "c7e204e9785c9f596d66fb884b493f658f2327f157646bdb4088efd6b3a7773f"
+    },
+    {
+      "path": "management/config/cache.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "5030cdf171704e58b96f2cf17f1c6d5921b27d5c63c2cefb730eeb2da49a8240"
+    },
+    {
+      "path": "management/config/capabilities.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "5a5639a58c02acf492ab40622ab85897567c850be569b1114b3575fd82144693"
+    },
+    {
+      "path": "management/config/database.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "02cd62f589b43d33f9ceac740705dac1dec9740eb2bb9e6e202d4b66a15244cf"
+    },
+    {
+      "path": "management/config/filesystems.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "ba7060d7a23e490c3ce830656f6d24ad3ccf5b868e3293f2a12e411959dc5635"
+    },
+    {
+      "path": "management/config/licensing.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "009be5471ec93bf67e9f3f5823f5f43bb7e0e7dd1b7180e2f904a5d9be234a18"
+    },
+    {
+      "path": "management/config/logging.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "beb1ffd0db910f6f0b4f75214c3d5aa385d692733ece8a450f4c169d2c99ce38"
+    },
+    {
+      "path": "management/config/mail.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "c43ff49a31c5f32ce21eb7159f2a4b3cd2f4074eaed5838d265646dbfedd3474"
+    },
+    {
+      "path": "management/config/nurrouteros.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "aab8a96b5a44920302c753bff8255baa0b483db5f81af98ac0cc0d37943485bf"
+    },
+    {
+      "path": "management/config/queue.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "6101774da7c8b79af46d0028f2b8b31a484c3f7eda10b76e5b27b6093ad364a4"
+    },
+    {
+      "path": "management/config/services.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "b7ee786ea1adbc92db9f229f479431c94503527c47051da3862eb0e4d7db70aa"
+    },
+    {
+      "path": "management/config/session.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "64272cfbef6f47c65bf857f1c5b1e853700c0d0278de46b86663fd83ef4aeed8"
+    },
+    {
+      "path": "management/database/factories/AuditLogFactory.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "5ebbee1fadda6aa182f13e1b5a97a6a42d8470a254d792fdb91958544b53c9f3"
+    },
+    {
+      "path": "management/database/factories/ConfigurationRevisionFactory.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "28a76a1a507b649c0782c3e86315d8912c826ee82852c0fb4610243a34b2649a"
+    },
+    {
+      "path": "management/database/factories/ObservedStateFactory.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "962cfcc01f4f8de3939eee4ba574c7c45f075136f5c8a81fedc53dfecdeab119"
+    },
+    {
+      "path": "management/database/factories/RouterNodeFactory.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "b5641d9e0ad398baf561789e6c766eb70f37c5784be40d8afc6d65d1b7b87edc"
+    },
+    {
+      "path": "management/database/factories/UserFactory.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "60490e8934bb8857184c95478ac43a02eb1247faad1fe9e611f2792130baa50c"
+    },
+    {
+      "path": "management/database/migrations/0001_01_01_000000_create_users_table.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "10d79883bc08ce46510f9ad8b1830b4d06d586dc56ae2c8bac3b3e491f69a90f"
+    },
+    {
+      "path": "management/database/migrations/0001_01_01_000001_create_cache_table.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "fbb4665e5a977e71df4e74ec75b3c06ca4f17ad0de7138fe9786639189978e77"
+    },
+    {
+      "path": "management/database/migrations/0001_01_01_000002_create_jobs_table.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "df4910687180313a14a3f96a8bddd808ae145ed1b107cd772caf865c0dc2b746"
+    },
+    {
+      "path": "management/database/migrations/2026_11_01_062906_create_router_nodes_table.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "39b8a29c4a773530ec53ca022615d924f203c0b05ecb367a8e9901bfc0b51980"
+    },
+    {
+      "path": "management/database/migrations/2026_11_01_062907_create_configuration_revisions_table.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "3c5f7f911c0a7869cadfa3baab096836deb830cc5f86bc25dfbc8903d154a8e4"
+    },
+    {
+      "path": "management/database/migrations/2026_11_01_062908_create_observed_states_table.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "09d99fed0f5198c9b854f1709b944d2592ee5cd34b1f19985a72a3192b0d0ff5"
+    },
+    {
+      "path": "management/database/migrations/2026_11_01_062909_create_audit_logs_table.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "bfeb5193dc1851a338b558cc3b69d8a010b810c85703316db3f9a0b13a4ea6d7"
+    },
+    {
+      "path": "management/database/migrations/2026_11_01_062941_add_is_admin_to_users_table.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "35e2f972733b1551cbbcc54d6c11a624b6caf8c217b86bdb659297ce5e6bc82e"
+    },
+    {
+      "path": "management/database/migrations/2026_11_01_064458_add_bootstrap_password_controls_to_users_table.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "5436a7e8adbcc9f01a2b26a7189f08c2c3eb44b4263241e4eae2e66b022aa204"
+    },
+    {
+      "path": "management/database/migrations/2026_11_01_064459_add_configuration_safety_fields_to_router_nodes_table.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "6bfa6f42c79aa6f9b209a4263c6b005a948505153c989cf29c15b6db3e8262b2"
+    },
+    {
+      "path": "management/database/migrations/2026_11_01_064500_add_configuration_safety_fields_to_configuration_revisions_table.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "88b9ed7f0e0db818069a1789ac6a9fe8b1fa26d215699886e1b65ed75bd07815"
+    },
+    {
+      "path": "management/database/migrations/2026_11_01_073157_add_runtime_service_configuration_to_router_nodes_and_configuration_revisions_tables.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "ece619001c4b17cef644e5d887e7ce8377ac9ffcd8df3fd280736a613e997015"
+    },
+    {
+      "path": "management/database/migrations/2026_11_01_074557_add_appliance_connection_fields_to_router_nodes_table.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "9aea6f108f971133a3e0fa331c90b755f673f6e33a53b6c7725742d1131dfff1"
+    },
+    {
+      "path": "management/database/migrations/2026_11_01_114505_create_licensing_tables.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "0d0c5535ddb1dc8838cd27f7a363d9893ac541ebd1279d1a8541e6193e87858d"
+    },
+    {
+      "path": "management/database/migrations/2026_11_01_120009_add_last_status_refresh_at_to_license_activations.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "d9e6e48fa67e72d0a094b1f75149e53dbfe129c87f4f7992311bab15d791bb46"
+    },
+    {
+      "path": "management/database/seeders/DatabaseSeeder.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "cf8e4b6e48360218bb5534f66419c955288f78338eb8a3dba9d8ac3394ec3dbc"
+    },
+    {
+      "path": "management/deploy/ubuntu/install.sh",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o775",
+      "sha256": "a1c14705d6b18629600b18ba648f376991b748a1300363d6909e4f0f2755402c"
+    },
+    {
+      "path": "management/deploy/ubuntu/logrotate/nur-wincontrol",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "be9b9b0ae856f5354b652579fe1eed7c3819f36f61531652bb06b7696431a8cc"
+    },
+    {
+      "path": "management/deploy/ubuntu/nginx/nur-wincontrol.conf.template",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "a82a3d165444e8f596959bf1f9b90a4c78e7df70dfbeeca16568237beecdeb1d"
+    },
+    {
+      "path": "management/deploy/ubuntu/scripts/backup-wincontrol.sh",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o775",
+      "sha256": "d3ad5f89fc1e19f29d456f1b4d595cc06528f6463c6cbf623f74aa4be93dcf9f"
+    },
+    {
+      "path": "management/deploy/ubuntu/scripts/healthcheck.sh",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o775",
+      "sha256": "15618b72885b767bfed0a7cd8a27db8a2331bac9b29e54d0200f5737a8dee651"
+    },
+    {
+      "path": "management/deploy/ubuntu/scripts/rollback.sh",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o775",
+      "sha256": "5772a3c2fcd7a193534d5623e7be7371227feedf9a3cda71b22c43a798399ca3"
+    },
+    {
+      "path": "management/deploy/ubuntu/scripts/upgrade.sh",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o775",
+      "sha256": "822d0ea98c9b0e403d75c47d18e93231ce4a3cb99227cdd39814883b4f4a6013"
+    },
+    {
+      "path": "management/deploy/ubuntu/systemd/nur-wincontrol-queue.service",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "65ad6ff27d013760c90defd412b6825ee2b6435833377f10683f1e7ce877446e"
+    },
+    {
+      "path": "management/deploy/ubuntu/systemd/nur-wincontrol-safemode.service",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "88cd4938b87b607499f201bbaf04baa8affddeedda82b09371fd68a5aeb7662d"
+    },
+    {
+      "path": "management/deploy/ubuntu/systemd/nur-wincontrol-safemode.timer",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "8fdfdf7e1a15a69b3b6a4745af2f31cdd76a2dbf8667abdf384c677bafc0b2f7"
+    },
+    {
+      "path": "management/deploy/ubuntu/systemd/nur-wincontrol-scheduler.service",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "dbf8005a16ca55bfe396aa169f26cb6bf253647d19cc320a6db8f745c1ec3369"
+    },
+    {
+      "path": "management/deploy/ubuntu/systemd/nur-wincontrol-scheduler.timer",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "784f9299c222795462243aff752135510d6afe44a98be7fefb393190c4e52528"
+    },
+    {
+      "path": "management/package.json",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "023d511d768e05b69e8127e18ae0e3d4a2e91702e8dd82917c655e53e5908de5"
+    },
+    {
+      "path": "management/phpunit.xml",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "d964bfa3ae8aa211540499fefcd929f7d29ea075610cda6f29e06a3f88cac978"
+    },
+    {
+      "path": "management/README.md",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "1ed7f729d514ddbddaac5944a07298c3c896099ae3cab8667030145cf8ff0e47"
+    },
+    {
+      "path": "management/resources/css/app.css",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "02db84e827e06d8349293e9797eb8d81465e109e91976775964c4bf873b6fab5"
+    },
+    {
+      "path": "management/resources/js/app.js",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "101ead936a2281d53dcc064b7e2a2ab0d53b92ef3ef7b34b668673007895c860"
+    },
+    {
+      "path": "management/resources/views/auth/login.blade.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "5a89868ac7d4a7defe8a96b09e00956e90728fe89558d428d2bc1971ef1bcb39"
+    },
+    {
+      "path": "management/resources/views/auth/rotate-password.blade.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "b49ba0c08874cd9290cc736ead3e960d0b6db2be2f840172ba7a9a2bf122ffc7"
+    },
+    {
+      "path": "management/resources/views/dashboard.blade.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "5ec3a820d0f6c8f0433721b7de8840178925b73eb03ef7b90b6905d77945ad94"
+    },
+    {
+      "path": "management/resources/views/layouts/app.blade.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "f3932cec5be14141803532b8a17b09aeaef62a6aa88c78dc5ab646bbc0a236e4"
+    },
+    {
+      "path": "management/resources/views/licensing/admin.blade.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "e5e4057fd3e362a7eaef327aa7b1d84a8f0d852364e9c41814cf5fa6e287691b"
+    },
+    {
+      "path": "management/resources/views/licensing/offline.blade.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "adca67ee306a1ee8d2f43782e69d455527e9ec9e1bf75468dfb826d701545f98"
+    },
+    {
+      "path": "management/resources/views/licensing/status.blade.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "1cdb4bd9b6c2f249d287481124a0e7165f11d1a8e90371c9d58f378a113e09e8"
+    },
+    {
+      "path": "management/resources/views/routers/_form.blade.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "a493fbbfafd26659dd5033805fab8a6775b9e6e8a516c89e01122240ddc48060"
+    },
+    {
+      "path": "management/resources/views/routers/backup.blade.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "9aeb16096d2454af329ea70270ae55ea5065b21bd66db33d4187c0d64c943c31"
+    },
+    {
+      "path": "management/resources/views/routers/configure.blade.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "538fce530effd949b9d8f22b3c8c8b95cb038d215d63ba11f66ab001ef33f6dc"
+    },
+    {
+      "path": "management/resources/views/routers/create.blade.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "dc6e29b70cf1556038672f5528a15eea79243ea17d9b77f8314673b32e5ae145"
+    },
+    {
+      "path": "management/resources/views/routers/edit.blade.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "9b766665af7bb62683179cf0927689f778683060bda6dfe968e841b8ab48a62a"
+    },
+    {
+      "path": "management/resources/views/routers/index.blade.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "055f72e707ed3e82ab70198ecf14f1e1fd0b9adf00d0e4b269d223efdd313f9c"
+    },
+    {
+      "path": "management/resources/views/routers/partials/addresses.blade.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "587ab5f342a25e867526c6615d97c7b4baeda6679574821655b0e1312aa26ee6"
+    },
+    {
+      "path": "management/resources/views/routers/partials/dhcp.blade.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "08bd5f9ae7facc4d96512ffb28d2a61848d1a9421886b3679e31d44c0cf9f1d9"
+    },
+    {
+      "path": "management/resources/views/routers/partials/interfaces.blade.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "be903ba325468cfdd61721d5b313848883475f09d49507c5e7dc9e23324ac6e7"
+    },
+    {
+      "path": "management/resources/views/routers/partials/pppoe.blade.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "948ebc4829e00f5a226b6d2c6d6d0ba7e87d0954a66b356ad994a93ed73a6267"
+    },
+    {
+      "path": "management/resources/views/routers/partials/routes.blade.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "4771824c94febca725cf92b80e8d7c62433dda8bb5a30ffcc93253cffc6d0fe1"
+    },
+    {
+      "path": "management/resources/views/routers/partials/traffic.blade.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "b8ececf89e8b0a06bc00029de8987c3d4fb9b4126c30a228a33165b79cd58d61"
+    },
+    {
+      "path": "management/resources/views/routers/show.blade.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "4ab7bae9ccd990768a7dae021593045f684e58ab6debe653f41deabcb5d19a50"
+    },
+    {
+      "path": "management/resources/views/welcome.blade.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "bdb9bb7d2eecceb3581e429545b6ec96014ccab6d0ae83d4c52930e9a15f7d65"
+    },
+    {
+      "path": "management/routes/console.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "9adccc33e7dd400683e434774077c7fdb2f299c5712cedf16a43fdf56f2850fa"
+    },
+    {
+      "path": "management/routes/web.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "13ae4b63df5e76aa7ff3a02f453b7f7c5b267e4eb499f7784bc13121791f0484"
+    },
+    {
+      "path": "management/tests/Feature/ApplianceTransportErrorTest.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "d4505e331f57708af73ce55fea585e89ac793d9e5e11f37d4331785803839166"
+    },
+    {
+      "path": "management/tests/Feature/EntitlementAndBackupTest.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "41f3e539dd1e5689735a9bd489bc7f90140d20b81b9606736520bc85191d3fd1"
+    },
+    {
+      "path": "management/tests/Feature/ExampleTest.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "aaa4a192fb4aa96d4e81eda06a29968da3d9a73b71026b87a67297e66dd985b8"
+    },
+    {
+      "path": "management/tests/Feature/ExportOpenWrtOverlayCommandTest.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "5f6db20bd8a53131936949baf3e8d421a7b0344e1159aa486e793e2cf6b0f402"
+    },
+    {
+      "path": "management/tests/Feature/LicensingTest.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "b87c66da13fced489f4943c3f7271e62868cc388fe6650f63f9f9a1a20049389"
+    },
+    {
+      "path": "management/tests/Feature/OpenWrtApplianceClientTest.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "f600647fd5df10d76dfbb0aaa8ba9440073a794b16db54f3f409ca1f0dd32e2f"
+    },
+    {
+      "path": "management/tests/Feature/RegisterApplianceSshCommandTest.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "ec6cde26a125f0cda1d7fbff5d353c3afb3671e700b2c97788a106ccfb054e81"
+    },
+    {
+      "path": "management/tests/Feature/RouterDesiredStateApiTest.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "e59c571ae5234d9d4d859b3aae9bb2d3cd36b590960c7e36e9341dd4a9706e58"
+    },
+    {
+      "path": "management/tests/Feature/RouterManagementTest.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "bea95ca08d587e12acde54b287d7720718573a56b8c838cdf605bf3d7034ee52"
+    },
+    {
+      "path": "management/tests/Feature/RouterStateApiTest.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "c744e178a3023958efe89e2a0107245d571a8f7ecd8dac8e527c9bca3dc8c73e"
+    },
+    {
+      "path": "management/tests/TestCase.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "c7c209f5579c42647c1f7b2a79ac828e8b54ac62a98442045a6e94fa2c0d0ebc"
+    },
+    {
+      "path": "management/tests/Unit/ExampleTest.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "ffacae5c1a2a44c809420af5b3b404910da1b12167d58764dac6d10b8ba8cfaf"
+    },
+    {
+      "path": "management/tests/Unit/OpenWrtRuntimeConfigRendererTest.php",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "bba54713f6fd1120bc6f33675a5e0bb97feaf64d6f2c940895c0175c0d0ebf8b"
+    },
+    {
+      "path": "management/vite.config.js",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "f413e14379e2db8b200c63a6326b925f6d47cc0df458c77bfe188cfc23e8081f"
+    },
+    {
+      "path": "packages.txt",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "f80216fa7163cc3dd58e2a5ca7855a8daab9860af8682f14ec890f252684c853"
+    },
+    {
+      "path": "VERSION",
+      "origin": "commit:53385154ecfb5e2c13adba4ca03cf6c12a2ee823",
+      "mode": "0o664",
+      "sha256": "4c549393e77124884e2151cd617e4711926c108703488c5294d0de9a6ed52fa6"
+    }
+  ],
+  "audit": "All 206 original tracked files screened for private keys, token patterns, credential URLs and secret assignments. Findings manually classified as placeholders, runtime expressions, or nonfunctional test keys. Nine supplemental agent files separately screened; private-range IPs belong to namespace test fixtures. Pattern scans are not proof of absence of all secrets.",
+  "provenance_gap": "No exact source-to-distributed-ISO match or reproducible rebuild is claimed."
+}

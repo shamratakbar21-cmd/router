@@ -1,0 +1,142 @@
+Third-party notices
+
+No new license is granted for original NUR code by this publication.
+management/composer.json identifies the Laravel application scaffold as MIT; management/README.md identifies Laravel as MIT. The following Laravel MIT notice was preserved from the installed framework's LICENSE.md. This notice applies to the relevant third-party code, not as a blanket license for original NUR code.
+
+The MIT License (MIT)
+
+Copyright (c) Taylor Otwell
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+Dependencies are referenced rather than vendored. The following records reproduce license identifiers and source references from the committed Composer lockfile; upstream license texts govern each dependency. This inventory is not a relicensing statement.
+
+brick/math 1.0.0 — MIT; https://github.com/brick/math.git @ 2effe05d2177c451b86c6a073196a4034c02f211
+carbonphp/carbon-doctrine-types 3.2.1 — MIT; https://github.com/CarbonPHP/carbon-doctrine-types.git @ 5fa5eacafd9ef47c8c6ab9143fc901ba0194d3dc
+dflydev/dot-access-data v3.0.3 — MIT; https://github.com/dflydev/dflydev-dot-access-data.git @ a23a2bf4f31d3518f3ecb38660c95715dfead60f
+doctrine/inflector 2.1.1 — MIT; https://github.com/doctrine/inflector.git @ 46351b6812b7b6d52b82c3efa5dfb786a198ec88
+doctrine/lexer 3.0.3 — MIT; https://github.com/doctrine/lexer.git @ 71d305eaa6480d3d3460c7d053d1da7749fa9cca
+dragonmantank/cron-expression v3.6.1 — MIT; https://github.com/dragonmantank/cron-expression.git @ 4189372ffeff09bf14f731f67a9de90c7b413ebe
+egulias/email-validator 4.0.4 — MIT; https://github.com/egulias/EmailValidator.git @ d42c8731f0624ad6bdc8d3e5e9a4524f68801cfa
+fruitcake/php-cors v1.4.0 — MIT; https://github.com/fruitcake/php-cors.git @ 38aaa6c3fd4c157ffe2a4d10aa8b9b16ba8de379
+graham-campbell/result-type v1.2.0 — MIT; https://github.com/GrahamCampbell/Result-Type.git @ adccca3324eece92ca35463648c12b9e6293c05b
+guzzlehttp/guzzle 8.3.1 — MIT; https://github.com/guzzle/guzzle.git @ 7d9b1f430bb65ac664e120af227bf9a795ad6333
+guzzlehttp/promises 3.1.0 — MIT; https://github.com/guzzle/promises.git @ 094d0ec418eb3b1411ea271a180ec95cae6ae933
+guzzlehttp/psr7 3.2.0 — MIT; https://github.com/guzzle/psr7.git @ cdc139396207a5eba10c242d241fb014cb098390
+guzzlehttp/uri-template v2.0.1 — MIT; https://github.com/guzzle/uri-template.git @ 7a466ad606491eb6528c717482f7cca77f1851f3
+laravel/framework v13.39.0 — MIT; https://github.com/laravel/framework.git @ d52c3b3129e4c8e213c97cdc68f94b0b7d27f181
+laravel/prompts v0.3.26 — MIT; https://github.com/laravel/prompts.git @ 2d1e9bf6bab8d3f383c254db7f2b4ea8816d55e0
+laravel/serializable-closure v2.1.0 — MIT; https://github.com/laravel/serializable-closure.git @ 2d5869a838bbcf37e0d8b0568fc41914e81374b5
+laravel/tinker v3.0.2 — MIT; https://github.com/laravel/tinker.git @ 4faba77764bd33411735936acdf30446d058c78b
+league/commonmark 2.10.7 — BSD-3-Clause; https://github.com/thephpleague/commonmark.git @ 8eb53e906fd60c67038d22f1f1cab420ed58b8be
+league/config v1.2.0 — BSD-3-Clause; https://github.com/thephpleague/config.git @ 754b3604fb2984c71f4af4a9cbe7b57f346ec1f3
+league/flysystem 3.36.0 — MIT; https://github.com/thephpleague/flysystem.git @ f7fb152932f30072d573510cbd4dd657d6475b25
+league/flysystem-local 3.35.3 — MIT; https://github.com/thephpleague/flysystem-local.git @ a099b24dce160f3b2239043d13d47c4a1a214ea4
+league/mime-type-detection 1.17.0 — MIT; https://github.com/thephpleague/mime-type-detection.git @ f5f47eff7c48ed1003069a2ca67f316fb4021c76
+league/uri 7.9.1 — MIT; https://github.com/thephpleague/uri.git @ 40403f5c3141457a61f7f1aba6706e8fa4a0ece5
+league/uri-interfaces 7.9.1 — MIT; https://github.com/thephpleague/uri-interfaces.git @ 994300a79e17f179112dc259f8df0c4de982f736
+monolog/monolog 3.12.1 — MIT; https://github.com/Seldaek/monolog.git @ d7059e4c691d05ea1222b5124bed0f961be46e15
+nesbot/carbon 3.15.1 — MIT; https://github.com/CarbonPHP/carbon.git @ ce0e5636fae7d1e99856eb70cae4c719a284aa08
+nette/schema v1.4.0 — BSD-3-Clause, GPL-2.0-only, GPL-3.0-only; https://github.com/nette/schema.git @ af9fa8a86bfca9b02b10346220db26e62ef942ec
+nette/utils v4.1.6 — BSD-3-Clause, GPL-2.0-only, GPL-3.0-only; https://github.com/nette/utils.git @ 6bf24518accf32cf845bca305e0b92078700fd01
+nikic/php-parser v5.9.0 — BSD-3-Clause; https://github.com/nikic/PHP-Parser.git @ 9e33da9553fe7786f0962b35f4e4ecf01be89def
+nunomaduro/termwind v2.4.0 — MIT; https://github.com/nunomaduro/termwind.git @ 712a31b768f5daea284c2169a7d227031001b9a8
+phpoption/phpoption 1.10.0 — Apache-2.0; https://github.com/schmittjoh/php-option.git @ 67b192b6a42ec03944b972d6e633ddec78ad2c6d
+psr/clock 1.0.0 — MIT; https://github.com/php-fig/clock.git @ e41a24703d4560fd0acb709162f73b8adfc3aa0d
+psr/container 2.0.2 — MIT; https://github.com/php-fig/container.git @ c71ecc56dfe541dbd90c5360474fbc405f8d5963
+psr/event-dispatcher 1.0.0 — MIT; https://github.com/php-fig/event-dispatcher.git @ dbefd12671e8a14ec7f180cab83036ed26714bb0
+psr/http-client 1.0.3 — MIT; https://github.com/php-fig/http-client.git @ bb5906edc1c324c9a05aa0873d40117941e5fa90
+psr/http-factory 1.1.0 — MIT; https://github.com/php-fig/http-factory.git @ 2b4765fddfe3b508ac62f829e852b1501d3f6e8a
+psr/http-message 2.0 — MIT; https://github.com/php-fig/http-message.git @ 402d35bcb92c70c026d1a6a9883f06b2ead23d71
+psr/log 3.0.2 — MIT; https://github.com/php-fig/log.git @ f16e1d5863e37f8d8c2a01719f5b34baa2b714d3
+psr/simple-cache 3.0.0 — MIT; https://github.com/php-fig/simple-cache.git @ 764e0b3939f5ca87cb904f570ef9be2d78a07865
+psy/psysh v0.12.24 — MIT; https://github.com/bobthecow/psysh.git @ ca0fdcf8a7617afa3adfdf1b5fef573dffb69ca1
+ramsey/collection 2.1.1 — MIT; https://github.com/ramsey/collection.git @ 344572933ad0181accbf4ba763e85a0306a8c5e2
+ramsey/uuid 4.9.4 — MIT; https://github.com/ramsey/uuid.git @ 75d73f48d02797c2c285a7e9f348fadc0102ffe2
+symfony/clock v7.4.21 — MIT; https://github.com/symfony/clock.git @ 07437f612dca89c1894c1db04491002b1e798f03
+symfony/console v7.4.22 — MIT; https://github.com/symfony/console.git @ 8012f842110b414fd1cc641adb0ed8423353b0bb
+symfony/css-selector v7.4.22 — MIT; https://github.com/symfony/css-selector.git @ 4cdbb4a575111d771791339a9d5231155918f699
+symfony/deprecation-contracts v3.7.1 — MIT; https://github.com/symfony/deprecation-contracts.git @ f3202fa1b5097b0af062dc978b32ecf63404e31d
+symfony/error-handler v7.4.22 — MIT; https://github.com/symfony/error-handler.git @ 545852cfe9c4979c82389155b4d8d05f8864e4f1
+symfony/event-dispatcher v7.4.17 — MIT; https://github.com/symfony/event-dispatcher.git @ d269974ee93c61d03620ffee358355bfdb471d66
+symfony/event-dispatcher-contracts v3.7.1 — MIT; https://github.com/symfony/event-dispatcher-contracts.git @ c7de7a00ffb67842132da02ea92988a39ccd9f4e
+symfony/finder v7.4.22 — MIT; https://github.com/symfony/finder.git @ e13420a8e0a76bdde1e7be09f923e62ad13739f2
+symfony/http-foundation v7.4.22 — MIT; https://github.com/symfony/http-foundation.git @ 63eda1d0c4de229d6b3e825709e49dd5c149699a
+symfony/http-kernel v7.4.22 — MIT; https://github.com/symfony/http-kernel.git @ 87e727b33983238d3f2ea50f9f62265499ca1a6d
+symfony/mailer v7.4.22 — MIT; https://github.com/symfony/mailer.git @ 1aa1e2ee7515826bb17b0ad0d2f16962fcaa7859
+symfony/mime v7.4.22 — MIT; https://github.com/symfony/mime.git @ 94a4c017435bc515f5ac80421a2c555fb9ca3676
+symfony/polyfill-ctype v1.37.0 — MIT; https://github.com/symfony/polyfill-ctype.git @ 141046a8f9477948ff284fa65be2095baafb94f2
+symfony/polyfill-intl-grapheme v1.43.3 — MIT; https://github.com/symfony/polyfill-intl-grapheme.git @ 5a8f33c87aeecffce24e721b5064fab05f4becf8
+symfony/polyfill-intl-idn v1.43.0 — MIT; https://github.com/symfony/polyfill-intl-idn.git @ 533d68cf99c8f8ee2e8893c59ed59192e92cfd74
+symfony/polyfill-intl-normalizer v1.43.0 — MIT; https://github.com/symfony/polyfill-intl-normalizer.git @ ebd57ccc7edb93d632e184efbe7693d2517bab3b
+symfony/polyfill-mbstring v1.43.3 — MIT; https://github.com/symfony/polyfill-mbstring.git @ 122889ed24dc000165bcbfd77ec412f15cbdfc6a
+symfony/polyfill-php80 v1.43.0 — MIT; https://github.com/symfony/polyfill-php80.git @ 9c6a5d6b01ca51d486c813e9a9c0ed55f208bb74
+symfony/polyfill-php82 v1.43.0 — MIT; https://github.com/symfony/polyfill-php82.git @ 843bbe8b2a7934307b749751eede0f111f5d1cfc
+symfony/polyfill-php83 v1.43.0 — MIT; https://github.com/symfony/polyfill-php83.git @ 80ccff923a8d61f73ebe9da0aa94e25232f004ce
+symfony/polyfill-php84 v1.43.0 — MIT; https://github.com/symfony/polyfill-php84.git @ 22c6548499cbe5c5bb072fc0c42312dff062a015
+symfony/polyfill-php85 v1.43.0 — MIT; https://github.com/symfony/polyfill-php85.git @ 86a42cbcc07adc331481a5ab310a4024bfc227f6
+symfony/polyfill-php86 v1.43.0 — MIT; https://github.com/symfony/polyfill-php86.git @ 8840df45b24f33a49dc419fa18dc0057231ae1d8
+symfony/polyfill-time v1.42.0 — MIT; https://github.com/symfony/polyfill-time.git @ ac9f1ed802dd58f37e720388130c088434aa09fc
+symfony/polyfill-uuid v1.43.0 — MIT; https://github.com/symfony/polyfill-uuid.git @ b23ff8245cc5c4479ea2be3d0132d2e6dd433993
+symfony/process v7.4.22 — MIT; https://github.com/symfony/process.git @ a5a6912edbbfc4c98cd080bc4bbe37c8e7eeb20a
+symfony/routing v7.4.22 — MIT; https://github.com/symfony/routing.git @ f79ed6fbf60d9e32d358054f1915295f3b8a6f7a
+symfony/service-contracts v3.7.3 — MIT; https://github.com/symfony/service-contracts.git @ 15e6a07ec2a2c75ceb1b21dd98105ee8456d2257
+symfony/string v7.4.22 — MIT; https://github.com/symfony/string.git @ 8dff7da3a56638f1d189c5368183294102de4ced
+symfony/translation v7.4.22 — MIT; https://github.com/symfony/translation.git @ a892cd1807bfaf0a10690359c47fdf95b162ef22
+symfony/translation-contracts v3.7.1 — MIT; https://github.com/symfony/translation-contracts.git @ ccb206b98faccc511ebae8e5fad50f2dc0b30621
+symfony/uid v7.4.21 — MIT; https://github.com/symfony/uid.git @ 3e706a245b5343ea93be9cafe84525bfb54e60fc
+symfony/var-dumper v7.4.22 — MIT; https://github.com/symfony/var-dumper.git @ 6e6ff33ea8cf5df27f00a5561ebd5ee9bd7f1618
+tijsverkoyen/css-to-inline-styles v2.4.0 — BSD-3-Clause; https://github.com/tijsverkoyen/CssToInlineStyles.git @ f0292ccf0ec75843d65027214426b6b163b48b41
+vlucas/phpdotenv v5.8.0 — BSD-3-Clause; https://github.com/phpdotenv/phpdotenv.git @ 96149103e62ac67e915f6d2ef59b72dee2e011e0
+voku/portable-ascii 2.1.1 — MIT; https://github.com/voku/portable-ascii.git @ 8e1051fe39379367aecf014f41744ce7539a856f
+fakerphp/faker v1.24.1 — MIT; https://github.com/FakerPHP/Faker.git @ e0ee18eb1e6dc3cda3ce9fd97e5a0689a88a64b5
+filp/whoops 2.18.7 — MIT; https://github.com/filp/whoops.git @ 50670ba239926c50f2073e868f6672f775cd57ec
+hamcrest/hamcrest-php v3.0.0 — BSD-3-Clause; https://github.com/hamcrest/hamcrest-php.git @ b61cd040da1a4925bc90a51c074f5297e7c0fa52
+laravel/agent-detector v2.0.5 — MIT; https://github.com/laravel/agent-detector.git @ 9e0d78ab6848d34f3ce5a438ca99ae082afd910a
+laravel/pail v1.2.7 — MIT; https://github.com/laravel/pail.git @ 2f7d27dada8effc48b8c424445a69cca7007daaa
+laravel/pao v1.1.5 — MIT; https://github.com/laravel/pao.git @ 620424f1ce744d96937fb6be60a94793e79b67ad
+laravel/pint v1.32.1 — MIT; https://github.com/laravel/pint.git @ 006bd7825eb01daf92959d060b89cd9514fe4253
+mockery/mockery 1.6.15 — BSD-3-Clause; https://github.com/mockery/mockery.git @ 967a801bd188989a5669bd280f252d51c0fdc9ee
+myclabs/deep-copy 1.14.0 — MIT; https://github.com/myclabs/DeepCopy.git @ 8680aa248f8e07bc8fb43f56f0f5fc77a0c96aae
+nunomaduro/collision v8.9.5 — MIT; https://github.com/nunomaduro/collision.git @ fb53eacd509a1d303858e2d20cfebf2d630254ec
+phar-io/manifest 2.0.4 — BSD-3-Clause; https://github.com/phar-io/manifest.git @ 54750ef60c58e43759730615a392c31c80e23176
+phar-io/version 3.2.1 — BSD-3-Clause; https://github.com/phar-io/version.git @ 4f7fd7836c6f332bb2933569e566a0d6c4cbed74
+phpunit/php-code-coverage 12.5.8 — BSD-3-Clause; https://github.com/sebastianbergmann/php-code-coverage.git @ 7440368d94738d54f2c1de24dbd3871793bbb0dd
+phpunit/php-file-iterator 6.0.2 — BSD-3-Clause; https://github.com/sebastianbergmann/php-file-iterator.git @ a248d1640ab059b075f53a2ef0f9856e864e06b5
+phpunit/php-invoker 6.0.0 — BSD-3-Clause; https://github.com/sebastianbergmann/php-invoker.git @ 12b54e689b07a25a9b41e57736dfab6ec9ae5406
+phpunit/php-text-template 5.0.1 — BSD-3-Clause; https://github.com/sebastianbergmann/php-text-template.git @ babab73b7ef9fae406f2eb3ee11323a61caa63d5
+phpunit/php-timer 8.0.0 — BSD-3-Clause; https://github.com/sebastianbergmann/php-timer.git @ f258ce36aa457f3aa3339f9ed4c81fc66dc8c2cc
+phpunit/phpunit 12.5.42 — BSD-3-Clause; https://github.com/sebastianbergmann/phpunit.git @ 1d6dbe748c079e5d2b03bca1be69d0f4cc52a578
+sebastian/cli-parser 4.2.1 — BSD-3-Clause; https://github.com/sebastianbergmann/cli-parser.git @ 7d05781b13f7dec9043a629a21d086ed74582a15
+sebastian/comparator 7.1.8 — BSD-3-Clause; https://github.com/sebastianbergmann/comparator.git @ 7c65c1e79836812819705b473a90c12399542485
+sebastian/complexity 5.0.0 — BSD-3-Clause; https://github.com/sebastianbergmann/complexity.git @ bad4316aba5303d0221f43f8cee37eb58d384bbb
+sebastian/diff 7.0.1 — BSD-3-Clause; https://github.com/sebastianbergmann/diff.git @ cd4cabe39f8a4e8ee6818ba99f10a05561ea4ad6
+sebastian/environment 8.1.2 — BSD-3-Clause; https://github.com/sebastianbergmann/environment.git @ 9d32c685773823b1983e256ae4ecd48a10d6e439
+sebastian/exporter 7.0.3 — BSD-3-Clause; https://github.com/sebastianbergmann/exporter.git @ c5e21b5de653ce0a769fb36f5cdfcb5e7a32cf23
+sebastian/global-state 8.0.3 — BSD-3-Clause; https://github.com/sebastianbergmann/global-state.git @ b164d3274d6537ab462591c5755f76a8f5b1aae9
+sebastian/lines-of-code 4.0.1 — BSD-3-Clause; https://github.com/sebastianbergmann/lines-of-code.git @ d543b8ef219dcd8da262cbb958639a96bedba10e
+sebastian/object-enumerator 7.0.0 — BSD-3-Clause; https://github.com/sebastianbergmann/object-enumerator.git @ 1effe8e9b8e068e9ae228e542d5d11b5d16db894
+sebastian/object-reflector 5.0.0 — BSD-3-Clause; https://github.com/sebastianbergmann/object-reflector.git @ 4bfa827c969c98be1e527abd576533293c634f6a
+sebastian/recursion-context 7.0.1 — BSD-3-Clause; https://github.com/sebastianbergmann/recursion-context.git @ 0b01998a7d5b1f122911a66bebcb8d46f0c82d8c
+sebastian/type 6.0.4 — BSD-3-Clause; https://github.com/sebastianbergmann/type.git @ 82ff822c2edc46724be9f7411d3163021f602773
+sebastian/version 6.0.1 — BSD-3-Clause; https://github.com/sebastianbergmann/version.git @ 9e935a16187e14f39b0e79910dabd614972cdb26
+staabm/side-effects-detector 1.0.5 — MIT; https://github.com/staabm/side-effects-detector.git @ d8334211a140ce329c13726d4a715adbddd0a163
+theseer/tokenizer 2.0.1 — BSD-3-Clause; https://github.com/theseer/tokenizer.git @ 7989e43bf381af0eac72e4f0ca5bcbfa81658be4
+
+OpenWrt ImageBuilder and packages are downloaded separately by build.sh. No upstream OpenWrt image or dependency vendor tree is included in this source archive. Consult upstream package licenses and corresponding-source obligations before redistributing built images. JavaScript dependencies are declared in management/package.json; their packages are not included.
