@@ -1,0 +1,193 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 340" width="960" height="340" role="img" aria-label="NurRouterOS x86_64 Rackmount Appliance">
+  <defs>
+    <linearGradient id="bgGlow" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0d1824"/>
+      <stop offset="55%" stop-color="#15273a"/>
+      <stop offset="100%" stop-color="#0b141e"/>
+    </linearGradient>
+    <linearGradient id="metalChassis" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f4f7fa"/>
+      <stop offset="18%" stop-color="#dce3ec"/>
+      <stop offset="52%" stop-color="#eef2f6"/>
+      <stop offset="88%" stop-color="#b8c4d2"/>
+      <stop offset="100%" stop-color="#8b99aa"/>
+    </linearGradient>
+    <linearGradient id="earMetal" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#9aa8b8"/>
+      <stop offset="50%" stop-color="#d4dde7"/>
+      <stop offset="100%" stop-color="#7c8b9b"/>
+    </linearGradient>
+    <linearGradient id="faceplateDark" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#141e28"/>
+      <stop offset="100%" stop-color="#1e2d3d"/>
+    </linearGradient>
+    <linearGradient id="lcdScreen" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#06283d"/>
+      <stop offset="100%" stop-color="#00507a"/>
+    </linearGradient>
+    <filter id="dropShadow" x="-10%" y="-15%" width="120%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="16" flood-color="#000000" flood-opacity="0.55"/>
+    </filter>
+  </defs>
+
+  <rect width="960" height="340" rx="8" fill="url(#bgGlow)"/>
+  <g stroke="#233a52" stroke-width="1" opacity="0.45">
+    <line x1="0" y1="60" x2="960" y2="60"/>
+    <line x1="0" y1="120" x2="960" y2="120"/>
+    <line x1="0" y1="180" x2="960" y2="180"/>
+    <line x1="0" y1="240" x2="960" y2="240"/>
+    <line x1="0" y1="300" x2="960" y2="300"/>
+    <line x1="120" y1="0" x2="120" y2="340"/>
+    <line x1="280" y1="0" x2="280" y2="340"/>
+    <line x1="480" y1="0" x2="480" y2="340"/>
+    <line x1="680" y1="0" x2="680" y2="340"/>
+    <line x1="840" y1="0" x2="840" y2="340"/>
+  </g>
+
+  <ellipse cx="480" cy="285" rx="390" ry="22" fill="#00a9e8" opacity="0.16"/>
+
+  <!-- Top Lid Perspective -->
+  <polygon points="84,82 876,82 912,118 48,118" fill="#cfd8e3" stroke="#96a5b5" stroke-width="1"/>
+  <line x1="160" y1="92" x2="800" y2="92" stroke="#aebbc9" stroke-width="1"/>
+  <line x1="140" y1="104" x2="820" y2="104" stroke="#aebbc9" stroke-width="1"/>
+
+  <!-- Main 1U Chassis -->
+  <g filter="url(#dropShadow)">
+    <!-- Rack Ears -->
+    <rect x="20" y="118" width="28" height="126" rx="3" fill="url(#earMetal)" stroke="#6c7a89"/>
+    <ellipse cx="34" cy="136" rx="6" ry="4.5" fill="#0d1824"/>
+    <ellipse cx="34" cy="181" rx="6" ry="4.5" fill="#0d1824"/>
+    <ellipse cx="34" cy="226" rx="6" ry="4.5" fill="#0d1824"/>
+
+    <rect x="912" y="118" width="28" height="126" rx="3" fill="url(#earMetal)" stroke="#6c7a89"/>
+    <ellipse cx="926" cy="136" rx="6" ry="4.5" fill="#0d1824"/>
+    <ellipse cx="926" cy="181" rx="6" ry="4.5" fill="#0d1824"/>
+    <ellipse cx="926" cy="226" rx="6" ry="4.5" fill="#0d1824"/>
+
+    <!-- Brushed Aluminum Body -->
+    <rect x="48" y="118" width="864" height="126" rx="3" fill="url(#metalChassis)" stroke="#8c9baa" stroke-width="1.5"/>
+    <rect x="58" y="128" width="844" height="106" rx="2" fill="url(#faceplateDark)" stroke="#384b5e"/>
+
+    <!-- Brand Identity Left Block -->
+    <rect x="74" y="142" width="34" height="34" rx="3" fill="#176bcc"/>
+    <text x="91" y="164" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="14" font-weight="800">NU</text>
+    <text x="118" y="156" fill="#ffffff" font-family="Arial, sans-serif" font-size="15" font-weight="700" letter-spacing="0.5">NurRouter</text>
+    <text x="118" y="171" fill="#6bc8f5" font-family="monospace" font-size="10" font-weight="700">CCR-x86_64 · 0.4.0-rc.4</text>
+
+    <!-- Ventilation Grille -->
+    <g fill="#0b1219">
+      <rect x="74" y="186" width="140" height="4" rx="1"/>
+      <rect x="74" y="195" width="140" height="4" rx="1"/>
+      <rect x="74" y="204" width="140" height="4" rx="1"/>
+      <rect x="74" y="213" width="140" height="4" rx="1"/>
+    </g>
+
+    <!-- 4x SFP+ 10G Cages -->
+    <g transform="translate(234, 142)">
+      <text x="0" y="-4" fill="#8ea3b8" font-family="monospace" font-size="8.5">SFP+ 10G UPLINK</text>
+      <g>
+        <rect x="0" y="2" width="42" height="28" rx="2" fill="#0b1117" stroke="#6d8094" stroke-width="1.5"/>
+        <rect x="6" y="8" width="30" height="16" fill="#182532"/>
+        <circle cx="8" cy="37" r="3" fill="#00d4ff"/>
+        <text x="21" y="40" text-anchor="middle" fill="#9fb2c6" font-family="monospace" font-size="8">SFP1</text>
+      </g>
+      <g transform="translate(48, 0)">
+        <rect x="0" y="2" width="42" height="28" rx="2" fill="#0b1117" stroke="#6d8094" stroke-width="1.5"/>
+        <rect x="6" y="8" width="30" height="16" fill="#182532"/>
+        <circle cx="8" cy="37" r="3" fill="#00d4ff"/>
+        <text x="21" y="40" text-anchor="middle" fill="#9fb2c6" font-family="monospace" font-size="8">SFP2</text>
+      </g>
+      <g transform="translate(0, 46)">
+        <rect x="0" y="2" width="42" height="28" rx="2" fill="#0b1117" stroke="#6d8094" stroke-width="1.5"/>
+        <rect x="6" y="8" width="30" height="16" fill="#182532"/>
+        <circle cx="8" cy="37" r="3" fill="#28d17c"/>
+        <text x="21" y="40" text-anchor="middle" fill="#9fb2c6" font-family="monospace" font-size="8">SFP3</text>
+      </g>
+      <g transform="translate(48, 46)">
+        <rect x="0" y="2" width="42" height="28" rx="2" fill="#0b1117" stroke="#6d8094" stroke-width="1.5"/>
+        <rect x="6" y="8" width="30" height="16" fill="#182532"/>
+        <circle cx="8" cy="37" r="3" fill="#28d17c"/>
+        <text x="21" y="40" text-anchor="middle" fill="#9fb2c6" font-family="monospace" font-size="8">SFP4</text>
+      </g>
+    </g>
+
+    <!-- 8x Gigabit Ethernet RJ45 Ports (2x4 Bank) -->
+    <g transform="translate(346, 142)">
+      <text x="0" y="-4" fill="#8ea3b8" font-family="monospace" font-size="8.5">1G / 2.5G ETHERNET INTERFACES (ETH1 - ETH8)</text>
+      <!-- Top Row ETH1-ETH4 -->
+      <g transform="translate(0, 2)">
+        <rect x="0" y="0" width="44" height="30" rx="2" fill="#0c131a" stroke="#7c8f9f" stroke-width="1.5"/>
+        <circle cx="8" cy="6" r="2.5" fill="#29d17d"/>
+        <circle cx="36" cy="6" r="2.5" fill="#ffb300"/>
+        <text x="22" y="24" text-anchor="middle" fill="#b7c7d8" font-family="monospace" font-size="8">WAN1</text>
+      </g>
+      <g transform="translate(50, 2)">
+        <rect x="0" y="0" width="44" height="30" rx="2" fill="#0c131a" stroke="#7c8f9f" stroke-width="1.5"/>
+        <circle cx="8" cy="6" r="2.5" fill="#29d17d"/>
+        <circle cx="36" cy="6" r="2.5" fill="#29d17d"/>
+        <text x="22" y="24" text-anchor="middle" fill="#b7c7d8" font-family="monospace" font-size="8">ETH2</text>
+      </g>
+      <g transform="translate(100, 2)">
+        <rect x="0" y="0" width="44" height="30" rx="2" fill="#0c131a" stroke="#7c8f9f" stroke-width="1.5"/>
+        <circle cx="8" cy="6" r="2.5" fill="#29d17d"/>
+        <circle cx="36" cy="6" r="2.5" fill="#29d17d"/>
+        <text x="22" y="24" text-anchor="middle" fill="#b7c7d8" font-family="monospace" font-size="8">ETH3</text>
+      </g>
+      <g transform="translate(150, 2)">
+        <rect x="0" y="0" width="44" height="30" rx="2" fill="#0c131a" stroke="#7c8f9f" stroke-width="1.5"/>
+        <circle cx="8" cy="6" r="2.5" fill="#29d17d"/>
+        <circle cx="36" cy="6" r="2.5" fill="#29d17d"/>
+        <text x="22" y="24" text-anchor="middle" fill="#b7c7d8" font-family="monospace" font-size="8">ETH4</text>
+      </g>
+      <!-- Bottom Row ETH5-ETH8 -->
+      <g transform="translate(0, 44)">
+        <rect x="0" y="0" width="44" height="30" rx="2" fill="#0c131a" stroke="#7c8f9f" stroke-width="1.5"/>
+        <circle cx="8" cy="6" r="2.5" fill="#29d17d"/>
+        <circle cx="36" cy="6" r="2.5" fill="#29d17d"/>
+        <text x="22" y="24" text-anchor="middle" fill="#b7c7d8" font-family="monospace" font-size="8">VLAN10</text>
+      </g>
+      <g transform="translate(50, 44)">
+        <rect x="0" y="0" width="44" height="30" rx="2" fill="#0c131a" stroke="#7c8f9f" stroke-width="1.5"/>
+        <circle cx="8" cy="6" r="2.5" fill="#29d17d"/>
+        <circle cx="36" cy="6" r="2.5" fill="#29d17d"/>
+        <text x="22" y="24" text-anchor="middle" fill="#b7c7d8" font-family="monospace" font-size="8">VLAN20</text>
+      </g>
+      <g transform="translate(100, 44)">
+        <rect x="0" y="0" width="44" height="30" rx="2" fill="#0c131a" stroke="#7c8f9f" stroke-width="1.5"/>
+        <circle cx="8" cy="6" r="2.5" fill="#29d17d"/>
+        <circle cx="36" cy="6" r="2.5" fill="#29d17d"/>
+        <text x="22" y="24" text-anchor="middle" fill="#b7c7d8" font-family="monospace" font-size="8">BR-LAN</text>
+      </g>
+      <g transform="translate(150, 44)">
+        <rect x="0" y="0" width="44" height="30" rx="2" fill="#0c131a" stroke="#00a9e8" stroke-width="1.5"/>
+        <circle cx="8" cy="6" r="2.5" fill="#00d4ff"/>
+        <circle cx="36" cy="6" r="2.5" fill="#29d17d"/>
+        <text x="22" y="24" text-anchor="middle" fill="#7cd8ff" font-family="monospace" font-size="8">MGMT</text>
+      </g>
+    </g>
+
+    <!-- Serial Console & Reset -->
+    <g transform="translate(562, 144)">
+      <text x="0" y="-6" fill="#8ea3b8" font-family="monospace" font-size="8.5">CONSOLE</text>
+      <rect x="0" y="0" width="46" height="30" rx="2" fill="#0c131a" stroke="#6d8094" stroke-width="1.5"/>
+      <text x="23" y="19" text-anchor="middle" fill="#7cd8ff" font-family="monospace" font-size="8">RS232</text>
+      <circle cx="14" cy="54" r="5" fill="#0c131a" stroke="#6d8094"/>
+      <text x="25" y="57" fill="#9fb2c6" font-family="monospace" font-size="8">RST</text>
+      <circle cx="14" cy="70" r="3.5" fill="#29d17d"/>
+      <text x="25" y="73" fill="#9fb2c6" font-family="monospace" font-size="8">PWR</text>
+    </g>
+
+    <!-- MikroTik-style Touch LCD Status Display -->
+    <g transform="translate(632, 138)">
+      <rect x="0" y="0" width="252" height="86" rx="4" fill="url(#lcdScreen)" stroke="#00a9e8" stroke-width="1.5"/>
+      <text x="14" y="20" fill="#7cd8ff" font-family="monospace" font-size="10" font-weight="700">NURROUTEROS 0.4.0-RC.4</text>
+      <circle cx="236" cy="16" r="4" fill="#29d17d"/>
+      <line x1="14" y1="27" x2="238" y2="27" stroke="#186491" stroke-width="1"/>
+      <text x="14" y="43" fill="#ffffff" font-family="monospace" font-size="10">OpenWrt 24.10.0 · x86_64</text>
+      <text x="14" y="58" fill="#a8dcfa" font-family="monospace" font-size="9.5">SSH Mgmt: Pinned · SafeMode: OK</text>
+      <!-- Mini live throughput waveform -->
+      <polyline points="14,76 38,72 62,74 86,65 110,69 134,58 158,64 182,52 206,61 236,49" fill="none" stroke="#00e1ff" stroke-width="2"/>
+    </g>
+  </g>
+</svg>
+

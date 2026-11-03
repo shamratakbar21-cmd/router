@@ -1,0 +1,459 @@
+<?php
+
+return array (
+  'brand' => 
+  array (
+    'name' => 'NurRouter',
+    'domain' => 'nurrouter.com',
+    'tagline' => 'OpenWrt-based ISP router OS with external WinControl management.',
+    'description' => 'NurRouterOS 0.5.0-dev.14 on OpenWrt 24.10.0 (x86/64), with accepted candidate-10 external WinControl desktop management. Factory lab WAN profile and fixture licensing trust removed; physical USB/hardware and commercial activation remain unqualified.',
+  ),
+  'release' => 
+  array (
+    'product' => 'NurRouterOS',
+    'version' => '0.5.0-dev.14',
+    'status' => 'development-candidate',
+    'openwrt_base' => '24.10.0',
+    'target' => 'x86/64',
+    'qualification' => 'Candidate-specific BIOS/UEFI ext4 VM installation, pinned management and affected ARP/recovery checks; optical ISO only',
+    'bare_metal_qualified' => false,
+    'production_ready' => false,
+    'management' => 'External Laravel WinControl (not packaged in appliance images)',
+    'path' => '/releases/0.5.0-dev.14',
+    'previous_path' => '/releases/0.5.0-dev.8',
+    'iso' => 
+    array (
+      'filename' => 'nurrouteros-0.5.0-dev.14-installer.iso',
+      'href' => '/releases/0.5.0-dev.14/nurrouteros-0.5.0-dev.14-installer.iso',
+      'size_bytes' => 166981632,
+      'sha256' => 'ffa1a26d27cf2c75e451bc17e29d0928cbf2c06876eaa6beeb496be6165dd11c',
+      'kind' => 'Installer ISO',
+      'compat' => 'BIOS + UEFI optical · ext4; squashfs also bundled, built only',
+      'firmware' => 'BIOS + UEFI optical',
+      'filesystem' => 'ext4; ISO carries built-only squashfs payloads',
+      'source_commit' => 'a3b4524485671dd6d4ef067e56ec50815f36d62c',
+      'qualification' => 'See candidate-specific QUALIFICATION.json; physical USB and hardware remain unqualified.',
+    ),
+    'artifacts' => 
+    array (
+      0 => 
+      array (
+        'filename' => 'nurrouteros-0.5.0-dev.14-installer.iso',
+        'href' => '/releases/0.5.0-dev.14/nurrouteros-0.5.0-dev.14-installer.iso',
+        'size_bytes' => 166981632,
+        'sha256' => 'ffa1a26d27cf2c75e451bc17e29d0928cbf2c06876eaa6beeb496be6165dd11c',
+        'kind' => 'Installer ISO',
+        'compat' => 'BIOS + UEFI optical · ext4; squashfs also bundled, built only',
+        'firmware' => 'BIOS + UEFI optical',
+        'filesystem' => 'ext4; ISO carries built-only squashfs payloads',
+        'source_commit' => '47a666ecfde754aee20a882abf7a921dce69f261',
+        'qualification' => 'See candidate-specific QUALIFICATION.json; physical USB and hardware remain unqualified.',
+      ),
+      1 => 
+      array (
+        'filename' => 'nurrouteros-bios-ext4.qcow2',
+        'href' => '/releases/0.5.0-dev.14/nurrouteros-bios-ext4.qcow2',
+        'size_bytes' => 90767360,
+        'sha256' => '6bd90be89b037d5f16b2b54bda9b25959c634749f065841043e507c90286c94e',
+        'kind' => 'QCOW2 lab image',
+        'compat' => 'BIOS · ext4',
+        'firmware' => 'BIOS',
+        'filesystem' => 'ext4; ISO carries built-only squashfs payloads',
+        'source_commit' => '47a666ecfde754aee20a882abf7a921dce69f261',
+        'qualification' => 'See candidate-specific QUALIFICATION.json; physical USB and hardware remain unqualified.',
+      ),
+      2 => 
+      array (
+        'filename' => 'nurrouteros-uefi-ext4.qcow2',
+        'href' => '/releases/0.5.0-dev.14/nurrouteros-uefi-ext4.qcow2',
+        'size_bytes' => 91422720,
+        'sha256' => '6ef84131e3997e0f2ddf76e2ce2a5c8389d072a76ddb0f4d6bafea5d92261dc5',
+        'kind' => 'QCOW2 lab image',
+        'compat' => 'UEFI · ext4',
+        'firmware' => 'UEFI',
+        'filesystem' => 'ext4; ISO carries built-only squashfs payloads',
+        'source_commit' => '47a666ecfde754aee20a882abf7a921dce69f261',
+        'qualification' => 'See candidate-specific QUALIFICATION.json; physical USB and hardware remain unqualified.',
+      ),
+      3 => 
+      array (
+        'filename' => 'payload/nurrouteros-bios-ext4.img.gz',
+        'href' => '/releases/0.5.0-dev.14/payload/nurrouteros-bios-ext4.img.gz',
+        'size_bytes' => 34948515,
+        'sha256' => '4c8212ab7395c9444ad5701ae483f79c6bb049bf58c7c05f78f2c6b84420ffe7',
+        'kind' => 'RAW image (gzip)',
+        'compat' => 'BIOS · ext4',
+        'firmware' => 'BIOS',
+        'filesystem' => 'ext4; ISO carries built-only squashfs payloads',
+        'source_commit' => '47a666ecfde754aee20a882abf7a921dce69f261',
+        'qualification' => 'See candidate-specific QUALIFICATION.json; physical USB and hardware remain unqualified.',
+      ),
+      4 => 
+      array (
+        'filename' => 'payload/nurrouteros-uefi-ext4.img.gz',
+        'href' => '/releases/0.5.0-dev.14/payload/nurrouteros-uefi-ext4.img.gz',
+        'size_bytes' => 35153247,
+        'sha256' => '1c8e93638dca008b5eb640d126a28e066fefd22d5151463d82b2f24fcaf638c0',
+        'kind' => 'RAW image (gzip)',
+        'compat' => 'UEFI · ext4',
+        'firmware' => 'UEFI',
+        'filesystem' => 'ext4; ISO carries built-only squashfs payloads',
+        'source_commit' => '47a666ecfde754aee20a882abf7a921dce69f261',
+        'qualification' => 'See candidate-specific QUALIFICATION.json; physical USB and hardware remain unqualified.',
+      ),
+    ),
+    'manifest_href' => '/releases/0.5.0-dev.14/RELEASE-MANIFEST.json',
+    'checksums_href' => '/releases/0.5.0-dev.14/SHA256SUMS',
+    'source' => 
+    array (
+      'appliance_href' => '/releases/0.5.0-dev.14/nurrouteros-0.5.0-dev.14-build-source.tar.gz',
+      'management_href' => '/releases/0.5.0-dev.14/nur-wincontrol-candidate-10-desktop-source.tar.gz',
+      'management_sha256' => 'd9df35e58ffa166ebed4f14011526479291fcb2201ddde17f888640d85c1855b',
+      'appliance_sha256' => '1424f93cf77719510de2f0e7f23b53e62cc3bc7d46ee7312e7a78280518ceeea',
+    ),
+    'source_commit' => '47a666ecfde754aee20a882abf7a921dce69f261',
+  ),
+  'boot_candidate' => 
+  array (
+    'version' => '0.5.0-dev.10',
+    'classification' => 'Hardware boot-test candidate',
+    'primary_release' => false,
+    'filename' => 'nurrouteros-0.5.0-dev.10-installer.iso',
+    'href' => '/releases/0.5.0-dev.10/nurrouteros-0.5.0-dev.10-installer.iso',
+    'size_bytes' => 166985728,
+    'sha256' => '65fc3fda5bb425bfb1aa1ac3bc68dc1afe05da2b88ef24e2588b14770b9e465b',
+    'checksums_href' => '/releases/0.5.0-dev.10/SHA256SUMS',
+    'manifest_href' => '/releases/0.5.0-dev.10/RELEASE-MANIFEST.json',
+    'handover_href' => '/releases/0.5.0-dev.10/BOOT-CONSOLE-HANDOVER.md',
+    'result_href' => '/releases/0.5.0-dev.10/BOOT-CONSOLE-RESULT.json',
+    'scope' => 'Corrected graphical/iDRAC and serial installer console paths, verified with isolated QEMU UEFI removable-USB and serial-media tests.',
+    'warning' => 'Historical immutable boot-console ISO only, not the current ARP candidate. The manually modified physical dev.10 USB is excluded. Physical payload discovery, hardware installation and recovery remain unresolved/unqualified.',
+  ),
+  'stats' => 
+  array (
+    0 => 
+    array (
+      'value' => '0.5.0-dev.14',
+      'label' => 'Appliance candidate',
+    ),
+    1 => 
+    array (
+      'value' => 'candidate-10',
+      'label' => 'WinControl desktop',
+    ),
+    2 => 
+    array (
+      'value' => 'x86/64',
+      'label' => 'Target',
+    ),
+    3 => 
+    array (
+      'value' => 'VM ext4',
+      'label' => 'Verification scope',
+    ),
+  ),
+  'features' => 
+  array (
+    0 => 
+    array (
+      'title' => 'Managed IPv4 neighbors',
+      'description' => 'Real Linux neighbor states and managed static add/edit/delete, explicit enable/disable, comments, revisions, reboot persistence, audit and Safe Mode. Requires negotiated appliance capabilities.',
+      'status' => 'verified dev.14 VM',
+    ),
+    1 => 
+    array (
+      'title' => 'Compact desktop workspace',
+      'description' => 'Floating windows, keyboard controls, browser-saved per-user/router workspaces and table preferences; selection, scroll and editor focus survive live refresh.',
+      'status' => 'verified candidate-10',
+    ),
+    2 => 
+    array (
+      'title' => 'External management',
+      'description' => 'Pinned SSH, authenticated administration, staged revisions, observed apply verification, durable reconciliation and recovery. The management host runs separately.',
+      'status' => 'implemented / tested',
+    ),
+    3 => 
+    array (
+      'title' => 'Explicit qualification',
+      'description' => 'BIOS/UEFI ext4 VM installation and documented ARP/recovery scope. Development images are not a production-hardware or subscriber-capacity claim.',
+      'status' => 'development only',
+    ),
+  ),
+  'feature_matrix' => 
+  array (
+    0 => 
+    array (
+      'area' => 'ARP observation and managed static neighbors',
+      'status' => 'verified dev.14 VM',
+      'notes' => 'Accurate Linux states; CRUD, enable/disable, comments, revision/apply verification, persistence, audit and rollback. Unknown VRF/bridge-port/hostname data is not fabricated.',
+    ),
+    1 => 
+    array (
+      'area' => 'Floating windows and keyboard controls',
+      'status' => 'verified candidate-10',
+      'notes' => 'Move, resize, minimize, maximize, restore, focus and stacking; multiple simultaneous core panels.',
+    ),
+    2 => 
+    array (
+      'area' => 'Workspaces and column preferences',
+      'status' => 'verified candidate-10',
+      'notes' => 'Browser-local storage scoped per authenticated user and router; geometry, open panels, column widths/order/visibility. No cloud synchronization.',
+    ),
+    3 => 
+    array (
+      'area' => 'Live refresh continuity',
+      'status' => 'verified candidate-10',
+      'notes' => 'Preserves selection, scroll, focus and unsaved editor state; shared observation requests.',
+    ),
+    4 => 
+    array (
+      'area' => 'Core network editors and views',
+      'status' => 'implemented / tested',
+      'notes' => 'Interfaces, addresses/routes, Bridge/VLAN, DHCP/DNS, firewall/NAT, PPPoE/shaping, WireGuard and IPv6 share desktop components. Editor tests do not establish live network qualification on every variant.',
+    ),
+    5 => 
+    array (
+      'area' => 'IPv4/firewall/NAT/DHCP/DNS and PPPoE/BRAS packet paths',
+      'status' => 'historical lab evidence',
+      'notes' => 'Earlier dev.8 isolated VM evidence remains historical. It is not a dev.14 soak, scale or hardware qualification.',
+    ),
+    6 => 
+    array (
+      'area' => 'Safe Mode and configuration recovery',
+      'status' => 'verified within scope',
+      'notes' => 'Independent watchdog and affected ARP/recovery cases; config backup/restore and operation reconciliation tested. This is not firmware A/B rollback.',
+    ),
+    7 => 
+    array (
+      'area' => 'BIOS / UEFI ext4 installation',
+      'status' => 'verified dev.14 VM',
+      'notes' => 'Fresh ISO installation on disposable VM disks. UEFI boot and pinned-management smoke; BIOS real ARP and recovery workflows.',
+    ),
+    8 => 
+    array (
+      'area' => 'Squashfs variants bundled in ISO',
+      'status' => 'built / not live qualified',
+      'notes' => 'Not separately offered as current downloads; no fresh live acceptance claim.',
+    ),
+    9 => 
+    array (
+      'area' => 'Licensing / commercial activation',
+      'status' => 'implemented / commercial unqualified',
+      'notes' => 'Authenticated administration/policy tests exist. Factory public fixture trust is removed; no commercial signing trust is provisioned.',
+    ),
+    10 => 
+    array (
+      'area' => 'WiFi, Switch, Mesh, MPLS, Dot1X, general Terminal and diagnostics',
+      'status' => 'unsupported',
+      'notes' => 'Labels are explicit; no enabled placeholder actions.',
+    ),
+    11 => 
+    array (
+      'area' => 'Physical USB / bare-metal / firmware A/B rollback',
+      'status' => 'unresolved / unsupported',
+      'notes' => 'Physical payload-discovery failure remains unresolved. Hardware qualification and automatic firmware A/B rollback are not established.',
+    ),
+  ),
+  'limitations' => 
+  array (
+    0 => 'Development candidate for isolated evaluation; not stable, production-ready or bare-metal qualified.',
+    1 => 'Physical installer USB payload discovery remains unresolved. Do not substitute the manually modified dev.10 USB for qualified immutable media.',
+    2 => 'dev.14 does not inherit dev.8 eight-hour soak or ten-subscriber capacity evidence. No current hardware or production-capacity claim.',
+    3 => 'Commercial activation is unqualified. dev.14 provisions no commercial signing trust; old public test trust has been removed.',
+    4 => 'Squashfs payloads in the ISO are built but not newly live qualified; current standalone downloads select ext4.',
+    5 => 'Automatic firmware A/B rollback is unsupported; configuration Safe Mode is a different recovery mechanism.',
+    6 => 'Desktop workspace preferences are local to the browser and scoped per user/router, without cross-browser synchronization.',
+    7 => 'A complete bit-identical rebuild and independent corresponding-source compliance audit have not been established; source provenance, upstream component sources and applicable license terms are provided.',
+  ),
+  'licensing_plans' => 
+  array (
+    0 => 
+    array (
+      'code' => 'trial',
+      'name' => 'Trial',
+      'duration' => '30 days',
+      'max_routers' => '1',
+      'max_pppoe_sessions' => '50',
+      'features' => 'routing, firewall, dhcp, dns, pppoe',
+    ),
+    1 => 
+    array (
+      'code' => 'standard',
+      'name' => 'Standard',
+      'duration' => '365 days',
+      'max_routers' => '5',
+      'max_pppoe_sessions' => '250',
+      'features' => 'routing, firewall, dhcp, dns, pppoe, shaping',
+    ),
+    2 => 
+    array (
+      'code' => 'professional',
+      'name' => 'Professional',
+      'duration' => '365 days',
+      'max_routers' => '25',
+      'max_pppoe_sessions' => '1000',
+      'features' => 'routing, firewall, dhcp, dns, pppoe, shaping',
+    ),
+    3 => 
+    array (
+      'code' => 'enterprise',
+      'name' => 'Enterprise',
+      'duration' => 'Configurable',
+      'max_routers' => 'Unlimited (0)',
+      'max_pppoe_sessions' => 'Unlimited (0)',
+      'features' => 'routing, firewall, dhcp, dns, pppoe, shaping',
+    ),
+  ),
+  'docs' => 
+  array (
+    0 => 
+    array (
+      'slug' => 'install',
+      'title' => 'Install and recovery',
+      'file' => 'INSTALL-AND-RECOVERY.md',
+    ),
+    1 => 
+    array (
+      'slug' => 'deploy',
+      'title' => 'WinControl deployment',
+      'file' => 'DEPLOYMENT.md',
+    ),
+    2 => 
+    array (
+      'slug' => 'features',
+      'title' => 'Supported feature matrix',
+      'file' => 'FEATURE-MATRIX.md',
+    ),
+    3 => 
+    array (
+      'slug' => 'gaps',
+      'title' => 'Feature gap matrix',
+      'file' => 'FEATURE-GAP-MATRIX.md',
+    ),
+    4 => 
+    array (
+      'slug' => 'licensing',
+      'title' => 'Licensing',
+      'file' => 'LICENSING.md',
+    ),
+    5 => 
+    array (
+      'slug' => 'backup',
+      'title' => 'Backup and restore',
+      'file' => 'BACKUP-RESTORE.md',
+    ),
+    6 => 
+    array (
+      'slug' => 'updates',
+      'title' => 'Appliance updates',
+      'file' => 'APPLIANCE-UPDATES.md',
+    ),
+    7 => 
+    array (
+      'slug' => 'release',
+      'title' => 'dev.14 factory cleanup and candidate-10 release notes',
+      'file' => 'RELEASE-NOTES-0.5.0-dev.14.md',
+    ),
+    8 => 
+    array (
+      'slug' => 'qualification-dev8',
+      'title' => 'Historical: 0.5.0-dev.8 qualification',
+      'file' => 'QUALIFICATION-0.5.0-dev.8.md',
+    ),
+    9 => 
+    array (
+      'slug' => 'dell-r630',
+      'title' => 'Historical: Dell R630 test handover',
+      'file' => 'HANDOVER-DELL-R630-0.5.0-dev.8.md',
+    ),
+    10 => 
+    array (
+      'slug' => 'boot-console-dev10',
+      'title' => 'Historical: 0.5.0-dev.10 boot-console handover',
+      'file' => 'HANDOVER-0.5.0-dev.10-BOOT-CONSOLE.md',
+    ),
+    11 => 
+    array (
+      'slug' => 'source',
+      'title' => 'Source, build inputs and license notices',
+      'file' => 'SOURCE-AND-LICENSES.md',
+    ),
+    12 => 
+    array (
+      'slug' => 'desktop',
+      'title' => 'WinControl desktop and ARP workflows',
+      'file' => 'WINCONTROL-DESKTOP.md',
+    ),
+    13 => 
+    array (
+      'slug' => 'usb-status',
+      'title' => 'Physical USB discovery: unresolved',
+      'file' => 'USB-DISCOVERY-STATUS.md',
+    ),
+  ),
+  'screenshots' => 
+  array (
+    0 => 
+    array (
+      'src' => '/media/screenshots/wincontrol-dev13-arp.png',
+      'alt' => 'Real ARP neighbor table',
+      'caption' => 'candidate-10 at 2048×1088, 100% zoom, unchanged dev.13. Sixty real kernel neighbor entries across two VMs and a multi-address peer; not sixty physical devices.',
+    ),
+    1 => 
+    array (
+      'src' => '/media/screenshots/wincontrol-desktop-windows.png',
+      'alt' => 'Independent desktop windows',
+      'caption' => 'Core panels with independent geometry, focus, stacking and taskbar controls in the isolated lab.',
+    ),
+    2 => 
+    array (
+      'src' => '/media/screenshots/wincontrol-dev13-arp-edit.png',
+      'alt' => 'Managed static ARP edit dialog',
+      'caption' => 'Real managed neighbor editing on a capable dev.13 appliance. Runtime state was verified after apply.',
+    ),
+    3 => 
+    array (
+      'src' => '/media/screenshots/wincontrol-saved-workspaces.png',
+      'alt' => 'Saved workspaces',
+      'caption' => 'Browser-local workspaces scoped to authenticated user and router.',
+    ),
+    4 => 
+    array (
+      'src' => '/media/screenshots/wincontrol-column-preferences.png',
+      'alt' => 'Column preferences',
+      'caption' => 'Resize, reorder, hide and restore table columns with browser persistence.',
+    ),
+  ),
+  'support' => 
+  array (
+    'note' => 'No public purchase cart or paid support portal is published with this candidate. Operators should use their project-owned deployment contacts.',
+    'source_status' => 'Reviewed dev.14 appliance build source and candidate-10 management source are public, with provenance and checksums. No new blanket source license is granted for original NUR code; third-party terms remain applicable. Source and image limitations are documented.',
+  ),
+  'i18n' => 
+  array (
+    'en' => 
+    array (
+      'nav_home' => 'Overview',
+      'nav_features' => 'Features',
+      'nav_downloads' => 'Downloads',
+      'nav_docs' => 'Docs',
+      'nav_licensing' => 'Licensing',
+      'nav_release' => 'Release notes',
+      'cta_download' => 'Download dev.14',
+      'cta_docs' => 'Read install guide',
+      'status_banner' => 'Development appliance · VM-qualified scope only · candidate-10 desktop deployed',
+    ),
+    'bn' => 
+    array (
+      'nav_home' => 'ওভারভিউ',
+      'nav_features' => 'ফিচার',
+      'nav_downloads' => 'ডাউনলোড',
+      'nav_docs' => 'ডকুমেন্টেশন',
+      'nav_licensing' => 'লাইসেন্সিং',
+      'nav_release' => 'রিলিজ নোট',
+      'cta_download' => 'dev.14 ডাউনলোড',
+      'cta_docs' => 'ইনস্টল গাইড',
+      'status_banner' => 'ডেভেলপমেন্ট অ্যাপ্লায়েন্স · সীমিত VM যাচাই · candidate-10 ডেস্কটপ চালু',
+    ),
+  ),
+);

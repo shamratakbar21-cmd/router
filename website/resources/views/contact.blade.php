@@ -1,0 +1,10 @@
+@extends('layouts.site', ['brand' => $brand, 'title' => 'Contact & Technical Support Channels | NurRouter', 'description' => 'Contact and public technical reporting channels for NurRouterOS and WinControl, including GitHub issue reporting and security disclosure guidelines.'])
+
+@section('content')
+<section class="page-hero"><div class="container"><span class="eyebrow">Contact</span><h1>Start with the right channel.</h1><p class="lead">Use the public source repository for reproducible technical reports. Commercial support and a public ticket portal are not currently offered for this release candidate.</p></div></section>
+<section class="sec"><div class="container article-grid"><article class="article-body">
+    <h2>Technical questions and defects</h2><p>Open a GitHub issue with the NurRouterOS version, artifact hash, platform, reproduction steps and redacted logs. Never post private keys, subscriber credentials, license payloads or production configuration.</p>
+    <div class="contact-list"><a href="https://github.com/shamratakbar21-cmd/router/issues"><strong>GitHub issues ↗</strong>Bug reports and reproducible technical discussion</a><a href="https://github.com/shamratakbar21-cmd/router"><strong>Source repository ↗</strong>Reviewed source, history and project context</a><a href="{{ route('docs.index') }}"><strong>Documentation</strong>Installation, deployment, licensing and recovery guides</a></div>
+    <h2>Security reports</h2><p>Do not disclose exploitable details or secrets in a public issue. Use the repository owner’s private contact method where available. No dedicated public security mailbox is configured on this site.</p>
+</article><aside class="side-note"><h3>Before contacting</h3><p>Confirm the exact version and SHA-256, reproduce in an isolated environment, and redact keys, addresses and subscriber information.</p></aside></div></section>
+@endsection

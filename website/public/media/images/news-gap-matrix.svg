@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 300" width="640" height="300" role="img" aria-label="Verified Lab Scope vs Known Feature Gaps">
+  <defs>
+    <linearGradient id="newsBg3" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#192330"/>
+      <stop offset="100%" stop-color="#2c4158"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="300" fill="url(#newsBg3)"/>
+  <rect x="44" y="44" width="164" height="28" rx="2" fill="#0d1824" opacity="0.75"/>
+  <text x="126" y="62" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="11" font-weight="700">QUALIFICATION MATRIX</text>
+  <text x="44" y="132" fill="#ffffff" font-family="Arial, sans-serif" font-size="32" font-weight="700">Evidence-Led Qualification</text>
+  <text x="44" y="168" fill="#d4dee8" font-family="Arial, sans-serif" font-size="16">QEMU/KVM lab verification &amp; documented scope boundaries</text>
+  <rect x="44" y="204" width="552" height="52" rx="4" fill="#0d1824" opacity="0.82"/>
+  <text x="64" y="235" fill="#fcd34d" font-family="monospace" font-size="13">Verified vs. Unverified vs. Deferred — Zero inflated claims</text>
+</svg>
+
