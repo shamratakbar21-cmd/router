@@ -10,7 +10,7 @@ Appliance evidence covers BIOS/UEFI ext4 ISO installation in VMs, BIOS live ARP 
 
 ## Limits
 
-Physical USB payload discovery remains unresolved. The modified physical dev.10 USB is not a qualified release and is not published. Bare-metal storage/NIC qualification, commercial activation, automatic firmware A/B rollback, and production subscriber migration are not accepted. The dev.14 factory image removes the baked-in lab PPPoE profile and public fixture licensing trust discovered in dev.13. No commercial trust chain is provisioned. dev.13 is preserved privately; it is not the public download. Production licensing signing credentials are not included.
+Physical USB payload discovery remains unresolved. The modified physical dev.10 USB is not a qualified release and is not published. Bare-metal storage/NIC qualification, commercial activation, automatic firmware A/B rollback, and production subscriber migration are not accepted. The dev.14 factory image removes the unintended lab PPPoE profile (with a redacted password placeholder) and public fixture licensing trust discovered in dev.13. No commercial trust chain is provisioned. dev.13 is preserved privately; it is not the public download. Production licensing signing credentials are not included.
 
 ## Source provenance and licensing
 

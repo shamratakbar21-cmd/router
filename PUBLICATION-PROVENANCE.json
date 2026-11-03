@@ -1319,7 +1319,8 @@
   ],
   "publication_changes": [
     "Tests generate an ephemeral signing key instead of shipping the historical shared fixture private key.",
-    "Upstream engine source inputs are provided separately; compiled overlay binaries are excluded from source."
+    "Upstream engine source inputs are provided separately; compiled overlay binaries are excluded from source.",
+    "Included empty Laravel storage-directory scaffolding; no runtime configuration or user data."
   ],
   "qualification": "See dev.14 candidate-specific acceptance record; dev.13 desktop screenshots remain labelled historical accepted baseline. No soak/capacity qualification inherited.",
   "source_terms": "Public source viewing; no blanket new license grant for original NUR code. Applicable third-party licenses remain in force.",
@@ -1695,7 +1696,7 @@
     "files/etc/nurrouter/overlay-manifest.json"
   ],
   "appliance_changes": [
-    "Removed baked-in lab PPPoE profile and credential from factory network configuration.",
+    "Removed unintended factory PPPoE profile including its generated password redaction placeholder, not an exposed operational secret.",
     "Removed historical public nur-lic-test verification trust from factory image.",
     "Updated version stamps only; installed packages, engines, neighbor code and installer discovery unchanged."
   ]
