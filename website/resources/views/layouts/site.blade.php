@@ -89,7 +89,7 @@
                 <a href="{{ route('release', ['lang' => $locale ?? 'en']) }}">Release {{ $release['version'] ?? '0.5.0-dev.13' }}</a>
                 <a href="{{ route('screenshots', ['lang' => $locale ?? 'en']) }}">WinControl</a>
                 <a href="{{ route('docs.show', ['slug' => 'gaps', 'lang' => $locale ?? 'en']) }}">Known Limitations</a>
-                <a href="https://github.com/shamratakbar21-cmd/router" target="_blank" rel="noopener">Historical GitHub ↗</a>
+                <a href="https://github.com/shamratakbar21-cmd/router" target="_blank" rel="noopener">GitHub Source ↗</a>
                 <a href="{{ url()->current() }}?lang=en" lang="en">English</a>
                 <a href="{{ url()->current() }}?lang=bn" lang="bn">বাংলা</a>
             </div>
@@ -159,7 +159,7 @@
                 </div>
                 <div style="display:flex; gap:10px; flex-wrap:wrap;">
                     <a class="btn btn-primary btn-sm" href="{{ route('release', ['lang' => $locale ?? 'en']) }}">View {{ $release['version'] ?? '0.5.0-dev.13' }} Changelog</a>
-                    <a class="mtk-button mtk-button-ghost-light btn-sm" href="https://github.com/shamratakbar21-cmd/router" target="_blank" rel="noopener">Historical GitHub ↗</a>
+                    <a class="mtk-button mtk-button-ghost-light btn-sm" href="https://github.com/shamratakbar21-cmd/router" target="_blank" rel="noopener">GitHub Source ↗</a>
                 </div>
             </div>
         </div>

@@ -5,7 +5,7 @@
 অ্যাপ্লায়েন্স dev.14 কেবল বিচ্ছিন্ন পরীক্ষার জন্য। WinControl candidate-10 সার্ভারে production কনফিগারেশনে চালু থাকলেও তা রাউটার ইমেজের production যোগ্যতা বোঝায় না। বাস্তব USB পেলোড শনাক্তকরণ, হার্ডওয়্যার যোগ্যতা ও বাণিজ্যিক অ্যাক্টিভেশন এখনো অসম্পূর্ণ। ইনস্টল করলে নির্বাচিত ডিস্কের তথ্য মুছে যায়; ডিভাইসের পরিচয় অনুমান করবেন না। নিচের কারিগরি কমান্ড ও পরিভাষা ইংরেজিতে দেওয়া আছে।
 
 
-The verified project-owned Git destination is https://github.com/shamratakbar21-cmd/router . GitHub currently accepts reading but rejects source pushes with HTTP 403; its main branch still contains historical source. Current reviewed source is available in the checksum-verified archives and Git bundle below. The reviewed dev.14 / candidate-10 source commit is `868698fdd7ee9d744167cc8816f97d368c2e8fb6`. Source was prepared in a separate publication checkout; qualification repositories and immutable snapshots were not rewritten.
+The verified project-owned repository is https://github.com/shamratakbar21-cmd/router . Current reviewed source is published there without force-pushing, and is also available in the checksum-verified source archives and offline Git bundle below. The reviewed dev.14 / candidate-10 source commit is `868698fdd7ee9d744167cc8816f97d368c2e8fb6`. Source was prepared in a separate publication checkout; qualification repositories and immutable snapshots were not rewritten.
 
 ## What the source contains
 
@@ -30,6 +30,6 @@ No clean-checkout bit-identical rebuild or independent complete corresponding-so
 
 dev.13 remains unchanged and private as the accepted ARP baseline. Publication review identified a lab WAN profile with a redacted password placeholder, not a recoverable secret, plus public fixture licensing trust. dev.14 removes that profile and trust and updates version stamps. Installed packages and engine/neighbor/discovery code are unchanged. Candidate-10 management is unchanged.
 
-## Current source distribution while Git push is blocked
+## Source archives and offline Git inspection
 
-The source archives on [Downloads](/downloads) contain the current reviewed appliance and management source. [Reviewed-project-source.bundle](/releases/0.5.0-dev.14/reviewed-project-source.bundle) includes the reviewed history and public website source for offline Git inspection. Verify it against SHA256SUMS before cloning. No GitHub commit link is claimed until the push permission is corrected.
+The source archives on [Downloads](/downloads) contain the current reviewed appliance and management source. [Reviewed-project-source.bundle](/releases/0.5.0-dev.14/reviewed-project-source.bundle) includes the reviewed history and public website source for offline Git inspection. Verify it against SHA256SUMS before cloning. The archive source commit identifies the appliance/management source; the later website publication commit adds the public frontend and guides.
