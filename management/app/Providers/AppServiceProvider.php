@@ -33,6 +33,8 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(License::class, LicensePolicy::class);
         Gate::policy(LicenseActivationKey::class, LicensePolicy::class);
 
+        RateLimiter::for('login', fn (Request $request) => Limit::perMinute(5)->by(Str::lower((string) $request->input('email')).'|'.$request->ip()));
+
         RateLimiter::for('licensing-activation', function (Request $request) {
             $perMinute = max(1, (int) config('licensing.activation_rate_limit_per_minute', 10));
 

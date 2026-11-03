@@ -35,3 +35,9 @@ kmod-ifb
 tcpdump
 unzip
 wireguard-tools
+
+kmod-sched-act-police
+
+# Experimental BRAS runtime dependencies; engine built from pinned source.
+libpcre2
+libgcc

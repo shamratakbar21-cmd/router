@@ -48,11 +48,24 @@ class OpenWrtOverlayExporter
         $firewallPath = "{$configDirectory}/firewall";
         $metadataPath = "{$metadataDirectory}/overlay-manifest.json";
 
-        File::ensureDirectoryExists($configDirectory);
-        File::ensureDirectoryExists($metadataDirectory);
+        File::ensureDirectoryExists($resolvedTargetDirectory, 0700);
+        chmod($resolvedTargetDirectory, 0700);
+        File::ensureDirectoryExists($configDirectory, 0700);
+        File::ensureDirectoryExists($metadataDirectory, 0700);
+        chmod($resolvedTargetDirectory, 0700);
+        chmod($configDirectory, 0700);
+        chmod($metadataDirectory, 0700);
 
         $shapingPath = "{$metadataDirectory}/pppoe-shaping.json";
         $entitlementsPath = "{$metadataDirectory}/license-entitlements.json";
+
+        File::put("{$metadataDirectory}/neighbors.json", json_encode(array_map(
+            fn (array $entry): array => [
+                'ip' => $entry['ip'], 'mac' => strtolower($entry['mac']),
+                'interface' => $entry['interface'], 'disabled' => (bool) ($entry['disabled'] ?? false),
+                'comment' => (string) ($entry['comment'] ?? ''),
+            ], $configuration['static_neighbors'] ?? []), JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR)."\n");
+        chmod("{$metadataDirectory}/neighbors.json", 0600);
 
         File::put($networkPath, $renderedConfig['network']);
         File::put($dhcpPath, $renderedConfig['dhcp']);
@@ -73,6 +86,15 @@ class OpenWrtOverlayExporter
                 JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES,
             )."\n",
         );
+        $bras = data_get($configuration, 'services.pppoe_server', ['enabled' => false]);
+        foreach ($bras['subscribers'] ?? [] as $index => $subscriber) {
+            $bras['subscribers'][$index]['password'] = ! $includeSecrets ? '[REDACTED]' : (data_get($secretConfiguration, 'services.pppoe_server.subscribers', [])[$subscriber['username']] ?? '');
+        }
+        if (($bras['auth_mode'] ?? '') === 'radius') {
+            $bras['radius']['secret'] = ! $includeSecrets ? '[REDACTED]' : data_get($secretConfiguration, 'services.pppoe_server.radius_secret', '');
+        }
+        File::put("{$metadataDirectory}/bras.json", json_encode($bras, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR)."\n");
+        chmod("{$metadataDirectory}/bras.json", 0600);
         File::put($metadataPath, json_encode([
             'router' => [
                 'id' => $routerNode->id,
@@ -91,6 +113,10 @@ class OpenWrtOverlayExporter
                 'license_entitlements' => $entitlementsPath,
             ],
         ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)."\n");
+
+        foreach ([$networkPath, $dhcpPath, $firewallPath, $shapingPath, $entitlementsPath, $metadataPath] as $path) {
+            chmod($path, 0600);
+        }
 
         return [
             'network' => $networkPath,

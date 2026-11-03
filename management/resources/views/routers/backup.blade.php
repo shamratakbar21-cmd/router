@@ -28,6 +28,8 @@
             <label>Backup JSON
                 <textarea name="backup_json" rows="12" required>{{ old('backup_json', session('backup_json_pending')) }}</textarea>
             </label>
+            <label><input type="checkbox" name="allow_legacy" value="1"> Import a trusted version 1 backup</label>
+            <p>Encrypted backups require the original APP_KEY. Public backups contain no secrets and are validated as untrusted input.</p>
             <button class="button button-secondary" type="submit">Preview</button>
         </form>
         @if (! empty($previewErrors))
@@ -41,6 +43,7 @@
             <pre>{{ json_encode($preview, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) }}</pre>
             <form method="POST" action="{{ route('routers.backup.restore', $routerNode) }}" class="stack" style="max-width: 480px;">
                 @csrf
+                <input type="hidden" name="allow_legacy" value="{{ session('backup_allow_legacy') ? 1 : 0 }}">
                 <input type="hidden" name="backup_json" value="{{ session('backup_json_pending') }}">
                 <label><input type="checkbox" name="confirm" value="1" required> I confirm restore onto this router (not a silent clone of device identity)</label>
                 <button class="button" type="submit">Restore into desired state</button>

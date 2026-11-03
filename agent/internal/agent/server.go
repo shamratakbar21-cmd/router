@@ -567,7 +567,20 @@ func (s *Server) reconcileManagedInterfaces(namespaceName string, desiredConfigu
 		}
 	}
 
-	for _, interfaceDefinition := range desiredInterfaces {
+	// Bring parent devices up before VLAN children. Iterating the map here made
+	// VLAN activation intermittently fail with ENETDOWN on a newly created bridge.
+	orderedInterfaces := []routingInterface{desiredInterfaces[desiredConfiguration.Management.Interface]}
+	for _, definition := range desiredConfiguration.Interfaces {
+		if definition.Type != "vlan" {
+			orderedInterfaces = append(orderedInterfaces, definition)
+		}
+	}
+	for _, definition := range desiredConfiguration.Interfaces {
+		if definition.Type == "vlan" {
+			orderedInterfaces = append(orderedInterfaces, definition)
+		}
+	}
+	for _, interfaceDefinition := range orderedInterfaces {
 		if interfaceDefinition.Master != "" {
 			if _, err := s.run("ip", "-n", namespaceName, "link", "set", "dev", interfaceDefinition.Name, "master", interfaceDefinition.Master); err != nil {
 				return err

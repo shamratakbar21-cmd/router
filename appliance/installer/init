@@ -71,9 +71,11 @@ try_mount_payload() {
     [ -b "${device}" ] || return 1
     /bin/umount /mnt/cdrom 2>/dev/null
 
+    # Installer media is always ISO9660, including when the hybrid ISO is
+    # written to a USB stick. Never ask mount to auto-detect filesystems on
+    # unrelated target disks: doing so produced misleading F2FS diagnostics.
     if /bin/mount -t iso9660 -o ro "${device}" /mnt/cdrom 2>/dev/null \
-        || /bin/mount -t iso9660 -o ro,norock "${device}" /mnt/cdrom 2>/dev/null \
-        || /bin/mount -o ro "${device}" /mnt/cdrom 2>/dev/null; then
+        || /bin/mount -t iso9660 -o ro,norock "${device}" /mnt/cdrom 2>/dev/null; then
         if [ -d /mnt/cdrom/payload ] && [ -f /mnt/cdrom/payload/SHA256SUMS ]; then
             echo " installer media : ${device}"
             return 0
@@ -86,6 +88,19 @@ try_mount_payload() {
 mount_installer_media() {
     for device in /dev/sr*; do
         try_mount_payload "${device}" && return 0
+    done
+
+    # A USB-written hybrid ISO normally appears as a removable SCSI disk.
+    # Prefer removable devices so fixed installation targets are not probed
+    # before media that is already present.
+    for sysfs_path in /sys/class/block/*; do
+        [ -e "${sysfs_path}/dev" ] || continue
+        [ "$(cat "${sysfs_path}/removable" 2>/dev/null)" = "1" ] || continue
+        name="${sysfs_path##*/}"
+        case "${name}" in
+            loop*|ram*|zram*|fd*|dm-*|md*|nbd*) continue ;;
+        esac
+        try_mount_payload "/dev/${name}" && return 0
     done
 
     for sysfs_path in /sys/class/block/*; do
@@ -106,6 +121,7 @@ mount_installer_media() {
 # Give storage a moment to appear before complaining about missing media.
 attempt=0
 while [ "${attempt}" -lt 20 ]; do
+    echo "Discovering installer media (attempt $((attempt + 1))/20)..."
     /bin/sh /usr/sbin/nur-devnodes
     if mount_installer_media; then
         break

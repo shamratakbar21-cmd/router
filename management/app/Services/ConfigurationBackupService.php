@@ -4,236 +4,141 @@ namespace App\Services;
 
 use App\Models\RouterNode;
 use App\Models\User;
-use App\Services\Licensing\EntitlementGate;
 use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use RuntimeException;
+use Throwable;
 
-/**
- * Versioned router configuration backup / restore for WinControl.
- *
- * Device identity and license ownership are NEVER included. Migration to new
- * hardware requires a separate license device transfer.
- */
 class ConfigurationBackupService
 {
-    public const FORMAT_VERSION = 1;
+    public const FORMAT_VERSION = 2;
 
     public function __construct(
         private readonly AuditLogWriter $auditLogWriter,
-        private readonly EntitlementGate $entitlementGate,
+        private readonly RouterConfigurationValidator $validator,
     ) {}
 
-    /**
-     * @return array{document: array<string, mixed>, json: string, integrity: string}
-     */
     public function export(RouterNode $routerNode, ?User $actor = null, bool $includeSecrets = false): array
     {
         $desired = $routerNode->desired_configuration ?? [];
         unset($desired['license_entitlements']);
-
-        $secrets = [];
-        if ($includeSecrets) {
-            $secrets = $routerNode->desired_secret_configuration ?? [];
-        }
-
         $document = [
-            'format' => 'nurrouter-config-backup',
-            'format_version' => self::FORMAT_VERSION,
-            'product_version' => trim((string) @file_get_contents(base_path('../VERSION'))) ?: 'unknown',
+            'format' => 'nurrouter-config-backup', 'format_version' => self::FORMAT_VERSION,
             'exported_at' => now()->toIso8601String(),
-            'source' => [
-                'router_name' => $routerNode->name,
-                'namespace_name' => $routerNode->namespace_name,
-                // Explicitly omit device_id and license fields.
-            ],
-            'compatibility' => [
-                'min_format_version' => 1,
-                'max_format_version' => self::FORMAT_VERSION,
-            ],
+            'source' => ['router_name' => $routerNode->name, 'namespace_name' => $routerNode->namespace_name],
             'desired_configuration' => $desired,
             'secrets_included' => $includeSecrets,
-            'desired_secret_configuration' => $includeSecrets
-                ? ['ciphertext' => Crypt::encryptString(json_encode($secrets, JSON_UNESCAPED_SLASHES) ?: '{}')]
-                : null,
-            'mode_hints' => [
-                'same_router' => 'Restore onto the same WinControl router record; device_id and license remain unchanged.',
-                'replacement_hardware' => 'Enroll the new appliance, run license device transfer, then restore config without copying device_id.',
-                'clone_new_device' => 'Disk clones copy device-id/license files; treat as unsupported ownership transfer — use official transfer.',
-            ],
+            'desired_secret_configuration' => $includeSecrets ? ($routerNode->desired_secret_configuration ?? []) : null,
         ];
-
-        $bodyJson = json_encode($document, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-        if ($bodyJson === false) {
-            throw new RuntimeException('Unable to encode configuration backup.');
+        if ($includeSecrets) {
+            // Authenticate the complete document, including its public configuration.
+            $document = [
+                'format' => 'nurrouter-config-backup', 'format_version' => self::FORMAT_VERSION,
+                'encrypted_payload' => Crypt::encryptString($this->encode($document)),
+            ];
         }
+        $integrity = hash('sha256', $this->encode($document));
+        $document['integrity'] = ['alg' => 'sha256', 'value' => $integrity];
+        $this->auditLogWriter->write('router.backup.exported', 'Exported a versioned configuration backup.', $routerNode, $actor, metadata: ['format_version' => self::FORMAT_VERSION, 'secrets_included' => $includeSecrets]);
 
-        $integrity = hash('sha256', $bodyJson);
-        $document['integrity'] = [
-            'alg' => 'sha256',
-            'value' => $integrity,
-            'covers' => 'sha256 of JSON object without the integrity field (JSON_UNESCAPED_SLASHES|UNICODE, key order as exported)',
-        ];
-
-        $exportJson = json_encode($document, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-        if ($exportJson === false) {
-            throw new RuntimeException('Unable to encode configuration backup with integrity.');
-        }
-
-        $this->auditLogWriter->write(
-            'router.backup.exported',
-            "Exported configuration backup for {$routerNode->namespace_name}.",
-            $routerNode,
-            $actor,
-            metadata: [
-                'format_version' => self::FORMAT_VERSION,
-                'secrets_included' => $includeSecrets,
-                'integrity' => $integrity,
-            ],
-        );
-
-        return [
-            'document' => $document,
-            'json' => $exportJson,
-            'integrity' => $integrity,
-        ];
+        return ['document' => $document, 'json' => json_encode($document, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR), 'integrity' => $integrity];
     }
 
-    /**
-     * @return array{ok: bool, errors: list<string>, preview: array<string, mixed>}
-     */
-    public function preview(string $backupJson, RouterNode $targetRouter): array
+    public function preview(string $backupJson, RouterNode $targetRouter, bool $allowLegacy = false): array
     {
         try {
-            /** @var array<string, mixed> $document */
-            $document = json_decode($backupJson, true, flags: JSON_THROW_ON_ERROR);
-        } catch (\Throwable $throwable) {
-            return ['ok' => false, 'errors' => ['Backup JSON is malformed.'], 'preview' => []];
-        }
-
-        $errors = [];
-        if (($document['format'] ?? '') !== 'nurrouter-config-backup') {
-            $errors[] = 'Unrecognized backup format.';
-        }
-
-        $version = (int) ($document['format_version'] ?? 0);
-        if ($version < 1 || $version > self::FORMAT_VERSION) {
-            $errors[] = "Incompatible backup format_version {$version}.";
-        }
-
-        if (isset($document['integrity']['value'], $document['integrity']['alg'])
-            && $document['integrity']['alg'] === 'sha256') {
-            $copy = $document;
-            unset($copy['integrity']);
-            $expected = hash('sha256', (string) json_encode($copy, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
-            if (! hash_equals((string) $document['integrity']['value'], $expected)) {
-                $errors[] = 'Integrity checksum mismatch; backup may be altered.';
+            if (strlen($backupJson) > 8 * 1024 * 1024) {
+                throw new RuntimeException('Backup exceeds the 8 MiB import limit.');
             }
+            $document = json_decode($backupJson, true, 64, JSON_THROW_ON_ERROR);
+            if (! is_array($document) || array_is_list($document)) {
+                throw new RuntimeException('Backup must be a JSON object.');
+            }
+            if (($document['format'] ?? '') !== 'nurrouter-config-backup') {
+                throw new RuntimeException('Unrecognized backup format.');
+            }
+            $version = $document['format_version'] ?? null;
+            if (! in_array($version, [1, self::FORMAT_VERSION], true)) {
+                throw new RuntimeException('Unsupported backup version.');
+            }
+            if ($version === 1 && ! $allowLegacy) {
+                throw new RuntimeException('Version 1 requires explicit legacy import; verify its source and retain the original APP_KEY for encrypted secrets.');
+            }
+            $integrity = $document['integrity'] ?? null;
+            unset($document['integrity']);
+            if (! is_array($integrity) || ($integrity['alg'] ?? '') !== 'sha256' || ! is_string($integrity['value'] ?? null)
+                || ! hash_equals(hash('sha256', $this->encode($document)), $integrity['value'])) {
+                throw new RuntimeException('Integrity checksum mismatch or missing checksum.');
+            }
+            if (isset($document['encrypted_payload'])) {
+                $document = json_decode(Crypt::decryptString($document['encrypted_payload']), true, 64, JSON_THROW_ON_ERROR);
+                if (! is_array($document) || ($document['format'] ?? '') !== 'nurrouter-config-backup' || ($document['format_version'] ?? null) !== self::FORMAT_VERSION || ($document['secrets_included'] ?? null) !== true) {
+                    throw new RuntimeException('Invalid authenticated backup payload.');
+                }
+            } elseif ($version === self::FORMAT_VERSION && ($document['secrets_included'] ?? false)) {
+                throw new RuntimeException('Secret-bearing backups require an authenticated encrypted payload.');
+            }
+            if (isset($document['source']['device_id']) || isset($document['license']) || isset($document['device_id'])) {
+                throw new RuntimeException('Backups cannot contain device identity or license ownership.');
+            }
+            if (! is_array($document['desired_configuration'] ?? null) || ! is_bool($document['secrets_included'] ?? null)) {
+                throw new RuntimeException('Invalid backup schema.');
+            }
+            $secrets = [];
+            if ($document['secrets_included']) {
+                $secrets = $version === 1
+                    ? json_decode(Crypt::decryptString($document['desired_secret_configuration']['ciphertext'] ?? ''), true, 64, JSON_THROW_ON_ERROR)
+                    : ($document['desired_secret_configuration'] ?? []);
+                if (! is_array($secrets)) {
+                    throw new RuntimeException('Invalid secret configuration.');
+                }
+            }
+            $desired = $document['desired_configuration'];
+            unset($desired['license_entitlements']);
+            $this->validator->validate($desired, $targetRouter, $secrets);
+            $document['desired_configuration'] = $desired;
+            $document['desired_secret_configuration'] = $secrets;
+
+            return ['ok' => true, 'errors' => [], 'document' => $document, 'preview' => [
+                'source_router' => $document['source']['router_name'] ?? null,
+                'target_router' => $targetRouter->name,
+                'interfaces' => count($desired['interfaces'] ?? []), 'addresses' => count($desired['addresses'] ?? []),
+                'routes' => count($desired['routes'] ?? []), 'secrets_included' => $document['secrets_included'],
+                'legacy_import' => $version === 1,
+            ]];
+        } catch (Throwable $exception) {
+            $message = $exception instanceof ValidationException ? implode(' ', $exception->validator->errors()->all()) : $exception->getMessage();
+
+            return ['ok' => false, 'errors' => ['Backup rejected. '.$message], 'preview' => []];
         }
-
-        if (isset($document['source']['device_id']) || isset($document['license'])) {
-            $errors[] = 'Backup must not carry device identity or license ownership.';
-        }
-
-        $desired = (array) ($document['desired_configuration'] ?? []);
-        $preview = [
-            'source_router' => $document['source']['router_name'] ?? null,
-            'source_namespace' => $document['source']['namespace_name'] ?? null,
-            'target_router' => $targetRouter->name,
-            'interfaces' => count($desired['interfaces'] ?? []),
-            'addresses' => count($desired['addresses'] ?? []),
-            'routes' => count($desired['routes'] ?? []),
-            'pppoe_clients' => count($desired['services']['pppoe_clients'] ?? []),
-            'secrets_included' => (bool) ($document['secrets_included'] ?? false),
-            'mode_hints' => $document['mode_hints'] ?? [],
-        ];
-
-        return [
-            'ok' => $errors === [] || (count($errors) === 1 && str_contains($errors[0], 'Integrity')),
-            'errors' => $errors,
-            'preview' => $preview,
-            'document' => $document,
-        ];
     }
 
-    /**
-     * @return array{revision_id: int}
-     */
-    public function restore(
-        RouterNode $routerNode,
-        string $backupJson,
-        ?User $actor = null,
-        bool $confirm = false,
-    ): array {
+    public function restore(RouterNode $routerNode, string $backupJson, ?User $actor = null, bool $confirm = false, bool $allowLegacy = false): array
+    {
         if (! $confirm) {
             throw new RuntimeException('Restore requires explicit confirmation.');
         }
-
-        $preview = $this->preview($backupJson, $routerNode);
-        if ($preview['errors'] !== [] && ! $preview['ok']) {
+        $preview = $this->preview($backupJson, $routerNode, $allowLegacy);
+        if (! $preview['ok']) {
             throw new RuntimeException(implode(' ', $preview['errors']));
         }
-
-        /** @var array<string, mixed> $document */
         $document = $preview['document'];
-        $desired = (array) ($document['desired_configuration'] ?? []);
-        unset($desired['license_entitlements']);
 
-        $secrets = [];
-        if (! empty($document['secrets_included']) && ! empty($document['desired_secret_configuration']['ciphertext'])) {
-            $decoded = Crypt::decryptString((string) $document['desired_secret_configuration']['ciphertext']);
-            $secrets = json_decode($decoded, true, flags: JSON_THROW_ON_ERROR);
-        }
-
-        // Snapshot current desired state for independent rollback if restore staging fails later.
-        $rollbackToken = (string) Str::uuid();
-        $rollbackPath = storage_path('app/nurrouter/restore-rollback/'.$rollbackToken.'.json');
-        if (! is_dir(dirname($rollbackPath))) {
-            mkdir(dirname($rollbackPath), 0750, true);
-        }
-        file_put_contents($rollbackPath, json_encode([
-            'router_id' => $routerNode->id,
-            'desired_configuration' => $routerNode->desired_configuration,
-            'desired_secret_configuration' => $routerNode->desired_secret_configuration,
-            'saved_at' => now()->toIso8601String(),
-        ], JSON_UNESCAPED_SLASHES));
-
-        try {
-            $this->entitlementGate->assertDesiredStateAllowed($routerNode, $desired, $secrets);
-            $revision = app(RouterConfigurationManager::class)->updateDesiredState(
-                $routerNode,
-                $desired,
-                $secrets,
-                $actor,
-            );
-        } catch (\Throwable $throwable) {
-            $rollback = json_decode((string) file_get_contents($rollbackPath), true);
-            if (is_array($rollback)) {
-                $routerNode->forceFill([
-                    'desired_configuration' => $rollback['desired_configuration'] ?? [],
-                    'desired_secret_configuration' => $rollback['desired_secret_configuration'] ?? [],
-                ])->save();
+        return DB::transaction(function () use ($routerNode, $document, $actor): array {
+            $router = RouterNode::query()->lockForUpdate()->findOrFail($routerNode->id);
+            if ($router->pending_operation_uuid || $router->safe_mode_status === 'pending_confirm') {
+                throw new RuntimeException('Finish the pending operation before restoring a backup.');
             }
+            $revision = app(RouterConfigurationManager::class)->updateDesiredState($router, $document['desired_configuration'], $document['desired_secret_configuration'], $actor);
+            $this->auditLogWriter->write('router.backup.restored', 'Validated backup restored into desired state; apply remains separate.', $router, $actor, metadata: ['revision_id' => $revision->id]);
 
-            throw new RuntimeException(
-                'Restore failed; previous desired configuration was reinstated locally. '.$throwable->getMessage(),
-                0,
-                $throwable,
-            );
-        }
+            return ['revision_id' => $revision->id];
+        }, attempts: 5);
+    }
 
-        $this->auditLogWriter->write(
-            'router.backup.restored',
-            "Restored configuration backup onto {$routerNode->namespace_name}.",
-            $routerNode,
-            $actor,
-            metadata: [
-                'revision_id' => $revision->id,
-                'rollback_token' => $rollbackToken,
-                'secrets_included' => (bool) ($document['secrets_included'] ?? false),
-            ],
-        );
-
-        return ['revision_id' => $revision->id, 'rollback_token' => $rollbackToken];
+    private function encode(array $document): string
+    {
+        return json_encode($document, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
     }
 }

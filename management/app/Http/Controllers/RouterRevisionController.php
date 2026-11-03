@@ -20,7 +20,7 @@ class RouterRevisionController extends Controller
             $this->configurationManager->applyCurrentRevision(
                 $router,
                 $request->user(),
-                $request->integer('expected_lock_version'),
+                $request->filled('expected_lock_version') ? $request->integer('expected_lock_version') : null,
                 $request->integer('safe_mode_minutes'),
             );
         } catch (Throwable $throwable) {
@@ -56,6 +56,17 @@ class RouterRevisionController extends Controller
         return redirect()
             ->route('routers.show', $router)
             ->with('status', "Safe Mode was confirmed for {$router->name}.");
+    }
+
+    public function recover(ApplyRouterRevisionRequest $request, RouterNode $router): RedirectResponse
+    {
+        try {
+            $this->configurationManager->recoverConfirmedConfiguration($router, $request->user());
+        } catch (Throwable $exception) {
+            return redirect()->route('routers.show', $router)->with('error', $exception->getMessage());
+        }
+
+        return redirect()->route('routers.show', $router)->with('status', 'Recorded previous Safe Mode configuration recovered.');
     }
 
     public function rollback(

@@ -17,7 +17,9 @@ BASE_URL="https://downloads.openwrt.org/releases/${OPENWRT_VERSION}/targets/${OP
 ARCHIVE_NAME="openwrt-imagebuilder-${OPENWRT_VERSION}-${OPENWRT_TARGET}-${OPENWRT_SUBTARGET}.Linux-x86_64.tar.zst"
 ARCHIVE_PATH="${ROOT_DIR}/downloads/${ARCHIVE_NAME}"
 WORK_DIR="${ROOT_DIR}/work"
-OUTPUT_DIR="${ROOT_DIR}/output/${OPENWRT_VERSION}"
+OUTPUT_DIR="${OUTPUT_DIR:-${ROOT_DIR}/output/${OPENWRT_VERSION}/${PRODUCT_RELEASE:-$(tr -d '[:space:]' < "${ROOT_DIR}/VERSION")}}"
+export OUTPUT_DIR
+export SOURCE_DIR="${OUTPUT_DIR}"
 OVERLAY_DIR="${ROOT_DIR}/files"
 MANAGEMENT_DIR="${ROOT_DIR}/management"
 AGENT_DIR="${ROOT_DIR}/agent"
@@ -35,6 +37,17 @@ require_command curl
 require_command tar
 require_command zstd
 require_command make
+require_command gcc
+
+# Build the pinned experimental access engine for new milestone media.
+# Keep rc.5 immutable; the engine is disabled by default in the new candidate.
+if [ -x "${ROOT_DIR}/appliance/build-bras-engine.sh" ]; then
+    "${ROOT_DIR}/appliance/build-bras-engine.sh"
+fi
+
+# Compile the privileged helper from its reviewed source for every build.
+gcc -static -O2 -Wall -Wextra -Werror -o "${OVERLAY_DIR}/usr/sbin/nur-mgmt-elev" "${OVERLAY_DIR}/usr/sbin/nur-mgmt-elev.c"
+chmod 0755 "${OVERLAY_DIR}/usr/sbin/nur-mgmt-elev"
 
 if [ -n "${NUR_OVERLAY_ROUTER}" ] || [ -d "${AGENT_DIR}" ]; then
     require_command php
@@ -58,6 +71,10 @@ if [ -d "${AGENT_DIR}" ]; then
             -o "${AGENT_DIR}/bin/nur-license-verify" \
             "./cmd/nur-license-verify"
     )
+    (cd "${AGENT_DIR}" && GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o bin/nur-brasctl ./cmd/nur-brasctl)
+    (cd "${AGENT_DIR}" && GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o bin/nur-accounting ./cmd/nur-accounting)
+    install -m755 "${AGENT_DIR}/bin/nur-accounting" "${OVERLAY_DIR}/usr/sbin/nur-accounting"
+    install -m 0755 "${AGENT_DIR}/bin/nur-brasctl" "${OVERLAY_DIR}/usr/sbin/nur-brasctl"
     install -m 0755 "${AGENT_DIR}/bin/nur-agent" "${OVERLAY_DIR}/usr/sbin/nur-agent"
     install -m 0755 "${AGENT_DIR}/bin/nur-license-verify" "${OVERLAY_DIR}/usr/sbin/nur-license-verify"
 fi

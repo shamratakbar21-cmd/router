@@ -9,9 +9,36 @@ IFACE="${1:-}"
 DOWNLOAD_KBPS="${2:-0}"
 UPLOAD_KBPS="${3:-0}"
 
+case "${IFACE}" in ""|*[!A-Za-z0-9_.:-]*) echo "invalid device" >&2; exit 2 ;; esac
+for rate in "${DOWNLOAD_KBPS}" "${UPLOAD_KBPS}"; do
+    case "${rate}" in ""|*[!0-9]*) echo "invalid rate" >&2; exit 2 ;; esac
+    [ "${#rate}" -le 9 ] || exit 2
+done
+mkdir -p /var/lock
+attempt=0
+until mkdir "/var/lock/nur-shape-${IFACE}" 2>/dev/null; do
+    attempt=$((attempt + 1))
+    [ "$attempt" -lt 5 ] || exit 3
+    sleep 1
+done
+trap 'rmdir "/var/lock/nur-shape-${IFACE}" 2>/dev/null || true' EXIT
 [ -n "${IFACE}" ] || { echo "usage: $0 <ifname> <download_kbps> <upload_kbps>" >&2; exit 1; }
 
 command -v tc >/dev/null 2>&1 || { echo "tc not available" >&2; exit 1; }
+
+# GRO can hand multi-packet aggregates to HTB/police before segmentation,
+# distorting low-rate forwarding and causing TCP loss. Keep wire packet granularity.
+if [ "${UPLOAD_KBPS}" -gt 0 ] || [ "${DOWNLOAD_KBPS}" -gt 0 ]; then
+    command -v ethtool >/dev/null 2>&1 || { echo "ethtool required for shaping" >&2; exit 1; }
+    for link_path in /sys/class/net/*; do
+        [ -d "${link_path}/device" ] || continue
+        [ "$(cat "${link_path}/type")" = 1 ] || continue
+        link_name="${link_path##*/}"
+        if ethtool -k "${link_name}" 2>/dev/null | grep -q '^generic-receive-offload: on'; then
+            ethtool -K "${link_name}" gro off || exit 1
+        fi
+    done
+fi
 
 # Clear existing qdiscs best-effort
 tc qdisc del dev "${IFACE}" root 2>/dev/null || true

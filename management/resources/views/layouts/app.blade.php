@@ -1,151 +1,114 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $title ?? 'NUR WinControl' }}</title>
-    <style>
-        :root {
-            --bg: #0f172a;
-            --panel: #111827;
-            --border: #334155;
-            --text: #e2e8f0;
-            --muted: #94a3b8;
-            --accent: #0284c7;
-            --danger: #7f1d1d;
-            --danger-border: #ef4444;
-            --danger-text: #fecaca;
-            --ok: #064e3b;
-            --ok-border: #10b981;
-            --ok-text: #d1fae5;
-            --warn: #78350f;
-            --warn-border: #f59e0b;
-            --warn-text: #fde68a;
-        }
-        body { font-family: "Segoe UI", "IBM Plex Sans", sans-serif; margin: 0; background: var(--bg); color: var(--text); }
-        a { color: #7dd3fc; text-decoration: none; }
-        nav, main { max-width: 1280px; margin: 0 auto; padding: 1rem 1.25rem; }
-        nav { display: flex; justify-content: space-between; align-items: center; }
-        .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; margin-bottom: 1rem; }
-        .grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
-        .table { width: 100%; border-collapse: collapse; }
-        .table th, .table td { border-bottom: 1px solid var(--border); padding: 0.75rem; text-align: left; vertical-align: top; }
-        .button { background: var(--accent); color: white; border: 0; border-radius: 8px; padding: 0.7rem 1rem; cursor: pointer; display: inline-block; }
-        .button-secondary { background: var(--border); }
-        .button:disabled, .button[aria-disabled="true"] { opacity: 0.5; cursor: not-allowed; }
-        .stack { display: grid; gap: 0.75rem; }
-        .flash { background: var(--ok); border: 1px solid var(--ok-border); color: var(--ok-text); padding: 0.9rem 1rem; border-radius: 10px; margin-bottom: 1rem; }
-        .flash-error { background: var(--danger); border: 1px solid var(--danger-border); color: var(--danger-text); padding: 0.9rem 1rem; border-radius: 10px; margin-bottom: 1rem; }
-        .flash-warn { background: var(--warn); border: 1px solid var(--warn-border); color: var(--warn-text); padding: 0.9rem 1rem; border-radius: 10px; margin-bottom: 1rem; }
-        .error { color: #fca5a5; font-size: 0.95rem; }
-        input, select, textarea { width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid #475569; background: #0b1120; color: var(--text); box-sizing: border-box; }
-        textarea { min-height: 8rem; resize: vertical; }
-        pre { overflow: auto; background: #020617; padding: 1rem; border-radius: 10px; }
-        .muted { color: var(--muted); }
-        form.inline { display: inline; }
-        .badge { display: inline-block; padding: 0.15rem 0.55rem; border-radius: 999px; font-size: 0.8rem; border: 1px solid var(--border); }
-        .badge-error { border-color: var(--danger-border); color: var(--danger-text); }
-        .badge-ok { border-color: var(--ok-border); color: var(--ok-text); }
-        .badge-warn { border-color: var(--warn-border); color: var(--warn-text); }
-        .workspace {
-            position: relative;
-            min-height: 70vh;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            background:
-                linear-gradient(180deg, rgba(2,132,199,0.08), transparent 40%),
-                #0b1220;
-            overflow: hidden;
-        }
-        .win {
-            position: absolute;
-            min-width: 280px;
-            min-height: 160px;
-            background: var(--panel);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.35);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-        .win-title {
-            cursor: move;
-            user-select: none;
-            padding: 0.55rem 0.75rem;
-            background: #0b1628;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            gap: 0.5rem;
-            align-items: center;
-        }
-        .win-body { padding: 0.75rem; overflow: auto; flex: 1; }
-        .win-resize {
-            position: absolute;
-            right: 0;
-            bottom: 0;
-            width: 16px;
-            height: 16px;
-            cursor: nwse-resize;
-            background: linear-gradient(135deg, transparent 50%, #475569 50%);
-        }
-        .safe-mode-banner {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-        .countdown { font-variant-numeric: tabular-nums; font-size: 1.25rem; color: var(--warn-text); }
-        .toolbar { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.75rem; }
-        .stale { opacity: 0.7; outline: 1px dashed var(--warn-border); }
-        .loading-overlay {
-            position: absolute; inset: 0; background: rgba(15,23,42,0.55);
-            display: none; align-items: center; justify-content: center; z-index: 50;
-        }
-        .loading-overlay.is-active { display: flex; }
-    </style>
+    <link rel="stylesheet" href="{{ asset('desktop/wincontrol.css') }}?v=20261104-desktop-2">
+    @stack('styles')
 </head>
-<body>
-    @auth
-        <nav>
-            <div>
-                <strong>NUR WinControl</strong>
-                <span class="muted">Isolated namespace orchestration</span>
-            </div>
-            <div style="display: flex; gap: 1rem; align-items: center;">
-                <a href="{{ route('dashboard') }}">Dashboard</a>
-                <a href="{{ route('routers.index') }}">Routers</a>
-                <a href="{{ route('licensing.admin') }}">Licensing</a>
-                <form class="inline" method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="button button-secondary">Logout</button>
-                </form>
-            </div>
-        </nav>
-    @endauth
-
-    <main>
-        @if (session('status'))
-            <div class="flash" role="status">{{ session('status') }}</div>
-        @endif
-
-        @if (session('error'))
-            <div class="flash-error" role="alert">
-                <strong>Connection / appliance error</strong>
-                @if (session('error_kind'))
-                    <span class="badge badge-error">{{ session('error_kind') }}</span>
-                @endif
-                <div>{{ session('error') }}</div>
-                @if (session('staged_preserved'))
-                    <div class="muted" style="margin-top: 0.5rem;">Staged desired configuration was preserved. Reconnect and retry apply when the appliance is reachable.</div>
-                @endif
-            </div>
-        @endif
-
-        @yield('content')
-    </main>
+<body class="{{ auth()->check() ? 'authenticated' : 'guest' }} {{ request()->routeIs('routers.show') ? 'router-desktop' : '' }}">
+<svg class="icon-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>
+    <symbol id="i-router" viewBox="0 0 24 24"><path d="M3 8h18v12H3zM7 8V3m10 5V3M6 16h1m4 0h1m4 0h1"/></symbol>
+    <symbol id="i-network" viewBox="0 0 24 24"><path d="M8 3h8v6H8zM3 17h6v5H3zm12 0h6v5h-6zM12 9v4H6v4m6-4h6v4"/></symbol>
+    <symbol id="i-interfaces" viewBox="0 0 24 24"><path d="M2 4h20v15H2zM5 8h5v6H5zM14 8h5v6h-5zM6 19v3m12-3v3M7 1v3m10-3v3"/></symbol>
+    <symbol id="i-bridge" viewBox="0 0 24 24"><path d="M7 1v22M3 5h8M3 11h8M3 17h8M17 1v22m-4-18h8m-8 6h8m-8 6h8M7 8h10m-10 6h10"/></symbol>
+    <symbol id="i-ppp" viewBox="0 0 24 24"><path d="M3 2v17h7M1 6h5m-5 6h5M15 2h7v7h-7zm0 13h7v7h-7zM10 5h5M10 5v14h5"/></symbol>
+    <symbol id="i-arp" viewBox="0 0 24 24"><path d="M2 8h20M5 2v6m7-6v6m7-6v6M7 15h10m-8-3-3 3 3 3m6-6 3 3-3 3M12 18v4"/></symbol>
+    <symbol id="i-switch" viewBox="0 0 24 24"><path d="M2 3h20v6H2zM4 9v12m5-12v12m6-12v12m5-12v12M1 21h5m12 0h5M6 6h1m4 0h1m4 0h1"/></symbol>
+    <symbol id="i-mesh" viewBox="0 0 24 24"><circle cx="4" cy="4" r="2"/><circle cx="20" cy="5" r="2"/><circle cx="11" cy="20" r="2"/><circle cx="3" cy="16" r="2"/><path d="m6 4 12 1M5 6l5 12m8-11-6 11M4 6l-1 8m2 3 4 2M5 15 18 6"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 2 21 6v6c0 5-9 10-9 10S3 17 3 12V6zM12 6v11"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M6 4h13v17H6zM3 7h6m-6 5h6m-6 5h6m3-10h4m-4 5h4m-4 5h4"/></symbol>
+    <symbol id="i-route" viewBox="0 0 24 24"><path d="m3 4 5 4-5 4m5-4h5c4 0 2 10 7 10m-4-4 4 4-4 4M3 20l5-4-5-4"/></symbol>
+    <symbol id="i-folder" viewBox="0 0 24 24"><path d="M2 6h8l2 3h10l-3 12H2zM2 16V3h8l2 3h8v3"/></symbol>
+    <symbol id="i-terminal" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="m6 8 4 4-4 4m7 0h5"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><path d="m9 3 1-2h4l1 3 3 1 3-1 2 4-2 2v4l2 2-2 4-3-1-3 1-1 3h-4l-1-3-3-1-3 1-2-4 2-2v-4L1 8l2-4 3 1z"/><circle cx="12" cy="12" r="4"/></symbol>
+    <symbol id="i-wifi" viewBox="0 0 24 24"><path d="M2 8a15 15 0 0 1 20 0M5 12a10 10 0 0 1 14 0m-11 4a5 5 0 0 1 8 0m-4 4h.01"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 3v18h19M6 16l4-6 4 3 7-9"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 5v7l5 3"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10" cy="10" r="7"/><path d="m15 15 7 7"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 3v18M3 12h18"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M21 9A9 9 0 1 0 20 17M21 3v6h-6"/></symbol>
+    <symbol id="i-filter" viewBox="0 0 24 24"><path d="M3 3h18l-7 9v7l-4 3V12z"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m4 12 5 5L21 5"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m5 5 14 14M5 19 19 5"/></symbol>
+    <symbol id="i-save" viewBox="0 0 24 24"><path d="M3 3h15l3 3v15H3zM7 3v7h10V3M7 21v-7h10v7"/></symbol>
+</defs></svg>
+@auth
+    @php
+        $shellRouter = $routerNode ?? request()->route('router');
+        if (! $shellRouter instanceof \App\Models\RouterNode) {
+            $shellRouter = auth()->user()->is_admin ? \App\Models\RouterNode::query()->first() : null;
+        }
+        $desktopUrl = $shellRouter ? route('routers.show', $shellRouter) : route('routers.index');
+        $menu = [
+            ['Quick Set', 'settings', 'overview'], ['WiFi', 'wifi', 'unsupported:WiFi'],
+            ['Interfaces', 'interfaces', 'interfaces'], ['WireGuard', 'shield', 'wireguard'],
+            ['Bridge', 'bridge', 'bridge'], ['PPP', 'ppp', 'pppoe'],
+            ['Switch', 'switch', 'unsupported:Switch'], ['Mesh', 'mesh', 'unsupported:Mesh'],
+        ];
+    @endphp
+    <aside class="sidebar" aria-label="Main menu">
+        <a class="brand" href="{{ $desktopUrl }}"><svg class="brand-logo"><use href="#i-router"/></svg><span>NUR<span class="brand-light">ROUTER</span></span></a>
+        <div class="sidebar-items">
+            @foreach ($menu as [$label, $icon, $panel])
+                <a class="menu-item" data-panel="{{ $panel }}" href="{{ $desktopUrl }}?panel={{ urlencode($panel) }}"><svg><use href="#i-{{ $icon }}"/></svg><span>{{ $label }}</span></a>
+            @endforeach
+            <details class="menu-group"><summary><svg><use href="#i-network"/></svg><span>IP</span><span class="chevron">›</span></summary>
+                @foreach (['arp'=>'ARP', 'addresses'=>'Addresses', 'routes'=>'Routes', 'dhcp-servers'=>'DHCP Server', 'dhcp'=>'DHCP Leases', 'dns'=>'DNS', 'firewall'=>'Firewall', 'connections'=>'Connections'] as $panel=>$label)
+                    <a data-panel="{{ $panel }}" href="{{ $desktopUrl }}?panel={{ $panel }}">{{ $label }}</a>
+                @endforeach
+            </details>
+            <a class="menu-item" data-panel="ipv6" href="{{ $desktopUrl }}?panel=ipv6"><svg><use href="#i-network"/></svg><span>IPv6</span></a>
+            <a class="menu-item" data-panel="unsupported:MPLS" href="{{ $desktopUrl }}?panel=unsupported:MPLS"><svg><use href="#i-network"/></svg><span>MPLS</span></a>
+            <a class="menu-item" data-panel="routes" href="{{ $desktopUrl }}?panel=routes"><svg><use href="#i-route"/></svg><span>Routing</span><span class="chevron">›</span></a>
+            <details class="menu-group"><summary><svg><use href="#i-settings"/></svg><span>System</span><span class="chevron">›</span></summary>
+                <a data-panel="capabilities" href="{{ $desktopUrl }}?panel=capabilities">Feature Status</a>
+                <a data-panel="resources" href="{{ $desktopUrl }}?panel=resources">Resources</a>
+                <a data-panel="revisions" href="{{ $desktopUrl }}?panel=revisions">Revisions</a>
+                @if ($shellRouter)<a href="{{ route('routers.edit', $shellRouter) }}">Identity &amp; connection</a><a href="{{ route('licensing.status', $shellRouter) }}">License</a>@endif
+            </details>
+            <a class="menu-item" data-panel="queues" href="{{ $desktopUrl }}?panel=queues"><svg><use href="#i-chart"/></svg><span>Queues</span></a>
+            <a class="menu-item" data-panel="unsupported:Dot1X" href="{{ $desktopUrl }}?panel=unsupported:Dot1X"><svg><use href="#i-shield"/></svg><span>Dot1X</span></a>
+            @if ($shellRouter)<a class="menu-item" href="{{ route('routers.backup.show', $shellRouter) }}"><svg><use href="#i-folder"/></svg><span>Files &amp; Backups</span></a>@endif
+            <a class="menu-item" data-panel="systemlog" href="{{ $desktopUrl }}?panel=systemlog"><svg><use href="#i-list"/></svg><span>Log</span></a>
+            <a class="menu-item" data-panel="audit" href="{{ $desktopUrl }}?panel=audit"><svg><use href="#i-list"/></svg><span>Audit Log</span></a>
+            <a class="menu-item" data-panel="unsupported:Terminal" href="{{ $desktopUrl }}?panel=unsupported:Terminal"><svg><use href="#i-terminal"/></svg><span>New Terminal</span></a>
+            @if ($shellRouter)<a class="menu-item" href="{{ route('routers.bras.edit', $shellRouter) }}"><svg><use href="#i-network"/></svg><span>RADIUS / BRAS</span></a>@endif
+            <a class="menu-item" data-panel="diagnostics" href="{{ $desktopUrl }}?panel=diagnostics"><svg><use href="#i-chart"/></svg><span>Tools</span><span class="chevron">›</span></a>
+            <div class="menu-divider"></div>
+            <a class="menu-item" href="{{ route('routers.index') }}"><svg><use href="#i-router"/></svg><span>Router inventory</span></a>
+        </div>
+    </aside>
+    <header class="desktop-header">
+        <div class="caption"><svg><use href="#i-router"/></svg><span>{{ auth()->user()->name.'@'.($shellRouter?->appliance_host ?? 'localhost') }} — {{ $shellRouter?->name ?? 'NUR' }} · WinControl</span><span class="caption-right">NURROUTER OS</span></div>
+        <div class="workspace-bar">
+            @if(request()->routeIs('routers.show'))
+            <label for="workspace-select">Workspace:</label><select id="workspace-select" aria-label="Workspace"><option value="own">&lt;own&gt;</option></select><button class="icon-button" id="workspace-manage" type="button" title="Manage saved workspaces" aria-label="Manage saved workspaces"><svg><use href="#i-save"/></svg></button><span id="workspace-status" class="workspace-save-status" role="status"></span>
+            @else
+            <a class="button" href="{{ $desktopUrl }}">Open desktop</a>
+            @endif
+            <span class="open-windows" title="Open windows"><svg><use href="#i-folder"/></svg><span id="window-count">1</span></span>
+            <button class="icon-button" type="button" id="global-find" title="Find in table" aria-label="Find in table"><svg><use href="#i-search"/></svg></button>
+            <span class="bar-spacer"></span><span class="version-label">NurRouterOS</span><span class="control-label">NUR WinControl</span>
+            @if ($shellRouter)
+                <span class="safe-mode-indicator" title="Configuration changes use timed Safe Mode rollback"><svg><use href="#i-shield"/></svg> Safe Mode<span class="safe-state">{{ $shellRouter->safe_mode_status === 'pending_confirm' ? 'pending' : 'ready' }}</span></span>
+                <a class="icon-button" aria-label="Router settings" title="Router settings" href="{{ route('routers.edit', $shellRouter) }}"><svg><use href="#i-settings"/></svg></a>
+            @endif
+            <form class="inline logout-form" method="POST" action="{{ route('logout') }}">@csrf @method('DELETE')<button title="Sign out" aria-label="Sign out" class="icon-button">↪</button></form>
+        </div>
+    </header>
+@endauth
+<main class="app-main">
+    @if(session('status'))<div class="flash" role="status">{{ session('status') }}</div>@endif
+    @if(session('error'))<div class="flash-error" role="alert">{{ session('error') }} @if(session('staged_preserved')) Staged configuration has been preserved. @endif</div>@endif
+    @yield('content')
+</main>
+@auth
+<footer class="system-status"><span class="device-label"><svg><use href="#i-router"/></svg><strong>{{ $shellRouter?->name ?? 'NUR WinControl' }}</strong></span><span id="status-mac">{{ $shellRouter?->appliance_host }}</span><span class="status-separator"></span><span>x86_64</span><span id="status-memory">NUR RouterOS</span><span class="status-spacer"></span><span id="status-connection">{{ $shellRouter?->status ?? 'Ready' }}</span><svg><use href="#i-clock"/></svg><span id="status-uptime">—</span><time id="status-clock"></time></footer>
+<script>setInterval(()=>{const el=document.getElementById('status-clock');if(el)el.textContent=new Date().toLocaleString(undefined,{hour12:false})},1000);</script>
+@endauth
+@stack('scripts')
 </body>
 </html>

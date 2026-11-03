@@ -1,0 +1,26 @@
+#!/bin/sh /etc/rc.common
+# Experimental server. WAN PPPoE client remains managed by netifd.
+START=96
+USE_PROCD=1
+start_service() {
+    [ -f /etc/nurrouter/bras.json ] || return 0
+    jq -e '.enabled == true' /etc/nurrouter/bras.json >/dev/null || return 0
+    ip link set lo up || return 1
+    ip addr replace 127.0.0.1/8 dev lo || return 1
+    /usr/sbin/nur-brasctl render || return 1
+    mkdir -p /var/log/accel-ppp
+    /etc/init.d/nur-accounting start || return 1
+    procd_open_instance engine
+    procd_set_param command /usr/sbin/accel-pppd -c /var/run/nur-bras/accel.conf
+    procd_set_param term_timeout 60
+    procd_set_param respawn 3600 5 5
+    procd_close_instance
+    procd_open_instance admission
+    procd_set_param command /usr/sbin/nur-bras-admission
+    procd_set_param respawn
+    procd_close_instance
+}
+reload_service() {
+    jq -e '.enabled == true' /etc/nurrouter/bras.json >/dev/null 2>&1 || { stop; return; }
+    if pidof accel-pppd >/dev/null; then /usr/sbin/nur-brasctl reload; else start; fi
+}

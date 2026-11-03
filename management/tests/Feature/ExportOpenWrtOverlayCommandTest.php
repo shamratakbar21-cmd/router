@@ -23,6 +23,10 @@ class ExportOpenWrtOverlayCommandTest extends TestCase
                     'interface' => 'mgmt0',
                     'cidr' => '192.0.2.1/24',
                 ],
+                'static_neighbors' => [
+                    ['ip' => '192.0.2.2', 'interface' => 'mgmt0', 'mac' => '02:AA:00:00:00:02', 'comment' => "Operator's entry"],
+                    ['ip' => '192.0.2.3', 'interface' => 'mgmt0', 'mac' => '02:aa:00:00:00:03', 'disabled' => true],
+                ],
                 'services' => [
                     'dns' => [
                         'forwarders' => ['1.1.1.1'],
@@ -57,6 +61,12 @@ class ExportOpenWrtOverlayCommandTest extends TestCase
         $this->assertFileExists("{$targetDirectory}/etc/config/dhcp");
         $this->assertFileExists("{$targetDirectory}/etc/config/firewall");
         $this->assertFileExists("{$targetDirectory}/etc/nurrouter/overlay-manifest.json");
+        $metadata = json_decode(file_get_contents("{$targetDirectory}/etc/nurrouter/neighbors.json"), true);
+        $this->assertSame("Operator's entry", $metadata[0]['comment']);
+        $this->assertSame('02:aa:00:00:00:02', $metadata[0]['mac']);
+        $this->assertFalse($metadata[0]['disabled']);
+        $this->assertTrue($metadata[1]['disabled']);
+
         $this->assertStringNotContainsString(
             'SecretPassword123!',
             (string) file_get_contents("{$targetDirectory}/etc/config/network"),

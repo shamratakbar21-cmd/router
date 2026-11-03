@@ -70,7 +70,7 @@ class RouterStateApiTest extends TestCase
                     ],
                 ],
                 'routes' => [
-                    ['dst' => 'default', 'gateway' => '192.0.2.254', 'dev' => 'mgmt0', 'protocol' => 'static'],
+                    ['dst' => 'default', 'gateway' => '192.0.2.254', 'dev' => 'mgmt0', 'protocol' => 'static', 'flags' => ['onlink']],
                 ],
                 'bridge_vlans' => [],
                 'firewall' => ['nftables' => []],
@@ -89,6 +89,7 @@ class RouterStateApiTest extends TestCase
             ->assertJsonPath('observed.normalized.interfaces.0.name', 'mgmt0')
             ->assertJsonPath('observed.normalized.addresses.0.cidr', '192.0.2.2/24')
             ->assertJsonPath('observed.normalized.routes.0.destination', 'default')
+            ->assertJsonPath('observed.normalized.routes.0.flags', ['onlink'])
             ->assertJsonPath('observed.normalized.forwarding.ipv4', '1')
             ->assertJsonPath('diff.desired_vs_applied.0.path', 'management.cidr');
     }

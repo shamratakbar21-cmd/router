@@ -201,7 +201,8 @@
                                 @error("services.pppoe_clients.$index.username") <div class="error">{{ $message }}</div> @enderror
                             </td>
                             <td>
-                                <input type="password" name="services[pppoe_clients][{{ $index }}][password]" value="{{ data_get($client, 'password', '') }}">
+                                <select name="services[pppoe_clients][{{ $index }}][password_action]"><option value="retain">Retain password</option><option value="replace">Replace password</option><option value="clear">Clear password</option></select>
+                                <input type="password" name="services[pppoe_clients][{{ $index }}][password]" value="" autocomplete="new-password">
                                 @error("services.pppoe_clients.$index.password") <div class="error">{{ $message }}</div> @enderror
                             </td>
                             <td>

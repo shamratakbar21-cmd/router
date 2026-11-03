@@ -547,12 +547,12 @@ class LicenseService
             }
         }
 
-        $path = base_path('../files/etc/nurrouter/license-public-keys.json');
+        $path = config('licensing.verification_keys_path', base_path('../files/etc/nurrouter/license-public-keys.json'));
         if (is_file($path)) {
             $decoded = json_decode((string) file_get_contents($path), true);
             foreach (($decoded['keys'] ?? []) as $entry) {
                 if (! empty($entry['key_id']) && ! empty($entry['public_key'])) {
-                    $keys[(string) $entry['key_id']] = (string) $entry['public_key'];
+                    $keys[(string) $entry['key_id']] ??= (string) $entry['public_key'];
                 }
             }
         }

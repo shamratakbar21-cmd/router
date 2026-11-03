@@ -36,6 +36,23 @@ class LicensingTest extends TestCase
         $this->licenses->ensureDefaultPlans();
     }
 
+    public function test_configured_signing_key_wins_over_stale_overlay_with_same_key_id(): void
+    {
+        $keyId = 'stale-overlay-test';
+        $oldPair = $this->crypto->generateKeyPair();
+        $path = tempnam(sys_get_temp_dir(), 'nur-public-keys-');
+        file_put_contents($path, json_encode(['keys' => [['key_id' => $keyId, 'public_key' => $oldPair['public_key']]]]));
+        config(['licensing.verification_keys_path' => $path]);
+        $pair = $this->crypto->generateKeyPair();
+        config(['licensing.signing_private_key' => $pair['private_key'], 'licensing.signing_key_id' => $keyId]);
+
+        try {
+            $this->assertSame($pair['public_key'], $this->licenses->verificationPublicKeysById()[$keyId]);
+        } finally {
+            unlink($path);
+        }
+    }
+
     public function test_non_admin_cannot_access_licensing_admin(): void
     {
         $user = User::factory()->create(['role' => 'operator', 'is_admin' => false]);

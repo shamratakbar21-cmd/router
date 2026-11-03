@@ -52,13 +52,14 @@ class RouterBackupController extends Controller
             'backup_json' => ['required', 'string'],
         ]);
 
-        $result = $this->backups->preview($validated['backup_json'], $router);
+        $result = $this->backups->preview($validated['backup_json'], $router, $request->boolean('allow_legacy'));
 
         return redirect()
             ->route('routers.backup.show', $router)
             ->with('backup_preview', $result['preview'])
             ->with('backup_preview_errors', $result['errors'])
             ->with('backup_json_pending', $validated['backup_json'])
+            ->with('backup_allow_legacy', $request->boolean('allow_legacy'))
             ->with('status', $result['ok'] ? 'Backup preview ready.' : 'Backup preview found issues.');
     }
 
@@ -77,6 +78,7 @@ class RouterBackupController extends Controller
                 $validated['backup_json'],
                 $request->user(),
                 confirm: true,
+                allowLegacy: $request->boolean('allow_legacy'),
             );
         } catch (Throwable $throwable) {
             return redirect()
@@ -87,6 +89,6 @@ class RouterBackupController extends Controller
         return redirect()
             ->route('routers.desired-state.edit', $router)
             ->with('status', 'Backup restored into desired state as revision '.$result['revision_id']
-                .'. Review and apply. Rollback token: '.$result['rollback_token']);
+                .'. Review and apply. Previous desired state is retained in revision history.');
     }
 }

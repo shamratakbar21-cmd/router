@@ -37,32 +37,34 @@ apt-get install -y \
   "php${PHP_VERSION}-mbstring" "php${PHP_VERSION}-xml" "php${PHP_VERSION}-curl" \
   "php${PHP_VERSION}-zip" "php${PHP_VERSION}-bcmath" "php${PHP_VERSION}-intl" \
   "php${PHP_VERSION}-tokenizer" \
-  nginx sqlite3 curl unzip git openssh-client openssl ca-certificates \
+  nginx sqlite3 curl unzip git rsync openssh-client openssl ca-certificates \
   composer logrotate gnupg ca-certificates
 
 # Vite 8 / laravel-vite-plugin require Node >= 20.19 (Ubuntu apt nodejs is often 18.x).
-if ! command -v node >/dev/null 2>&1 || ! node -e 'process.exit(Number(process.versions.node.split(".")[0])>=20?0:1)'; then
+if ! command -v node >/dev/null 2>&1 || ! node -e 'process.exit((v=>v[0]>22||(v[0]===22&&v[1]>=12)||(v[0]===20&&v[1]>=19))(process.versions.node.split(".").map(Number))?0:1)'; then
   log "Installing Node.js 22.x from NodeSource (apt nodejs too old for Vite 8)..."
   curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
   apt-get install -y nodejs
 fi
-node -e 'process.exit(Number(process.versions.node.split(".")[0])>=20?0:1)' || die "Node.js >= 20 is required"
+node -e 'process.exit((v=>v[0]>22||(v[0]===22&&v[1]>=12)||(v[0]===20&&v[1]>=19))(process.versions.node.split(".").map(Number))?0:1)' || die "Node.js >= 20 is required"
 
 # Verify required PHP extensions
-php${PHP_VERSION} -m | grep -qi sqlite3 || die "php-sqlite3 missing"
-php${PHP_VERSION} -m | grep -qi mbstring || die "php-mbstring missing"
-php${PHP_VERSION} -m | grep -qi openssl || die "php openssl missing"
-php${PHP_VERSION} -m | grep -qi ctype || die "php ctype missing"
-php${PHP_VERSION} -m | grep -qi json || die "php json missing"
-php${PHP_VERSION} -m | grep -qi tokenizer || die "php tokenizer missing"
-php${PHP_VERSION} -m | grep -qi xml || die "php xml missing"
-php${PHP_VERSION} -m | grep -qi curl || die "php curl missing"
+php${PHP_VERSION} -m | grep -i sqlite3 >/dev/null || die "php-sqlite3 missing"
+php${PHP_VERSION} -m | grep -i mbstring >/dev/null || die "php-mbstring missing"
+php${PHP_VERSION} -m | grep -i openssl >/dev/null || die "php openssl missing"
+php${PHP_VERSION} -m | grep -i ctype >/dev/null || die "php ctype missing"
+php${PHP_VERSION} -m | grep -i json >/dev/null || die "php json missing"
+php${PHP_VERSION} -m | grep -i tokenizer >/dev/null || die "php tokenizer missing"
+php${PHP_VERSION} -m | grep -i xml >/dev/null || die "php xml missing"
+php${PHP_VERSION} -m | grep -i curl >/dev/null || die "php curl missing"
 command -v ssh >/dev/null || die "openssh-client missing"
 
 log "Syncing application into ${APP_ROOT}"
 mkdir -p "${APP_ROOT}"
 rsync -a --delete \
   --exclude '.env' \
+  --exclude 'database/*.sqlite*' \
+  --exclude 'storage/app' \
   --exclude 'node_modules' \
   --exclude 'vendor' \
   --exclude 'storage/logs/*' \
@@ -122,6 +124,11 @@ if [[ "${DB_CONNECTION}" == "sqlite" ]]; then
   fi
 fi
 
+# Environment material is readable only by root and the application group.
+sed -i 's/^APP_ENV=.*/APP_ENV=production/; s/^APP_DEBUG=.*/APP_DEBUG=false/' .env
+chown "root:${APP_USER}" .env
+chmod 0640 .env
+
 log "Installing locked Composer dependencies (no-dev)..."
 composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
 
@@ -162,8 +169,7 @@ fi
 DEPLOY_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 log "Installing nginx site on ports ${LISTEN_HTTP_PORT}/${LISTEN_HTTPS_PORT} (isolated from default :80/:443)..."
-# Disable default site if present on this VM only
-rm -f /etc/nginx/sites-enabled/default
+# Dedicated ports leave any other nginx sites intact.
 sed \
   -e "s|__APP_ROOT__|${APP_ROOT}|g" \
   -e "s|__DOMAIN__|${DOMAIN}|g" \

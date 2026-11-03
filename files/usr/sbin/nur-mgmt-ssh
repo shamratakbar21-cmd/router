@@ -27,49 +27,42 @@ run_privileged() {
     reject 'privileged helper unavailable (nur-mgmt-elev/sudo missing and not root)'
 }
 
-# Allow legacy SCP of overlays into /tmp/nurrouter-overlay-* only.
-# OpenSSH "scp -O" commonly sends flags such as "-r -t <path>" or "-v -r -t <path>".
-is_overlay_scp=0
+# Commands are tokenized only after metacharacters have been rejected.
 case "${ORIGINAL_COMMAND}" in
-    scp\ *)
-        case "${ORIGINAL_COMMAND}" in
-            *\ -t\ /tmp/nurrouter-overlay-*|*\ -f\ /tmp/nurrouter-overlay-*|*\ -t\ --\ /tmp/nurrouter-overlay-*|*\ -f\ --\ /tmp/nurrouter-overlay-*)
-                is_overlay_scp=1
-                ;;
-        esac
-        ;;
+    *[!A-Za-z0-9_./\ -]*) reject 'invalid command characters' ;;
 esac
-
-if [ "${is_overlay_scp}" -eq 1 ]; then
-    overlay_path="$(printf '%s\n' "${ORIGINAL_COMMAND}" | awk '{print $NF}')"
-    case "${overlay_path}" in
-        /tmp/nurrouter-overlay-[A-Za-z0-9._-]*)
-            exec /bin/sh -c "${ORIGINAL_COMMAND}"
-            ;;
-        *)
-            reject 'scp target not an allowed overlay path'
-            ;;
-    esac
-fi
-
-case "${ORIGINAL_COMMAND}" in
-    /usr/sbin/nur-runtimectl\ observe)
-        run_privileged /usr/sbin/nur-runtimectl observe
+set -f
+set -- ${ORIGINAL_COMMAND}
+valid_overlay() {
+    case "$1" in /tmp/nurrouter-overlay-*) ;; *) return 1 ;; esac
+    suffix="${1#/tmp/nurrouter-overlay-}"
+    case "${suffix}" in ""|*[!A-Za-z0-9_-]*) return 1 ;; esac
+    [ "${#suffix}" -le 80 ]
+}
+case "$1" in
+    scp)
+        shift
+        # Only sink mode is needed for management uploads; no arbitrary flags.
+        while [ "$#" -gt 0 ]; do
+            case "$1" in -v|-r|-d) shift ;; *) break ;; esac
+        done
+        [ "$#" -eq 2 ] && [ "$1" = -t ] && valid_overlay "$2" || reject 'invalid scp target'
+        exec /usr/bin/scp -r -t "$2"
         ;;
-    /usr/sbin/nur-runtimectl\ apply\ --overlay\ /tmp/nurrouter-overlay-*\ --operation\ *\ --safe-mode-seconds\ *)
-        # Re-parse into argv for the elevator (avoid shell as root).
-        # shellcheck disable=SC2086
-        set -- ${ORIGINAL_COMMAND}
+    /usr/sbin/nur-runtimectl)
+        case "${2:-}" in
+            observe) [ "$#" -eq 2 ] || reject 'unexpected arguments' ;;
+            apply)
+                [ "$#" -eq 8 ] && [ "$3" = --overlay ] && valid_overlay "$4" && [ "$5" = --operation ] && [ "$7" = --safe-mode-seconds ] || reject 'invalid apply'
+                ;;
+            confirm) [ "$#" -eq 4 ] && [ "$3" = --operation ] || reject 'invalid confirm' ;;
+            *) reject 'unsupported operation' ;;
+        esac
         run_privileged "$@"
         ;;
-    /usr/sbin/nur-runtimectl\ confirm\ --operation\ *)
-        set -- ${ORIGINAL_COMMAND}
-        run_privileged "$@"
+    /bin/rm)
+        [ "$#" -eq 4 ] && [ "$2" = -rf ] && [ "$3" = -- ] && valid_overlay "$4" || reject 'invalid cleanup'
+        exec /bin/rm -rf -- "$4"
         ;;
-    /bin/rm\ -rf\ --\ /tmp/nurrouter-overlay-*|/bin/rm\ -rf\ /tmp/nurrouter-overlay-*)
-        exec /bin/sh -c "${ORIGINAL_COMMAND}"
-        ;;
-    *)
-        reject "unsupported command"
-        ;;
+    *) reject 'unsupported command' ;;
 esac

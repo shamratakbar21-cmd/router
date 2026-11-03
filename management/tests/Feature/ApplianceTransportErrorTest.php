@@ -101,7 +101,7 @@ class ApplianceTransportErrorTest extends TestCase
         $revision->refresh();
         $this->assertSame($revision->id, $router->desired_revision_id);
         $this->assertSame('error', $router->status);
-        $this->assertSame('failed', $revision->apply_status);
+        $this->assertSame('outcome-unknown', $revision->apply_status);
         $this->assertTrue($router->hasStagedConfiguration() || $router->desired_revision_id === $revision->id);
 
         File::deleteDirectory($fixtureDirectory);

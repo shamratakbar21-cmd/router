@@ -11,6 +11,20 @@ class UpdateRouterDesiredStateRequest extends FormRequest
 {
     protected function prepareForValidation(): void
     {
+        $router = $this->route('router');
+        if ($router instanceof RouterNode) {
+            $existing = $router->desired_configuration ?? [];
+            foreach (['interfaces', 'addresses', 'routes', 'bridge_vlans', 'forwarding', 'firewall'] as $field) {
+                if (! $this->exists($field) && array_key_exists($field, $existing)) {
+                    $this->merge([$field => $existing[$field]]);
+                }
+            }
+            $services = $this->input('services', []);
+            if (is_array($services)) {
+                $this->merge(['services' => array_replace($existing['services'] ?? [], $services)]);
+            }
+        }
+
         $services = is_array($this->input('services')) ? $this->input('services') : [];
         $dns = is_array(data_get($services, 'dns')) ? data_get($services, 'dns') : [];
 
@@ -89,6 +103,7 @@ class UpdateRouterDesiredStateRequest extends FormRequest
             'services.pppoe_clients.*.name' => ['required_with:services.pppoe_clients', 'string', 'max:32', 'regex:/^[a-zA-Z0-9._-]+$/'],
             'services.pppoe_clients.*.interface' => ['required_with:services.pppoe_clients', 'string', 'max:15', 'regex:/^[a-zA-Z0-9._-]+$/'],
             'services.pppoe_clients.*.username' => ['required_with:services.pppoe_clients', 'string', 'max:255'],
+            'services.pppoe_clients.*.password_action' => ['sometimes', 'in:retain,replace,clear'],
             'services.pppoe_clients.*.password' => ['nullable', 'string', 'max:255'],
             'services.pppoe_clients.*.service_name' => ['nullable', 'string', 'max:255'],
             'services.pppoe_clients.*.default_route' => ['sometimes', 'boolean'],
@@ -99,7 +114,7 @@ class UpdateRouterDesiredStateRequest extends FormRequest
             'firewall.rules' => ['sometimes', 'array'],
             'firewall.rules.*.chain' => ['required_with:firewall.rules', 'string', 'max:32'],
             'firewall.rules.*.action' => ['required_with:firewall.rules', 'string', 'in:accept,drop,reject'],
-            'firewall.rules.*.protocol' => ['nullable', 'string', 'in:tcp,udp,icmp'],
+            'firewall.rules.*.protocol' => ['nullable', 'string', 'in:all,tcp,udp,icmp'],
             'firewall.rules.*.source' => ['nullable', 'string'],
             'firewall.rules.*.destination' => ['nullable', 'string'],
             'firewall.rules.*.in_interface' => ['nullable', 'string', 'max:15', 'regex:/^[a-zA-Z0-9._-]+$/'],
@@ -107,7 +122,7 @@ class UpdateRouterDesiredStateRequest extends FormRequest
             'firewall.nat' => ['sometimes', 'array'],
             'firewall.nat.*.chain' => ['required_with:firewall.nat', 'string', 'max:32'],
             'firewall.nat.*.action' => ['required_with:firewall.nat', 'string', 'in:masquerade,snat,dnat'],
-            'firewall.nat.*.protocol' => ['nullable', 'string', 'in:tcp,udp,icmp'],
+            'firewall.nat.*.protocol' => ['nullable', 'string', 'in:all,tcp,udp,icmp'],
             'firewall.nat.*.to_address' => ['nullable', 'ip'],
             'firewall.nat.*.source' => ['nullable', 'string'],
             'firewall.nat.*.destination' => ['nullable', 'string'],
@@ -124,7 +139,7 @@ class UpdateRouterDesiredStateRequest extends FormRequest
         $validated = $this->validated();
         $pppoeClients = array_map(
             fn (array $client): array => collect($client)
-                ->except(['password'])
+                ->except(['password', 'password_action'])
                 ->all(),
             data_get($validated, 'services.pppoe_clients', []),
         );
@@ -154,10 +169,12 @@ class UpdateRouterDesiredStateRequest extends FormRequest
     {
         $validated = $this->validated();
         $pppoeSecrets = [];
+        $actions = [];
 
         foreach (data_get($validated, 'services.pppoe_clients', []) as $client) {
             $name = (string) ($client['name'] ?? '');
             $password = (string) ($client['password'] ?? '');
+            $actions[$name] = $client['password_action'] ?? ($password !== '' ? 'replace' : 'retain');
 
             if ($name === '' || $password === '') {
                 continue;
@@ -167,6 +184,7 @@ class UpdateRouterDesiredStateRequest extends FormRequest
         }
 
         return [
+            'password_actions' => $actions,
             'services' => [
                 'pppoe_clients' => $pppoeSecrets,
             ],
@@ -177,6 +195,22 @@ class UpdateRouterDesiredStateRequest extends FormRequest
     {
         return [
             function (Validator $validator): void {
+                $walk = function (mixed $value, string $path = '') use (&$walk, $validator): void {
+                    if (is_array($value)) {
+                        foreach ($value as $key => $child) {
+                            $walk($child, $path.'.'.$key);
+                        }
+                    } elseif (is_string($value) && preg_match('/[\x00-\x1f\x7f]/', $value)) {
+                        $validator->errors()->add(ltrim($path, '.'), 'Control characters are not supported.');
+                    }
+                };
+                $walk($this->all());
+                foreach ($this->input('services.pppoe_clients', []) as $index => $client) {
+                    if (($client['password_action'] ?? '') === 'replace' && empty($client['password'])) {
+                        $validator->errors()->add("services.pppoe_clients.$index.password", 'A replacement password is required.');
+                    }
+                }
+
                 foreach ($this->input('addresses', []) as $index => $address) {
                     $cidr = (string) ($address['cidr'] ?? '');
 
@@ -208,6 +242,17 @@ class UpdateRouterDesiredStateRequest extends FormRequest
         ];
     }
 
+    public static function validateConfiguration(array $configuration): array
+    {
+        $request = new self;
+        $request->setContainer(app());
+        $request->replace($configuration);
+        $request->prepareForValidation();
+        $request->getValidatorInstance()->validate();
+
+        return $request->publicConfiguration();
+    }
+
     private function isValidIpv4Cidr(string $cidr): bool
     {
         if (! preg_match('/^(\d{1,3}\.){3}\d{1,3}\/\d{1,2}$/', $cidr)) {
@@ -232,7 +277,7 @@ class UpdateRouterDesiredStateRequest extends FormRequest
 
         return array_values(array_filter(
             $rows,
-            fn (mixed $row): bool => is_array($row) && $this->rowHasContent($row),
+            fn (mixed $row): bool => is_array($row) && $this->rowHasContent(array_diff_key($row, ['password_action' => true])),
         ));
     }
 

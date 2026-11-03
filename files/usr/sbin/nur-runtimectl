@@ -6,7 +6,8 @@ RUNTIME_ROOT="/etc/nurrouter/runtime"
 BACKUP_ROOT="${RUNTIME_ROOT}/backups"
 PENDING_ROOT="${RUNTIME_ROOT}/pending"
 
-mkdir -p "${BACKUP_ROOT}" "${PENDING_ROOT}"
+umask 077
+mkdir -p "${BACKUP_ROOT}" "${PENDING_ROOT}" /var/lock
 
 command_name="${1:-}"
 shift || true
@@ -36,6 +37,21 @@ while [ "$#" -gt 0 ]; do
     esac
 done
 
+case "${command_name}" in
+    apply|confirm|expire)
+        case "${operation_id}" in
+            ""|*[!A-Za-z0-9_-]*) echo "invalid operation identifier" >&2; exit 2 ;;
+        esac
+        [ "${#operation_id}" -le 80 ] || exit 2
+        mkdir /var/lock/nur-mutation.lock 2>/dev/null || { echo "configuration mutation busy" >&2; exit 3; }
+        trap 'rmdir /var/lock/nur-mutation.lock 2>/dev/null || true' EXIT
+        ;;
+esac
+case "${safe_mode_seconds}" in
+    ""|*[!0-9]*) echo "invalid Safe Mode duration" >&2; exit 2 ;;
+esac
+[ "${#safe_mode_seconds}" -le 5 ] && [ "${safe_mode_seconds}" -le 86400 ] || exit 2
+
 backup_config() {
     backup_dir="${BACKUP_ROOT}/${operation_id}"
     mkdir -p "${backup_dir}"
@@ -46,9 +62,13 @@ backup_config() {
         fi
     done
 
-    if [ -f /etc/nurrouter/pppoe-shaping.json ]; then
-        cp /etc/nurrouter/pppoe-shaping.json "${backup_dir}/pppoe-shaping.json"
-    fi
+    for extra in pppoe-shaping.json license-entitlements.json bras.json neighbors.json; do
+        if [ -f "/etc/nurrouter/${extra}" ]; then
+            cp "/etc/nurrouter/${extra}" "${backup_dir}/${extra}"
+        else
+            touch "${backup_dir}/${extra}.absent"
+        fi
+    done
 }
 
 restore_backup() {
@@ -60,19 +80,55 @@ restore_backup() {
         fi
     done
 
-    if [ -f "${backup_dir}/pppoe-shaping.json" ]; then
-        mkdir -p /etc/nurrouter
-        cp "${backup_dir}/pppoe-shaping.json" /etc/nurrouter/pppoe-shaping.json
-    fi
+    for extra in pppoe-shaping.json license-entitlements.json bras.json neighbors.json; do
+        if [ -f "${backup_dir}/${extra}" ]; then
+            cp "${backup_dir}/${extra}" "/etc/nurrouter/${extra}"
+        elif [ -f "${backup_dir}/${extra}.absent" ]; then
+            rm -f "/etc/nurrouter/${extra}"
+        fi
+    done
 }
 
 reload_services() {
-    /etc/init.d/network restart
-    /etc/init.d/firewall restart
-    /etc/init.d/dnsmasq restart
+    # Prefer reload over restart so management SSH can survive Safe Mode applies.
+    if [ -x /etc/init.d/network ]; then
+        /etc/init.d/network reload 2>/dev/null || /etc/init.d/network restart || return 1
+    fi
+    if [ -x /etc/init.d/firewall ]; then
+        /etc/init.d/firewall reload 2>/dev/null || /etc/init.d/firewall restart || return 1
+    fi
+    if [ -x /etc/init.d/dnsmasq ]; then
+        /etc/init.d/dnsmasq reload 2>/dev/null || /etc/init.d/dnsmasq restart || return 1
+    fi
+    if [ -x /etc/init.d/nur-bras ]; then
+        /etc/init.d/nur-bras reload || return 1
+    fi
+}
+
+# Reconcile actual queues, including clearing a profile removed by rollback.
+reconcile_shaping() {
+    allow_shape=1
+    if [ -f /etc/nurrouter/license-entitlements.json ]; then
+        jq -e '.features | index("shaping")' /etc/nurrouter/license-entitlements.json >/dev/null 2>&1 || allow_shape=0
+    fi
+    ubus list | awk -F. '/^network\.interface\./ { print $3 }' | while read -r name; do
+        status="$(ubus call "network.interface.${name}" status 2>/dev/null || true)"
+        l3="$(printf '%s' "$status" | jq -r 'select(.proto=="pppoe" and .up==true) | .l3_device // empty')"
+        [ -n "$l3" ] || continue
+        download_kbps=0
+        upload_kbps=0
+        if [ "$allow_shape" -eq 1 ] && [ -f /etc/nurrouter/pppoe-shaping.json ]; then
+            row="$(jq -c --arg name "$name" '[.[] | select(.name==$name)][0] // {}' /etc/nurrouter/pppoe-shaping.json)"
+            download_kbps="$(printf '%s' "$row" | jq -r '.download_kbps // 0')"
+            upload_kbps="$(printf '%s' "$row" | jq -r '.upload_kbps // 0')"
+        fi
+        /usr/sbin/nur-pppoe-shape "$l3" "$download_kbps" "$upload_kbps" || exit 1
+    done
 }
 
 observe_state() {
+    neighbor_state="$(/usr/sbin/nur-neighborctl observe 2>/dev/null || echo '{"neighbors":null,"neighbor_api":null,"neighbor_verification":{"ok":false}}')"
+    bras_state="$(/usr/sbin/nur-brasctl observe 2>/dev/null || echo '{"state":"unavailable"}')"
     links="$(ip -j link show 2>/dev/null || echo '[]')"
     addresses="$(ip -j addr show 2>/dev/null || echo '[]')"
     routes="$(ip -j route show 2>/dev/null || echo '[]')"
@@ -141,21 +197,44 @@ observe_state() {
         [ -n "${shaping_status}" ] || shaping_status='[]'
     fi
 
-    jq -n \
-        --argjson links "${links}" \
-        --argjson addresses "${addresses}" \
-        --argjson routes "${routes}" \
-        --argjson bridge_vlans "${bridge_vlans}" \
-        --argjson firewall "${firewall_ruleset}" \
-        --argjson link_stats "${link_stats}" \
-        --argjson pppoe_interfaces "${pppoe_interfaces}" \
-        --argjson dhcp_leases "${dhcp_leases}" \
-        --argjson pppoe_sessions "${pppoe_sessions}" \
-        --argjson shaping_status "${shaping_status}" \
+    operations="$(for status_file in "${BACKUP_ROOT}"/*/status; do
+        [ -f "${status_file}" ] || continue
+        jq -n --arg id "$(basename "$(dirname "${status_file}")")" --arg state "$(cat "${status_file}")" '{key:$id,value:$state}'
+    done | jq -s 'from_entries')"
+    # Large observed state must travel on stdin, not Linux per-argument argv limits.
+    printf '%s\n' "${operations}" "${links}" "${addresses}" "${routes}" "${bridge_vlans}" "${firewall_ruleset}" "${link_stats}" "${pppoe_interfaces}" "${dhcp_leases}" "${pppoe_sessions}" "${bras_state}" "${shaping_status}" "${neighbor_state}" |
+    jq -s \
+        --arg boot_id "$(cat /proc/sys/kernel/random/boot_id)" \
+        --arg device_id "$(cat /etc/nurrouter/device-id)" \
+        --arg product_version "$(cat /etc/nurrouter/product-version)" \
+        --arg uptime "$(cut -d ' ' -f1 /proc/uptime)" \
+        --arg cpu "$(head -n1 /proc/stat)" \
+        --arg mem_available_kb "$(awk '/MemAvailable:/ {print $2}' /proc/meminfo)" \
+        --arg disk_used_kb "$(df -k / | awk 'NR==2 {print $3}')" \
+        --arg service_pids "$(for service in dropbear dnsmasq netifd nur-agent nur-runtime-watchdog; do printf '%s=' "$service"; pgrep -f "^(/usr/sbin/|/sbin/|/bin/sh /usr/sbin/)?${service}( |$)" | sort -n | tr '\n' ','; printf ';'; done)" \
         --arg dnsmasq_running "${dnsmasq_running}" \
         --arg ipv4 "$(cat /proc/sys/net/ipv4/ip_forward 2>/dev/null || echo 0)" \
         --arg observed_at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
-        '{
+        '.[0] as $apply_operations
+         | .[1] as $links
+         | .[2] as $addresses
+         | .[3] as $routes
+         | .[4] as $bridge_vlans
+         | .[5] as $firewall
+         | .[6] as $link_stats
+         | .[7] as $pppoe_interfaces
+         | .[8] as $dhcp_leases
+         | .[9] as $pppoe_sessions
+         | .[10] as $bras_state
+         | .[11] as $shaping_status
+         | .[12] as $neighbor_state
+         | {
+            neighbors: $neighbor_state.neighbors,
+            managed_neighbors: ($neighbor_state.managed_neighbors // []),
+            neighbor_api: $neighbor_state.neighbor_api,
+            neighbor_verification: $neighbor_state.neighbor_verification,
+            health: {boot_id:$boot_id,device_id:$device_id,product_version:$product_version,uptime:($uptime|tonumber),cpu:$cpu,mem_available_kb:($mem_available_kb|tonumber),disk_used_kb:($disk_used_kb|tonumber),service_pids:$service_pids},
+            apply_operations: $apply_operations,
             links: $links,
             addresses: $addresses,
             routes: $routes,
@@ -170,7 +249,8 @@ observe_state() {
                 pppoe_interfaces: $pppoe_interfaces,
                 dhcp_leases: $dhcp_leases,
                 pppoe_sessions: $pppoe_sessions,
-                shaping_status: $shaping_status
+                shaping_status: $shaping_status,
+                pppoe_server: $bras_state
             },
             observed_at: $observed_at
         }'
@@ -183,7 +263,31 @@ case "${command_name}" in
             exit 1
         fi
 
+        [ ! -d /var/lock/nur-reload.lock ] || { echo "reload in progress" >&2; exit 3; }
+        for pending in "${PENDING_ROOT}"/*.env; do
+            [ ! -f "${pending}" ] || { echo "Safe Mode operation pending" >&2; exit 3; }
+        done
+        [ ! -d "${BACKUP_ROOT}/${operation_id}" ] || { echo "operation already used" >&2; exit 3; }
+        # Parse all UCI inputs before touching live configuration.
+        for config_name in network dhcp firewall; do
+            if [ -f "${overlay_dir}/etc/config/${config_name}" ]; then
+                uci -c "${overlay_dir}/etc/config" export "${config_name}" >/dev/null || exit 4
+            fi
+        done
+        if [ -f "${overlay_dir}/etc/nurrouter/bras.json" ]; then
+            /usr/sbin/nur-brasctl validate "${overlay_dir}/etc/nurrouter/bras.json" || exit 4
+        fi
+        if [ -f "${overlay_dir}/etc/nurrouter/neighbors.json" ]; then
+            /usr/sbin/nur-neighborctl validate "${overlay_dir}/etc/nurrouter/neighbors.json" || exit 4
+        fi
+        if [ ! -f "${overlay_dir}/etc/nurrouter/neighbors.json" ]; then
+            if grep -Eq "^[[:space:]]*config[[:space:]]+neighbor" "${overlay_dir}/etc/config/network" || [ "$(jq length /etc/nurrouter/neighbors.json 2>/dev/null || echo 0)" -gt 0 ]; then
+                echo "Managed ARP requires neighbor API 1 metadata; update the management client." >&2
+                exit 4
+            fi
+        fi
         backup_config
+        printf '%s\n' reloading > "${BACKUP_ROOT}/${operation_id}/status"
 
         # Gate BEFORE mutating /etc/config so a refused apply leaves running config untouched.
         entitlements_src=""
@@ -211,12 +315,21 @@ case "${command_name}" in
         if command -v nur-license-check >/dev/null 2>&1 && command -v jq >/dev/null 2>&1; then
             license_state_json="$(nur-license-check 2>/dev/null || true)"
             if [ -n "${license_state_json}" ]; then
-                allow_mutations="$(printf '%s' "${license_state_json}" | jq -r '.allow_entitlement_mutations // true')"
+                allow_mutations="$(printf '%s' "${license_state_json}" | jq -r 'if has("allow_entitlement_mutations") then .allow_entitlement_mutations else true end')"
                 if [ "${allow_mutations}" = "false" ]; then
                     echo "License policy blocks entitlement-gated configuration changes (allow_entitlement_mutations=false). Existing traffic and local recovery are preserved." >&2
                     exit 21
                 fi
             fi
+        fi
+
+        # Arm Safe Mode before network mutation so a dropped SSH session still rolls back.
+        if [ "${safe_mode_seconds}" -gt 0 ] 2>/dev/null; then
+            deadline_epoch="$(( $(date +%s) + safe_mode_seconds ))"
+            cat >"${PENDING_ROOT}/${operation_id}.env" <<EOF
+DEADLINE_EPOCH=${deadline_epoch}
+BACKUP_DIR=${BACKUP_ROOT}/${operation_id}
+EOF
         fi
 
         for config_name in network dhcp firewall; do
@@ -229,6 +342,18 @@ case "${command_name}" in
         done
 
         mkdir -p /etc/nurrouter
+        if [ -f "${overlay_dir}/etc/nurrouter/neighbors.json" ]; then
+            cp "${overlay_dir}/etc/nurrouter/neighbors.json" /etc/nurrouter/neighbors.json
+            chmod 600 /etc/nurrouter/neighbors.json
+        else
+            # Compatibility: an older manager did not replace neighbor metadata.
+            # Preserve it alongside its network configuration; never infer deletion.
+            :
+        fi
+        if [ -f "${overlay_dir}/etc/nurrouter/bras.json" ]; then
+            cp "${overlay_dir}/etc/nurrouter/bras.json" /etc/nurrouter/bras.json
+            chmod 600 /etc/nurrouter/bras.json
+        fi
         if [ -f "${overlay_dir}/etc/nurrouter/pppoe-shaping.json" ]; then
             cp "${overlay_dir}/etc/nurrouter/pppoe-shaping.json" /etc/nurrouter/pppoe-shaping.json
             chmod 600 /etc/nurrouter/pppoe-shaping.json
@@ -238,37 +363,71 @@ case "${command_name}" in
             chmod 644 /etc/nurrouter/license-entitlements.json
         fi
 
-        reload_services
+        case "${overlay_dir}" in
+            /tmp/nur-root-overlay-*) rm -rf -- "${overlay_dir}" ;;
+        esac
 
-        # Apply PPPoE profile rate limits once L3 devices exist (skip when shaping feature absent).
-        allow_shape=1
-        if [ -f /etc/nurrouter/license-entitlements.json ] && command -v jq >/dev/null 2>&1; then
-            if ! jq -e '.features | index("shaping")' /etc/nurrouter/license-entitlements.json >/dev/null 2>&1; then
-                allow_shape=0
+        # Detach reload from the SSH session. Rewriting network can flap the
+        # management interface and would otherwise kill this process mid-apply.
+        apply_log="${RUNTIME_ROOT}/apply-${operation_id}.log"
+        mkdir /var/lock/nur-reload.lock
+        (
+            trap '' HUP INT TERM
+            finish_reload() {
+                result="$1"
+                set +e
+                if [ "$result" -ne 0 ]; then
+                    restore_backup
+                    restored=$?
+                    reload_services
+                    reloaded=$?
+                    reconcile_shaping
+                    reshaped=$?
+                    printf '%s\n' failed > "${BACKUP_ROOT}/${operation_id}/status"
+                    if [ "$restored" -eq 0 ] && [ "$reloaded" -eq 0 ] && [ "$reshaped" -eq 0 ]; then
+                        rm -f "${PENDING_ROOT}/${operation_id}.env"
+                    fi
+                fi
+                rmdir /var/lock/nur-reload.lock 2>/dev/null || true
+            }
+            trap 'finish_reload $?' EXIT
+            sleep 1
+            if ! reload_services; then
+                exit 1
             fi
-        fi
-        if [ "${allow_shape}" -eq 1 ] && [ -f /etc/nurrouter/pppoe-shaping.json ] && command -v jq >/dev/null 2>&1; then
+
             sleep 2
-            jq -c '.[]?' /etc/nurrouter/pppoe-shaping.json 2>/dev/null | while read -r row; do
-                name="$(printf '%s' "${row}" | jq -r '.name // empty')"
-                download_kbps="$(printf '%s' "${row}" | jq -r '.download_kbps // 0')"
-                upload_kbps="$(printf '%s' "${row}" | jq -r '.upload_kbps // 0')"
-                [ -n "${name}" ] || continue
-                l3="$(ubus call "network.interface.${name}" status 2>/dev/null | jq -r '.["l3_device"] // empty')"
-                [ -n "${l3}" ] || continue
-                /usr/sbin/nur-pppoe-shape "${l3}" "${download_kbps}" "${upload_kbps}" >/dev/null 2>&1 || true
-            done
-        fi
+            reconcile_shaping
+            /usr/sbin/nur-neighborctl verify "${BACKUP_ROOT}/${operation_id}/neighbors.json" | jq -e '.neighbor_verification.ok' >/dev/null
+            printf '%s\n' applied > "${BACKUP_ROOT}/${operation_id}/status"
+        ) </dev/null >"${apply_log}" 2>&1 &
 
-        if [ "${safe_mode_seconds}" -gt 0 ] 2>/dev/null; then
-            deadline_epoch="$(( $(date +%s) + safe_mode_seconds ))"
-            cat >"${PENDING_ROOT}/${operation_id}.env" <<EOF
-DEADLINE_EPOCH=${deadline_epoch}
-BACKUP_DIR=${BACKUP_ROOT}/${operation_id}
-EOF
-        fi
-
-        observe_state
+        # Immediate structured ack so WinControl can mark Safe Mode pending and poll observe.
+        jq -n \
+            --arg operation_id "${operation_id}" \
+            --arg observed_at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            --arg apply_log "${apply_log}" \
+            '{
+                status: "accepted",
+                phase: "reloading",
+                operation_id: $operation_id,
+                apply_log: $apply_log,
+                links: [],
+                addresses: [],
+                routes: [],
+                bridge_vlans: [],
+                firewall: {},
+                link_stats: [],
+                forwarding: {ipv4: "1"},
+                services: {
+                    dnsmasq_running: false,
+                    pppoe_interfaces: [],
+                    dhcp_leases: [],
+                    pppoe_sessions: [],
+                    shaping_status: []
+                },
+                observed_at: $observed_at
+            }'
         ;;
     confirm)
         if [ -z "${operation_id}" ]; then
@@ -276,7 +435,9 @@ EOF
             exit 1
         fi
 
+        [ "$(cat "${BACKUP_ROOT}/${operation_id}/status" 2>/dev/null)" = applied ] || { echo "operation not applied" >&2; exit 4; }
         rm -f "${PENDING_ROOT}/${operation_id}.env"
+        printf '%s\n' confirmed > "${BACKUP_ROOT}/${operation_id}/status"
         observe_state
         ;;
     expire)
@@ -289,8 +450,11 @@ EOF
             exit 0
         fi
 
+        [ ! -d /var/lock/nur-reload.lock ] || exit 3
         restore_backup
         reload_services
+        reconcile_shaping
+        printf '%s\n' rolled_back > "${BACKUP_ROOT}/${operation_id}/status"
         rm -f "${PENDING_ROOT}/${operation_id}.env"
         observe_state
         ;;

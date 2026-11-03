@@ -10,6 +10,11 @@ class RouterStateProjector
 {
     public function __construct(private readonly OpenWrtRuntimeConfigRenderer $runtimeConfigRenderer) {}
 
+    public static function supportsNeighborManagement(array $observed): bool
+    {
+        return NeighborCapabilities::advertised($observed);
+    }
+
     /**
      * @return array<string, mixed>
      */
@@ -43,7 +48,7 @@ class RouterStateProjector
                     $routerNode->desired_configuration ?? [],
                     $routerNode->desired_secret_configuration ?? [],
                 ),
-                'runtime_preview' => $this->runtimeConfigRenderer->render(
+                'runtime_preview' => $this->preview(
                     $routerNode->desired_configuration ?? [],
                     $routerNode->desired_secret_configuration ?? [],
                 ),
@@ -55,12 +60,19 @@ class RouterStateProjector
                     $routerNode->applied_configuration ?? [],
                     $routerNode->applied_secret_configuration ?? [],
                 ),
-                'runtime_preview' => $this->runtimeConfigRenderer->render(
+                'runtime_preview' => $this->preview(
                     $routerNode->applied_configuration ?? [],
                     $routerNode->applied_secret_configuration ?? [],
                 ),
             ],
+            'runtime_capabilities' => [
+                'neighbor_observation' => is_array($observedPayload['neighbors'] ?? null),
+                'neighbor_management' => NeighborCapabilities::ready($routerNode, $observedPayload),
+                'neighbor_qualification' => NeighborCapabilities::qualification($routerNode, $observedPayload),
+            ],
             'observed' => [
+                'age_seconds' => $observedState?->recorded_at?->diffInSeconds(now(), true),
+                'stale' => $observedState === null || $observedState->recorded_at->diffInSeconds(now(), true) > 120,
                 'recorded_at' => $observedState?->recorded_at?->toIso8601String(),
                 'normalized' => $this->normalizeObservedState($observedPayload),
                 'raw' => $observedPayload,
@@ -108,6 +120,15 @@ class RouterStateProjector
      * @param  array<string, mixed>  $secretConfiguration
      * @return array<string, mixed>
      */
+    private function preview(array $configuration, array $secrets): array
+    {
+        try {
+            return $this->runtimeConfigRenderer->render($configuration, $secrets);
+        } catch (\InvalidArgumentException $exception) {
+            return ['error' => $exception->getMessage()];
+        }
+    }
+
     private function normalizeConfiguration(array $configuration, array $secretConfiguration = []): array
     {
         $interfaces = collect(Arr::get($configuration, 'interfaces', []));
@@ -118,7 +139,7 @@ class RouterStateProjector
 
                 return [
                     ...$client,
-                    'has_password' => data_get($secretConfiguration, "services.pppoe_clients.{$name}.password") !== null,
+                    'has_password' => isset($secretConfiguration['services']['pppoe_clients'][$name]['password']),
                 ];
             })
             ->values()
@@ -199,6 +220,7 @@ class RouterStateProjector
                 'gateway' => Arr::get($route, 'gateway'),
                 'device' => Arr::get($route, 'dev'),
                 'protocol' => Arr::get($route, 'protocol'),
+                'flags' => Arr::get($route, 'flags', []),
                 'scope' => Arr::get($route, 'scope'),
             ])
             ->values();
@@ -239,6 +261,7 @@ class RouterStateProjector
             'traffic' => $traffic->all(),
             'dhcp_leases' => Arr::get($observedPayload, 'services.dhcp_leases', []),
             'pppoe_sessions' => Arr::get($observedPayload, 'services.pppoe_sessions', []),
+            'pppoe_server' => Arr::get($observedPayload, 'services.pppoe_server', []),
             'services' => Arr::get($observedPayload, 'services', []),
             'observed_at' => Arr::get($observedPayload, 'observed_at'),
         ];

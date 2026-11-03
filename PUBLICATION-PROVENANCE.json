@@ -1,0 +1,1702 @@
+{
+  "appliance_version": "0.5.0-dev.14",
+  "management_candidate": "candidate-10-desktop",
+  "accepted_management_archive_sha256": "4307f8986eeafb75f6670e720c524f32eedef800164a9f3831033955f3be92ce",
+  "accepted_appliance_source_archive_sha256": "14834b2e3ce736d78926b3de8c43d2990f25ad0af254f45a3cbb9a01c9df68a4",
+  "accepted_source_files": [
+    {
+      "scope": "management",
+      "path": "management/.codex/config.toml",
+      "accepted_input_sha256": "bebb093046ae3bdeca2771a6f9cbafaa3883281c4766a1ec26ad19e130adfebd"
+    },
+    {
+      "scope": "management",
+      "path": "management/.editorconfig",
+      "accepted_input_sha256": "fe39e0ad06edea8e256e44f1fc4f319a8acfa785a7470af5cf6b9ed12dc34406"
+    },
+    {
+      "scope": "management",
+      "path": "management/.env.example",
+      "accepted_input_sha256": "d55e9ceb9a9eebb7b2517eea0e06a10b4448a2fcbbce618b1a55608ed23b9d1b"
+    },
+    {
+      "scope": "management",
+      "path": "management/.gitignore",
+      "accepted_input_sha256": "3ee1060a695b64e763d8a438ac1fe87494ff00d92680c3f63ca56bc103ed4142"
+    },
+    {
+      "scope": "management",
+      "path": "management/CORRECTNESS-RECOVERY.json",
+      "accepted_input_sha256": "29f3ffc459ca517f256aad46cce7b141d291d8cc6fcce301a8512eb4f343a0f8"
+    },
+    {
+      "scope": "management",
+      "path": "management/CORRECTNESS-RECOVERY.md",
+      "accepted_input_sha256": "07b80f688dd5417d469cfe4ab316013ec69fc9481b163332eb5618dcdfd4fe61"
+    },
+    {
+      "scope": "management",
+      "path": "management/README.md",
+      "accepted_input_sha256": "1ed7f729d514ddbddaac5944a07298c3c896099ae3cab8667030145cf8ff0e47"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Console/Commands/CreateAdminUserCommand.php",
+      "accepted_input_sha256": "a26faeff15cb89e27f59c930244d827f2e8fb81204546936c3aa2eff33a9d677"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Console/Commands/ExportOpenWrtOverlayCommand.php",
+      "accepted_input_sha256": "5136c884d1e152b5b78f9b0c2871cdf24d973930635a8f4f7121fbfc68c26627"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Console/Commands/GenerateLicenseSigningKeyCommand.php",
+      "accepted_input_sha256": "2b999cfe03ac74d8b43b33c16c3f146491a263f31b15e639b297af5a03f114c2"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Console/Commands/ReconcileRouterOperationsCommand.php",
+      "accepted_input_sha256": "2ceda7c256f64868a0965845f8a8716bfacceb41c5df4c2adb4482e719bb7133"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Console/Commands/RegisterApplianceSshCommand.php",
+      "accepted_input_sha256": "7cfbab87aa6e1c6549ed2a503a83f52a00db7cc26f9bc760ce1eb1c715972a68"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Console/Commands/SafeModeWatchdogCommand.php",
+      "accepted_input_sha256": "1bd2398e832dc360393295692fca339436d9eb64d40ede4ccc7df1db9799af7d"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Exceptions/ApplianceTransportException.php",
+      "accepted_input_sha256": "94e8538425ffccde80b99fc5612715259d09ecd32d0422fc70c0f56750b4134f"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Http/Controllers/AuthenticatedSessionController.php",
+      "accepted_input_sha256": "c41e15b3c0e2d51dddccf412801a703c8f7c206a854c5fe212256266a39bf2f8"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Http/Controllers/Controller.php",
+      "accepted_input_sha256": "e5ddafa07059bfc9f8310767b0fc04dd3b8a1f50bcec1fd693b19f5555697825"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Http/Controllers/DashboardController.php",
+      "accepted_input_sha256": "41a8b7b5a8febe39a082270057af2b778ac33736833d0a62d12e7456abdc6c2c"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Http/Controllers/LicenseActivationController.php",
+      "accepted_input_sha256": "f7509a78b6e52a0725374f6f50d7cf04b4cef3a85637d8cff3f73bc93145e7ef"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Http/Controllers/LicenseAdminController.php",
+      "accepted_input_sha256": "96b1b98a766c8ba68d99a6cd4a60f9bc93e39b7ca11925723cdcafcb828f0bed"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Http/Controllers/PasswordRotationController.php",
+      "accepted_input_sha256": "0e5b6783d02b0e9a15b305cdfe4ba46cfc7fb80c450b7a1931e18fa035d2c5d9"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Http/Controllers/RouterBackupController.php",
+      "accepted_input_sha256": "5dc600efee054312ade73a9fa0a47c84d8b080601aba4818686a25e71dc86921"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Http/Controllers/RouterBrasController.php",
+      "accepted_input_sha256": "9d1832fc15c4ffcb9a4fd71be2cf8df78dc9edf438480a6ae7265f13b3e46180"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Http/Controllers/RouterDesiredStateController.php",
+      "accepted_input_sha256": "849fef0e048d61c8dbcacbd6053b9f85d06ef227c350acd03cf5ed5bbc515030"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Http/Controllers/RouterDesktopMutationController.php",
+      "accepted_input_sha256": "7e7c8dbcad8ba1197d5266f4f7a2f4492f0857aa673ee74cf386b5bfe219cf0d"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Http/Controllers/RouterDiagnosticController.php",
+      "accepted_input_sha256": "3c1e4613f20f1ace2124d23b2dfb4bcb8f1bb3ca937a91643dab6ee9bfa3a3e2"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Http/Controllers/RouterNodeController.php",
+      "accepted_input_sha256": "c4c930d319df88db57b44b884799a6541dbcce365b7fb067b1ff39af7ee5f33b"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Http/Controllers/RouterRevisionController.php",
+      "accepted_input_sha256": "25cf0c4cd8bf087c00901e0c418bcb702e7f67a00a6aeb977fec81dd9873b36d"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Http/Controllers/RouterStateController.php",
+      "accepted_input_sha256": "eee245f9a8d316c2ab14e17d0a68cdc95efdf1bc6f1224adda6aeace59d2b8fb"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Http/Middleware/RequirePasswordRotation.php",
+      "accepted_input_sha256": "d24c9ff3122408f3953714a3da75cdcd517caf4aae59c9b06b43150977596563"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Http/Middleware/SetLocale.php",
+      "accepted_input_sha256": "af5eee4192be6917b74318da9c706b31fc1bd8ef7030dff34e6bbe96f930954f"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Http/Requests/ApplyRouterRevisionRequest.php",
+      "accepted_input_sha256": "743d1e64f576324e9edec6de0d09a51b6b4521908ec7f85282fe7f7340a33290"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Http/Requests/RotatePasswordRequest.php",
+      "accepted_input_sha256": "37108612ec8e417677f279b294dd6eac18c86a6eb9d09eab7cd17e9b82f992a7"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Http/Requests/StoreRouterNodeRequest.php",
+      "accepted_input_sha256": "28fd56e45f33077bb95104794b0b2181a7b767fd58a6ae41bc29b64b7cfe20be"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Http/Requests/UpdateRouterDesiredStateRequest.php",
+      "accepted_input_sha256": "ce62e61c414a445ac11a183c00953b60705fdec1408e2b2b81e90898569900bc"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Http/Requests/UpdateRouterNodeRequest.php",
+      "accepted_input_sha256": "1a6afa543f23353a2e6b4942ddf3d06c6857a675684e454cb7c10f5dc7804b56"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Models/AuditLog.php",
+      "accepted_input_sha256": "e0cbf7c77782872dfceb82b8750bf9b9c95d9044bda32dd1f12a6888f7992e45"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Models/ConfigurationRevision.php",
+      "accepted_input_sha256": "8e9d78fde4f4af8672f72e2c50c66dab704d5389414d8a15a672c61ccd3d15ad"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Models/License.php",
+      "accepted_input_sha256": "388602556725ce8d929c9b6b7439690f7af61d47257cd349062fcd1efc479cd5"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Models/LicenseActivation.php",
+      "accepted_input_sha256": "7c7c889e26d5fd3c42e1c125c4f014789467601217438e15e1259ce80b472a11"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Models/LicenseActivationKey.php",
+      "accepted_input_sha256": "906e6eeae1aec53b6a59641761eda81ff8fb34d55fef04979dfd07f759806f04"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Models/LicensePlan.php",
+      "accepted_input_sha256": "13f5432903c4288549a6a9561c2db2eaeadd73cf841ef9ca6768843299452fb9"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Models/LicenseRevocation.php",
+      "accepted_input_sha256": "aed3d7dbd5b1abb642311b9f0a0e19e62a7c85e9d8527c11c2b89fb53f68e02f"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Models/LicenseTransfer.php",
+      "accepted_input_sha256": "2f6743f2dc3da01954149eb845dc2d3540a52ef6a25b5bac2b522cc4fcc4b2ca"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Models/ObservedState.php",
+      "accepted_input_sha256": "a209cf68ddb4e1a638c3d5ac881f3d8b0d258cec61820b39866e2dbbcdfd1704"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Models/RouterNode.php",
+      "accepted_input_sha256": "02563b0cacb07bde8a289690de8bfb8472891c9faeeb7185aaa2b9b2a935c1d4"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Models/User.php",
+      "accepted_input_sha256": "8dac257a70de20805750b225fece1a41df8c93dc50fa1d9259f8c23856765b86"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Policies/LicensePolicy.php",
+      "accepted_input_sha256": "4e9abae9a44a57962cff2ae09d3fa6bdc37565b942b17ea8289e3570b06c37e2"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Policies/RouterNodePolicy.php",
+      "accepted_input_sha256": "48e82354f1bb542ecd7fdd19c2739bcd23f8dbb8d5c7e590f9023d278bedfda5"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Providers/AppServiceProvider.php",
+      "accepted_input_sha256": "37f53bcbbf1071bc2f0fd8c684edb0d7cd05f45bd2ef4e20899a01e8e9b142c2"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Services/ApplianceSshOperation.php",
+      "accepted_input_sha256": "6ed2e346ac60a2a272632357b1f0d762866b7f65e11b6efb2c1cf633d9095042"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Services/AuditLogWriter.php",
+      "accepted_input_sha256": "aca408a929afee5cf99d4be6e08b93c5c2ca8700a7c547279f5f55c9f6a246aa"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Services/BrasSessionTable.php",
+      "accepted_input_sha256": "2ed8958f728c14df3e6b61c72f03ec4bd93d261ac42e45b4fed919935a71942e"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Services/ConfigurationBackupService.php",
+      "accepted_input_sha256": "ad46590a4de70c549bfb5664519512080a110e9a7f5c480324756259506d519b"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Services/Licensing/CapabilityRegistry.php",
+      "accepted_input_sha256": "41dc6ff3c6951ed83974a3bc0b257ad6da641d86203c110ca0fffe203cd9a646"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Services/Licensing/EntitlementGate.php",
+      "accepted_input_sha256": "ee9dc9592b91b97fbc5a030c68e7dbc497ef71acf46052fcb02589355015bba6"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Services/Licensing/LicenseCrypto.php",
+      "accepted_input_sha256": "c63d2203cd831d01960a1c66da8d921e5e9219d6d04b74824678d92033317c68"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Services/Licensing/LicenseEnforcement.php",
+      "accepted_input_sha256": "6f43480f3b7e0baa841710ab71ad853d20eab808a12c7c42d0871c257d1a11e0"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Services/Licensing/LicensePolicyMatrix.php",
+      "accepted_input_sha256": "0b5a875ed6b98ef2d0776cfb70e7b1d1bbe069a807dc8f9ea8254e701548a1a3"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Services/Licensing/LicenseService.php",
+      "accepted_input_sha256": "037d296fc905a75ca24be4190f47eb5f08c96a372a9dcf9fde412fe827d34478"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Services/NeighborCapabilities.php",
+      "accepted_input_sha256": "81c73217234d1d9303e0d69646ef06ef3972a572e73805001ce59d50aa440f5c"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Services/OpenWrtApplianceClient.php",
+      "accepted_input_sha256": "ef76044a387525c96dd8c030e3dd220ae75c91e203fe84d70f5ee3cded3aa7e8"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Services/OpenWrtOverlayExporter.php",
+      "accepted_input_sha256": "bb8f2ac53e82e682daca3c6eec0aa565d19bfc905401829fe7819a78d29024d9"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Services/OpenWrtRuntimeConfigRenderer.php",
+      "accepted_input_sha256": "66bb09da8e18f6a812fd46debf8586203b486d493bfcfe81a17ed5623dcc8790"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Services/RouterAgentClient.php",
+      "accepted_input_sha256": "db58cdc5c00b30fbfb021a47424acf6d880407fd554b1c40f87e724c3ac069fc"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Services/RouterCapacity.php",
+      "accepted_input_sha256": "e8c91994d78b2dbef2be97930e6e2d3cccb62330356205473e4f1832e0d884d7"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Services/RouterConfigurationManager.php",
+      "accepted_input_sha256": "a23af6312e7e6227976cbfd9268732dc0498f227033ebf400b3f68356bd6f407"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Services/RouterConfigurationValidator.php",
+      "accepted_input_sha256": "99a4623ee3705a1fa9a5250ae9820eeba52eff18728c5ad0b449eb4e861a3a2e"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Services/RouterStateProjector.php",
+      "accepted_input_sha256": "5edd6183c6a1dfa382565f6546fdadfb3424e571d61d2ed18265535bac3c7d51"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Services/UciSerializer.php",
+      "accepted_input_sha256": "3355775bc6beef1f16baa5206045d38ee0671073722eb3f5e96fc58c36a87e25"
+    },
+    {
+      "scope": "management",
+      "path": "management/app/Support/DestructiveMigrationGuard.php",
+      "accepted_input_sha256": "64090cddc7e44cd653e738db440cdebb25cef89f23a78cb30f663560214fe20a"
+    },
+    {
+      "scope": "management",
+      "path": "management/artisan",
+      "accepted_input_sha256": "f91a517c0c5d3a904c3f390933964a5e08ec1fc68146882730daac4aca4ffcec"
+    },
+    {
+      "scope": "management",
+      "path": "management/boost.json",
+      "accepted_input_sha256": "1c35cdd3809c44a682a4125eb2914cd7ab7021b250021caf7ff8e2742602d508"
+    },
+    {
+      "scope": "management",
+      "path": "management/bootstrap/app.php",
+      "accepted_input_sha256": "c4928eb9b26f24cb27178a2928046628142975e8f7cde12b376d53883c957809"
+    },
+    {
+      "scope": "management",
+      "path": "management/bootstrap/providers.php",
+      "accepted_input_sha256": "f720e185207a343d4c19fc99dbb317a4187efbcd7d38a303a695bbdd77ffb943"
+    },
+    {
+      "scope": "management",
+      "path": "management/composer.json",
+      "accepted_input_sha256": "d0cd3f2831510b1968bd5f29867f6d2b104da3494c9c255dd32fcda303a24040"
+    },
+    {
+      "scope": "management",
+      "path": "management/composer.lock",
+      "accepted_input_sha256": "edb5ca45048141f124abe6dc846c381e0955eba45edb8cd91225b26c61aeee76"
+    },
+    {
+      "scope": "management",
+      "path": "management/config/app.php",
+      "accepted_input_sha256": "b4b25e15efa76846a7f2e19fd1044fec4945e4e928c4098126a2b0042b034383"
+    },
+    {
+      "scope": "management",
+      "path": "management/config/auth.php",
+      "accepted_input_sha256": "c7e204e9785c9f596d66fb884b493f658f2327f157646bdb4088efd6b3a7773f"
+    },
+    {
+      "scope": "management",
+      "path": "management/config/cache.php",
+      "accepted_input_sha256": "5030cdf171704e58b96f2cf17f1c6d5921b27d5c63c2cefb730eeb2da49a8240"
+    },
+    {
+      "scope": "management",
+      "path": "management/config/capabilities.php",
+      "accepted_input_sha256": "a47bb188243b3d1f514b4c10ba304d2adfa4b3a46c6bfd7736a7ff29a974df8b"
+    },
+    {
+      "scope": "management",
+      "path": "management/config/database.php",
+      "accepted_input_sha256": "02cd62f589b43d33f9ceac740705dac1dec9740eb2bb9e6e202d4b66a15244cf"
+    },
+    {
+      "scope": "management",
+      "path": "management/config/filesystems.php",
+      "accepted_input_sha256": "ba7060d7a23e490c3ce830656f6d24ad3ccf5b868e3293f2a12e411959dc5635"
+    },
+    {
+      "scope": "management",
+      "path": "management/config/licensing.php",
+      "accepted_input_sha256": "009be5471ec93bf67e9f3f5823f5f43bb7e0e7dd1b7180e2f904a5d9be234a18"
+    },
+    {
+      "scope": "management",
+      "path": "management/config/logging.php",
+      "accepted_input_sha256": "beb1ffd0db910f6f0b4f75214c3d5aa385d692733ece8a450f4c169d2c99ce38"
+    },
+    {
+      "scope": "management",
+      "path": "management/config/mail.php",
+      "accepted_input_sha256": "c43ff49a31c5f32ce21eb7159f2a4b3cd2f4074eaed5838d265646dbfedd3474"
+    },
+    {
+      "scope": "management",
+      "path": "management/config/nurrouteros.php",
+      "accepted_input_sha256": "aab8a96b5a44920302c753bff8255baa0b483db5f81af98ac0cc0d37943485bf"
+    },
+    {
+      "scope": "management",
+      "path": "management/config/queue.php",
+      "accepted_input_sha256": "6101774da7c8b79af46d0028f2b8b31a484c3f7eda10b76e5b27b6093ad364a4"
+    },
+    {
+      "scope": "management",
+      "path": "management/config/services.php",
+      "accepted_input_sha256": "b7ee786ea1adbc92db9f229f479431c94503527c47051da3862eb0e4d7db70aa"
+    },
+    {
+      "scope": "management",
+      "path": "management/config/session.php",
+      "accepted_input_sha256": "64272cfbef6f47c65bf857f1c5b1e853700c0d0278de46b86663fd83ef4aeed8"
+    },
+    {
+      "scope": "management",
+      "path": "management/database/.gitignore",
+      "accepted_input_sha256": "e758642d95e83e907e010b6e46b07b3f953c7cef11fe5ebefc2a77b9d7b4d5f7"
+    },
+    {
+      "scope": "management",
+      "path": "management/database/factories/AuditLogFactory.php",
+      "accepted_input_sha256": "5ebbee1fadda6aa182f13e1b5a97a6a42d8470a254d792fdb91958544b53c9f3"
+    },
+    {
+      "scope": "management",
+      "path": "management/database/factories/ConfigurationRevisionFactory.php",
+      "accepted_input_sha256": "28a76a1a507b649c0782c3e86315d8912c826ee82852c0fb4610243a34b2649a"
+    },
+    {
+      "scope": "management",
+      "path": "management/database/factories/ObservedStateFactory.php",
+      "accepted_input_sha256": "962cfcc01f4f8de3939eee4ba574c7c45f075136f5c8a81fedc53dfecdeab119"
+    },
+    {
+      "scope": "management",
+      "path": "management/database/factories/RouterNodeFactory.php",
+      "accepted_input_sha256": "b5641d9e0ad398baf561789e6c766eb70f37c5784be40d8afc6d65d1b7b87edc"
+    },
+    {
+      "scope": "management",
+      "path": "management/database/factories/UserFactory.php",
+      "accepted_input_sha256": "60490e8934bb8857184c95478ac43a02eb1247faad1fe9e611f2792130baa50c"
+    },
+    {
+      "scope": "management",
+      "path": "management/database/migrations/0001_01_01_000000_create_users_table.php",
+      "accepted_input_sha256": "10d79883bc08ce46510f9ad8b1830b4d06d586dc56ae2c8bac3b3e491f69a90f"
+    },
+    {
+      "scope": "management",
+      "path": "management/database/migrations/0001_01_01_000001_create_cache_table.php",
+      "accepted_input_sha256": "fbb4665e5a977e71df4e74ec75b3c06ca4f17ad0de7138fe9786639189978e77"
+    },
+    {
+      "scope": "management",
+      "path": "management/database/migrations/0001_01_01_000002_create_jobs_table.php",
+      "accepted_input_sha256": "df4910687180313a14a3f96a8bddd808ae145ed1b107cd772caf865c0dc2b746"
+    },
+    {
+      "scope": "management",
+      "path": "management/database/migrations/2026_11_01_062906_create_router_nodes_table.php",
+      "accepted_input_sha256": "39b8a29c4a773530ec53ca022615d924f203c0b05ecb367a8e9901bfc0b51980"
+    },
+    {
+      "scope": "management",
+      "path": "management/database/migrations/2026_11_01_062907_create_configuration_revisions_table.php",
+      "accepted_input_sha256": "3c5f7f911c0a7869cadfa3baab096836deb830cc5f86bc25dfbc8903d154a8e4"
+    },
+    {
+      "scope": "management",
+      "path": "management/database/migrations/2026_11_01_062908_create_observed_states_table.php",
+      "accepted_input_sha256": "09d99fed0f5198c9b854f1709b944d2592ee5cd34b1f19985a72a3192b0d0ff5"
+    },
+    {
+      "scope": "management",
+      "path": "management/database/migrations/2026_11_01_062909_create_audit_logs_table.php",
+      "accepted_input_sha256": "bfeb5193dc1851a338b558cc3b69d8a010b810c85703316db3f9a0b13a4ea6d7"
+    },
+    {
+      "scope": "management",
+      "path": "management/database/migrations/2026_11_01_062941_add_is_admin_to_users_table.php",
+      "accepted_input_sha256": "35e2f972733b1551cbbcc54d6c11a624b6caf8c217b86bdb659297ce5e6bc82e"
+    },
+    {
+      "scope": "management",
+      "path": "management/database/migrations/2026_11_01_064458_add_bootstrap_password_controls_to_users_table.php",
+      "accepted_input_sha256": "5436a7e8adbcc9f01a2b26a7189f08c2c3eb44b4263241e4eae2e66b022aa204"
+    },
+    {
+      "scope": "management",
+      "path": "management/database/migrations/2026_11_01_064459_add_configuration_safety_fields_to_router_nodes_table.php",
+      "accepted_input_sha256": "6bfa6f42c79aa6f9b209a4263c6b005a948505153c989cf29c15b6db3e8262b2"
+    },
+    {
+      "scope": "management",
+      "path": "management/database/migrations/2026_11_01_064500_add_configuration_safety_fields_to_configuration_revisions_table.php",
+      "accepted_input_sha256": "88b9ed7f0e0db818069a1789ac6a9fe8b1fa26d215699886e1b65ed75bd07815"
+    },
+    {
+      "scope": "management",
+      "path": "management/database/migrations/2026_11_01_073157_add_runtime_service_configuration_to_router_nodes_and_configuration_revisions_tables.php",
+      "accepted_input_sha256": "ece619001c4b17cef644e5d887e7ce8377ac9ffcd8df3fd280736a613e997015"
+    },
+    {
+      "scope": "management",
+      "path": "management/database/migrations/2026_11_01_074557_add_appliance_connection_fields_to_router_nodes_table.php",
+      "accepted_input_sha256": "9aea6f108f971133a3e0fa331c90b755f673f6e33a53b6c7725742d1131dfff1"
+    },
+    {
+      "scope": "management",
+      "path": "management/database/migrations/2026_11_01_114505_create_licensing_tables.php",
+      "accepted_input_sha256": "0d0c5535ddb1dc8838cd27f7a363d9893ac541ebd1279d1a8541e6193e87858d"
+    },
+    {
+      "scope": "management",
+      "path": "management/database/migrations/2026_11_01_120009_add_last_status_refresh_at_to_license_activations.php",
+      "accepted_input_sha256": "d9e6e48fa67e72d0a094b1f75149e53dbfe129c87f4f7992311bab15d791bb46"
+    },
+    {
+      "scope": "management",
+      "path": "management/database/seeders/DatabaseSeeder.php",
+      "accepted_input_sha256": "cf8e4b6e48360218bb5534f66419c955288f78338eb8a3dba9d8ac3394ec3dbc"
+    },
+    {
+      "scope": "management",
+      "path": "management/deploy/ubuntu/install.sh",
+      "accepted_input_sha256": "f5c172d48627436a35d4894ee6440f82634530015f70017ff593b65486c3143e"
+    },
+    {
+      "scope": "management",
+      "path": "management/deploy/ubuntu/logrotate/nur-wincontrol",
+      "accepted_input_sha256": "be9b9b0ae856f5354b652579fe1eed7c3819f36f61531652bb06b7696431a8cc"
+    },
+    {
+      "scope": "management",
+      "path": "management/deploy/ubuntu/nginx/nur-wincontrol.conf.template",
+      "accepted_input_sha256": "a453bfe230a7e1e829cccaa555557254d10831330e7adbe4f8c6e5f0c2d640e9"
+    },
+    {
+      "scope": "management",
+      "path": "management/deploy/ubuntu/scripts/backup-wincontrol.sh",
+      "accepted_input_sha256": "c3e12a1d8fff470bbb67651a9fb09c0653341e8d5fe1438bb4304fb17b3d8aff"
+    },
+    {
+      "scope": "management",
+      "path": "management/deploy/ubuntu/scripts/healthcheck.sh",
+      "accepted_input_sha256": "5812f5192033ae63065b7b7188db140de1851ffcbd4cf2a8090381343592096e"
+    },
+    {
+      "scope": "management",
+      "path": "management/deploy/ubuntu/scripts/rollback.sh",
+      "accepted_input_sha256": "21cedbecbbda51b76b51f99be03e26d8cbdb16b0484dd365a53654940c46d49a"
+    },
+    {
+      "scope": "management",
+      "path": "management/deploy/ubuntu/scripts/upgrade.sh",
+      "accepted_input_sha256": "6d1e201d52613e104f40812f7d8aaae807a34a0c85f698eb8bfd4846c8f7d1ea"
+    },
+    {
+      "scope": "management",
+      "path": "management/deploy/ubuntu/systemd/nur-wincontrol-queue.service",
+      "accepted_input_sha256": "65ad6ff27d013760c90defd412b6825ee2b6435833377f10683f1e7ce877446e"
+    },
+    {
+      "scope": "management",
+      "path": "management/deploy/ubuntu/systemd/nur-wincontrol-safemode.service",
+      "accepted_input_sha256": "88cd4938b87b607499f201bbaf04baa8affddeedda82b09371fd68a5aeb7662d"
+    },
+    {
+      "scope": "management",
+      "path": "management/deploy/ubuntu/systemd/nur-wincontrol-safemode.timer",
+      "accepted_input_sha256": "8fdfdf7e1a15a69b3b6a4745af2f31cdd76a2dbf8667abdf384c677bafc0b2f7"
+    },
+    {
+      "scope": "management",
+      "path": "management/deploy/ubuntu/systemd/nur-wincontrol-scheduler.service",
+      "accepted_input_sha256": "dbf8005a16ca55bfe396aa169f26cb6bf253647d19cc320a6db8f745c1ec3369"
+    },
+    {
+      "scope": "management",
+      "path": "management/deploy/ubuntu/systemd/nur-wincontrol-scheduler.timer",
+      "accepted_input_sha256": "784f9299c222795462243aff752135510d6afe44a98be7fefb393190c4e52528"
+    },
+    {
+      "scope": "management",
+      "path": "management/lang/bn/wincontrol.php",
+      "accepted_input_sha256": "ed7148da70cb6d53bb7f0b75f5e7567f65623c0400fa5d049e1b41e7cea125fd"
+    },
+    {
+      "scope": "management",
+      "path": "management/lang/en/wincontrol.php",
+      "accepted_input_sha256": "37a1fd1e63cd625b8c9f9455768080eada038e77e67f290830e901d0b0299ec4"
+    },
+    {
+      "scope": "management",
+      "path": "management/package-lock.json",
+      "accepted_input_sha256": "eac419f00dbe9b110406507f01fc9878d32da610c2cd7942846aed21c5f05a2a"
+    },
+    {
+      "scope": "management",
+      "path": "management/package.json",
+      "accepted_input_sha256": "023d511d768e05b69e8127e18ae0e3d4a2e91702e8dd82917c655e53e5908de5"
+    },
+    {
+      "scope": "management",
+      "path": "management/phpunit.xml",
+      "accepted_input_sha256": "005f6c2ffdb05847dc14b855007fd527856ef4ce53cc7ef469d2b6402d114792"
+    },
+    {
+      "scope": "management",
+      "path": "management/public/.htaccess",
+      "accepted_input_sha256": "b7e379c77639fd56144947dbae84c84eb466d9c686ea81f2f013ae85421da923"
+    },
+    {
+      "scope": "management",
+      "path": "management/public/build/assets/app-BvRk9kiK.js",
+      "accepted_input_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "scope": "management",
+      "path": "management/public/build/assets/app-D9FO8NWx.css",
+      "accepted_input_sha256": "ea8fc42ae4c1d7791e3fa6cf1ab30a3d7b39416292221641d52e39946cc59cff"
+    },
+    {
+      "scope": "management",
+      "path": "management/public/build/assets/fonts-C9MNnjVw.css",
+      "accepted_input_sha256": "3846a9bb60bfad92960eadcccaf0b4e129d74b11d48791506c8d1a827a385cc8"
+    },
+    {
+      "scope": "management",
+      "path": "management/public/build/assets/instrument-sans-400-normal-D1W7dsQl.woff",
+      "accepted_input_sha256": "797bd3eaa70edbd4757650ab44dad75fbfbfdf18bacedb4b71022c04621d30ad"
+    },
+    {
+      "scope": "management",
+      "path": "management/public/build/assets/instrument-sans-400-normal-DRC__1Mx.woff2",
+      "accepted_input_sha256": "9a91efaa3599a6ef01b2f49e9ec670e3a2f39baeef09c73198f1052cf3bb0850"
+    },
+    {
+      "scope": "management",
+      "path": "management/public/build/assets/instrument-sans-500-normal-Dk9ku72i.woff2",
+      "accepted_input_sha256": "9d3547da16d950d12a677c772a3ff9b69846e60e7dcd1b5efd540993f7286532"
+    },
+    {
+      "scope": "management",
+      "path": "management/public/build/assets/instrument-sans-500-normal-Z6ESRlEs.woff",
+      "accepted_input_sha256": "bd6a8dc8b0dc0cced0c32d3eda93f0e0e82c58ddefea8b53b3307b0c48da3089"
+    },
+    {
+      "scope": "management",
+      "path": "management/public/build/assets/instrument-sans-600-normal-B7fBEWYG.woff2",
+      "accepted_input_sha256": "efb770916eda95a0e31d80cccde9651d4e8617010b21220e9f227c4820d675da"
+    },
+    {
+      "scope": "management",
+      "path": "management/public/build/assets/instrument-sans-600-normal-B9e8oLYv.woff",
+      "accepted_input_sha256": "9b4ce1f2b26be7cb087fd87d6f99a202136292ec820af75bd38ab9e53895cf28"
+    },
+    {
+      "scope": "management",
+      "path": "management/public/build/fonts-manifest.json",
+      "accepted_input_sha256": "66edf17c93351fe01158be7414a441a762f106417c74351881876b405b8b10ca"
+    },
+    {
+      "scope": "management",
+      "path": "management/public/build/manifest.json",
+      "accepted_input_sha256": "45bd5acefee7d39aa687d03ebfe4610a94a63fa9f20fc9e623ad0ad82f0bafc4"
+    },
+    {
+      "scope": "management",
+      "path": "management/public/desktop/desktop.js",
+      "accepted_input_sha256": "18456182888497f2d515cb0761514f20a5ff064527ccbcd0c931c4dcfb85535f"
+    },
+    {
+      "scope": "management",
+      "path": "management/public/desktop/wincontrol.css",
+      "accepted_input_sha256": "6883e75ba53e2abc91be57679bdd5ae865ed2d42e65b0ed7acd0bab6f341523c"
+    },
+    {
+      "scope": "management",
+      "path": "management/public/desktop/wincontrol.js",
+      "accepted_input_sha256": "0cbf2400cd989428dd04e2484c7b5e2b2e0eec4211c885cc3e824b893ede9f77"
+    },
+    {
+      "scope": "management",
+      "path": "management/public/favicon.ico",
+      "accepted_input_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "scope": "management",
+      "path": "management/public/index.php",
+      "accepted_input_sha256": "eba77cba39695b6bd091fe5211d481f7ebb2ce2d8d26230b5a609465d0a4aff9"
+    },
+    {
+      "scope": "management",
+      "path": "management/public/robots.txt",
+      "accepted_input_sha256": "e5c4b84484ee4216e9373be99380320c25dd94805f99f0a805846f087636553f"
+    },
+    {
+      "scope": "management",
+      "path": "management/resources/css/app.css",
+      "accepted_input_sha256": "02db84e827e06d8349293e9797eb8d81465e109e91976775964c4bf873b6fab5"
+    },
+    {
+      "scope": "management",
+      "path": "management/resources/js/app.js",
+      "accepted_input_sha256": "101ead936a2281d53dcc064b7e2a2ab0d53b92ef3ef7b34b668673007895c860"
+    },
+    {
+      "scope": "management",
+      "path": "management/resources/views/auth/login.blade.php",
+      "accepted_input_sha256": "5a89868ac7d4a7defe8a96b09e00956e90728fe89558d428d2bc1971ef1bcb39"
+    },
+    {
+      "scope": "management",
+      "path": "management/resources/views/auth/rotate-password.blade.php",
+      "accepted_input_sha256": "b49ba0c08874cd9290cc736ead3e960d0b6db2be2f840172ba7a9a2bf122ffc7"
+    },
+    {
+      "scope": "management",
+      "path": "management/resources/views/dashboard.blade.php",
+      "accepted_input_sha256": "5ec3a820d0f6c8f0433721b7de8840178925b73eb03ef7b90b6905d77945ad94"
+    },
+    {
+      "scope": "management",
+      "path": "management/resources/views/layouts/app.blade.php",
+      "accepted_input_sha256": "a2301978df4b4838d4658cff5a1985b1fb54b29021cadab8bcef74e843bc509c"
+    },
+    {
+      "scope": "management",
+      "path": "management/resources/views/licensing/admin.blade.php",
+      "accepted_input_sha256": "e5e4057fd3e362a7eaef327aa7b1d84a8f0d852364e9c41814cf5fa6e287691b"
+    },
+    {
+      "scope": "management",
+      "path": "management/resources/views/licensing/offline.blade.php",
+      "accepted_input_sha256": "adca67ee306a1ee8d2f43782e69d455527e9ec9e1bf75468dfb826d701545f98"
+    },
+    {
+      "scope": "management",
+      "path": "management/resources/views/licensing/status.blade.php",
+      "accepted_input_sha256": "1cdb4bd9b6c2f249d287481124a0e7165f11d1a8e90371c9d58f378a113e09e8"
+    },
+    {
+      "scope": "management",
+      "path": "management/resources/views/routers/_form.blade.php",
+      "accepted_input_sha256": "a493fbbfafd26659dd5033805fab8a6775b9e6e8a516c89e01122240ddc48060"
+    },
+    {
+      "scope": "management",
+      "path": "management/resources/views/routers/backup.blade.php",
+      "accepted_input_sha256": "1585db1ab60bf28a2556ef8ecf6ed26f0a244e6ae91200096382aa332bf403ec"
+    },
+    {
+      "scope": "management",
+      "path": "management/resources/views/routers/bras.blade.php",
+      "accepted_input_sha256": "d7e5fcee6f137ed82e257ea3182214f2ce756d2326aa07cf74b49798fa067c1c"
+    },
+    {
+      "scope": "management",
+      "path": "management/resources/views/routers/configure.blade.php",
+      "accepted_input_sha256": "9551cd3e71f5343a84f42622dcfaf071a110bd649e3090acdc41491b62a6ea3a"
+    },
+    {
+      "scope": "management",
+      "path": "management/resources/views/routers/create.blade.php",
+      "accepted_input_sha256": "dc6e29b70cf1556038672f5528a15eea79243ea17d9b77f8314673b32e5ae145"
+    },
+    {
+      "scope": "management",
+      "path": "management/resources/views/routers/edit.blade.php",
+      "accepted_input_sha256": "9b766665af7bb62683179cf0927689f778683060bda6dfe968e841b8ab48a62a"
+    },
+    {
+      "scope": "management",
+      "path": "management/resources/views/routers/index.blade.php",
+      "accepted_input_sha256": "1e4a58381d04d032700fecac3cfc4b256cc9f53f7dbb26c326473d9fd5d14e84"
+    },
+    {
+      "scope": "management",
+      "path": "management/resources/views/routers/partials/addresses.blade.php",
+      "accepted_input_sha256": "587ab5f342a25e867526c6615d97c7b4baeda6679574821655b0e1312aa26ee6"
+    },
+    {
+      "scope": "management",
+      "path": "management/resources/views/routers/partials/dhcp.blade.php",
+      "accepted_input_sha256": "08bd5f9ae7facc4d96512ffb28d2a61848d1a9421886b3679e31d44c0cf9f1d9"
+    },
+    {
+      "scope": "management",
+      "path": "management/resources/views/routers/partials/interfaces.blade.php",
+      "accepted_input_sha256": "be903ba325468cfdd61721d5b313848883475f09d49507c5e7dc9e23324ac6e7"
+    },
+    {
+      "scope": "management",
+      "path": "management/resources/views/routers/partials/pppoe.blade.php",
+      "accepted_input_sha256": "82bb13789ef06d238a5dcb0cfbcced8225658b29fdfea82b4fcb36d0c5f19e41"
+    },
+    {
+      "scope": "management",
+      "path": "management/resources/views/routers/partials/routes.blade.php",
+      "accepted_input_sha256": "4771824c94febca725cf92b80e8d7c62433dda8bb5a30ffcc93253cffc6d0fe1"
+    },
+    {
+      "scope": "management",
+      "path": "management/resources/views/routers/partials/traffic.blade.php",
+      "accepted_input_sha256": "b8ececf89e8b0a06bc00029de8987c3d4fb9b4126c30a228a33165b79cd58d61"
+    },
+    {
+      "scope": "management",
+      "path": "management/resources/views/routers/show.blade.php",
+      "accepted_input_sha256": "f071e8cd4b57a18cbe5cddbd8d159a8c9ac8c5c9b86d2c94ce938fca86d61513"
+    },
+    {
+      "scope": "management",
+      "path": "management/resources/views/welcome.blade.php",
+      "accepted_input_sha256": "bdb9bb7d2eecceb3581e429545b6ec96014ccab6d0ae83d4c52930e9a15f7d65"
+    },
+    {
+      "scope": "management",
+      "path": "management/routes/console.php",
+      "accepted_input_sha256": "db4b663790e3fc8f20e6ccd4055f1b15d8f2c804114e2fb1883ed1ad1aec5ec2"
+    },
+    {
+      "scope": "management",
+      "path": "management/routes/web.php",
+      "accepted_input_sha256": "47b087334fb88ea5c35962c7c12d6d064094ba5c9d24046750270f2bc374e864"
+    },
+    {
+      "scope": "management",
+      "path": "management/tests/DesktopBrowserTest.mjs",
+      "accepted_input_sha256": "4c1041df55d00fbd6c5c470f766df7286907e0ba69a87ff2907b8248e8e43922"
+    },
+    {
+      "scope": "management",
+      "path": "management/tests/Feature/ApplianceCapabilityTest.php",
+      "accepted_input_sha256": "92ea24508d6361d57c1e1ca576336cef80c5e4a37d34483ba36f385c5ff75325"
+    },
+    {
+      "scope": "management",
+      "path": "management/tests/Feature/ApplianceTransportErrorTest.php",
+      "accepted_input_sha256": "68674f6dbbfd4202cc3a5ff91142f99628d63426797482f70753afa47ec0d2a5"
+    },
+    {
+      "scope": "management",
+      "path": "management/tests/Feature/BrasManagementTest.php",
+      "accepted_input_sha256": "64172a3ce6f76f7c7db0de8981f0a7469db5cd113bc53e989d2b0ab9ea962f2f"
+    },
+    {
+      "scope": "management",
+      "path": "management/tests/Feature/BridgeDesktopTest.php",
+      "accepted_input_sha256": "8b03f23c038cd7894b9d580df79c05a70a9e9e558c842d861a9c5edc32f20b43"
+    },
+    {
+      "scope": "management",
+      "path": "management/tests/Feature/ConfigurationSafetyTest.php",
+      "accepted_input_sha256": "d06d3dc779d0bc83260fb0595f3a4d55aededd4be1e36ffc9a0228b2c8aede2c"
+    },
+    {
+      "scope": "management",
+      "path": "management/tests/Feature/CorrectnessRecoveryTest.php",
+      "accepted_input_sha256": "8db1aae7dfdcdfaa768dcd4dabb2c530ef3d5f6a6294cf7cd053cb21abfb42d7"
+    },
+    {
+      "scope": "management",
+      "path": "management/tests/Feature/DeploymentScriptsTest.php",
+      "accepted_input_sha256": "3cfdb8b15f297239d2aba0ca1949514c1c85c998ec1a1868ebc699e13c6a4065"
+    },
+    {
+      "scope": "management",
+      "path": "management/tests/Feature/DesktopMutationTest.php",
+      "accepted_input_sha256": "bb38c267ead46e407e5ba430f072a79e26c36f8c2f722d214099f0f8a5fcf20a"
+    },
+    {
+      "scope": "management",
+      "path": "management/tests/Feature/DeviceDesktopTest.php",
+      "accepted_input_sha256": "b2e080a50b746adda5b48f7e07ca15f0a2ff98a79a01f49075b1b3d94a278494"
+    },
+    {
+      "scope": "management",
+      "path": "management/tests/Feature/DhcpReservationTest.php",
+      "accepted_input_sha256": "6dd68bd1d9381a91c8dbcbbbc01ee6ede0536324f400e6435ed89b19eeb600cc"
+    },
+    {
+      "scope": "management",
+      "path": "management/tests/Feature/DurableOperationProcessTest.php",
+      "accepted_input_sha256": "a198d7ec2e05b3dba12e705f26b4659e49bea261af3c13e97a3c1c658282e733"
+    },
+    {
+      "scope": "management",
+      "path": "management/tests/Feature/EntitlementAndBackupTest.php",
+      "accepted_input_sha256": "41f3e539dd1e5689735a9bd489bc7f90140d20b81b9606736520bc85191d3fd1"
+    },
+    {
+      "scope": "management",
+      "path": "management/tests/Feature/ExampleTest.php",
+      "accepted_input_sha256": "dc8ef230fff797847bef36fd7287650e561369408228220bac86d2814b11c82d"
+    },
+    {
+      "scope": "management",
+      "path": "management/tests/Feature/ExportOpenWrtOverlayCommandTest.php",
+      "accepted_input_sha256": "209c9a7d37a6c0e0bbc7d3327f8347621a4ae0bf25a7264c4595aa1d97e589ed"
+    },
+    {
+      "scope": "management",
+      "path": "management/tests/Feature/FirewallDesktopTest.php",
+      "accepted_input_sha256": "1cefdb5030b76de79a768ee1a9f2da01df0e1ddadadf6487379e799f62f9185e"
+    },
+    {
+      "scope": "management",
+      "path": "management/tests/Feature/Ipv6DesktopTest.php",
+      "accepted_input_sha256": "282d339758e5e316ab3e4387bbe75e01b8475bff507b09b83724dd474c953002"
+    },
+    {
+      "scope": "management",
+      "path": "management/tests/Feature/LicensingTest.php",
+      "accepted_input_sha256": "41603593697ae309eb9ce2e4b5f09f0dbe481696c6fd1536d66d05415466af99"
+    },
+    {
+      "scope": "management",
+      "path": "management/tests/Feature/LiveApplianceRecoveryTest.php",
+      "accepted_input_sha256": "58a42e392dce8d9b74b80f584f93a16b8c8d409d8662e4b2c0885cdd493d5123"
+    },
+    {
+      "scope": "management",
+      "path": "management/tests/Feature/OpenWrtApplianceClientTest.php",
+      "accepted_input_sha256": "e80efdcd8d1863dcf8a33caf1b7dba17365e085d122a50d5e1436944d6e80a4d"
+    },
+    {
+      "scope": "management",
+      "path": "management/tests/Feature/PppoeDesktopTest.php",
+      "accepted_input_sha256": "d1af8f37356a60182febc6c14d4d0b1b99085fb39863def5e2508f7af3d3a9d5"
+    },
+    {
+      "scope": "management",
+      "path": "management/tests/Feature/RegisterApplianceSshCommandTest.php",
+      "accepted_input_sha256": "ec6cde26a125f0cda1d7fbff5d353c3afb3671e700b2c97788a106ccfb054e81"
+    },
+    {
+      "scope": "management",
+      "path": "management/tests/Feature/RouterDesiredStateApiTest.php",
+      "accepted_input_sha256": "e59c571ae5234d9d4d859b3aae9bb2d3cd36b590960c7e36e9341dd4a9706e58"
+    },
+    {
+      "scope": "management",
+      "path": "management/tests/Feature/RouterDesktopTest.php",
+      "accepted_input_sha256": "7238ac018b2a722f8a64545b655114394a22c51c1e189570a2bf3f76556e6c30"
+    },
+    {
+      "scope": "management",
+      "path": "management/tests/Feature/RouterDiagnosticTest.php",
+      "accepted_input_sha256": "205c67aa7b1bd0064f9576f88b1eea29c5b19deb4832493dc97cbdf3ceae4365"
+    },
+    {
+      "scope": "management",
+      "path": "management/tests/Feature/RouterManagementTest.php",
+      "accepted_input_sha256": "fa2a5025e34b48537e583a965f5d12307ed6e25b54c5dfb1c0122bb6b1853a81"
+    },
+    {
+      "scope": "management",
+      "path": "management/tests/Feature/RouterStateApiTest.php",
+      "accepted_input_sha256": "7fdfc4fa595fd7c787f2df2aadaff3626d5ed0b57cd2b75b49d969064750ced9"
+    },
+    {
+      "scope": "management",
+      "path": "management/tests/Feature/RuleOrderingTest.php",
+      "accepted_input_sha256": "69d2d025460bb6d4d9b0c148a813e7ef1b5ffd2668b7a26d3361343448996b97"
+    },
+    {
+      "scope": "management",
+      "path": "management/tests/Feature/SQLiteContentionTest.php",
+      "accepted_input_sha256": "f987bea7f48a8d7db331a7f4949629e70f5f09291ee65c80f6cffd02168c5448"
+    },
+    {
+      "scope": "management",
+      "path": "management/tests/Feature/WireGuardDesktopTest.php",
+      "accepted_input_sha256": "131256297f5710e1c1394f48bd68aed96d9fd8d3ca2ada4356541816fec6132f"
+    },
+    {
+      "scope": "management",
+      "path": "management/tests/TestCase.php",
+      "accepted_input_sha256": "c7c209f5579c42647c1f7b2a79ac828e8b54ac62a98442045a6e94fa2c0d0ebc"
+    },
+    {
+      "scope": "management",
+      "path": "management/tests/Unit/ExampleTest.php",
+      "accepted_input_sha256": "ffacae5c1a2a44c809420af5b3b404910da1b12167d58764dac6d10b8ba8cfaf"
+    },
+    {
+      "scope": "management",
+      "path": "management/tests/Unit/OpenWrtRuntimeConfigRendererTest.php",
+      "accepted_input_sha256": "122cdd6d98f0b263d9eeccb920288787d0198ed9cdc065135edb46d6fcfd198a"
+    },
+    {
+      "scope": "management",
+      "path": "management/tests/Unit/StaticWanFirewallTest.php",
+      "accepted_input_sha256": "3f7fc5b3cbabd3405a8fe220c860c5c12f84e4ebb30570cff81fbe61fd902b8d"
+    },
+    {
+      "scope": "management",
+      "path": "management/tests/Unit/UciSerializerTest.php",
+      "accepted_input_sha256": "8d78ef7e45c90d1d3148a984b13f79ab0e9583b82394f6a63b966603c71f3561"
+    },
+    {
+      "scope": "management",
+      "path": "management/vite.config.js",
+      "accepted_input_sha256": "f413e14379e2db8b200c63a6326b925f6d47cc0df458c77bfe188cfc23e8081f"
+    }
+  ],
+  "excluded_files": [
+    {
+      "scope": "appliance",
+      "path": "files/etc/nurrouter/overlay-manifest.json",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "appliance",
+      "path": "files/usr/lib/accel-ppp/libauth_pap.so",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "appliance",
+      "path": "files/usr/lib/accel-ppp/libchap-secrets.so",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "appliance",
+      "path": "files/usr/lib/accel-ppp/libconnlimit.so",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "appliance",
+      "path": "files/usr/lib/accel-ppp/libippool.so",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "appliance",
+      "path": "files/usr/lib/accel-ppp/liblog_file.so",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "appliance",
+      "path": "files/usr/lib/accel-ppp/libpppoe.so",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "appliance",
+      "path": "files/usr/lib/accel-ppp/libradius.so",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "appliance",
+      "path": "files/usr/lib/accel-ppp/libshaper.so",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "appliance",
+      "path": "files/usr/lib/accel-ppp/libtriton.so",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "appliance",
+      "path": "files/usr/lib/accel-ppp/libucontext.so.1",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "appliance",
+      "path": "files/usr/lib/accel-ppp/libvlan-mon.so",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "appliance",
+      "path": "files/usr/sbin/accel-pppd",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "appliance",
+      "path": "files/usr/sbin/nur-accounting",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "appliance",
+      "path": "files/usr/sbin/nur-agent",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "appliance",
+      "path": "files/usr/sbin/nur-brasctl",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "appliance",
+      "path": "files/usr/sbin/nur-license-verify",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "appliance",
+      "path": "files/usr/sbin/nur-mgmt-elev",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "management",
+      "path": ".agents/skills/deploying-to-cloud/SKILL.md",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "management",
+      "path": ".agents/skills/deploying-to-cloud/reference/checklists.md",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "management",
+      "path": ".agents/skills/infer-conventions/SKILL.md",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "management",
+      "path": ".agents/skills/infer-conventions/references/checklist.md",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "management",
+      "path": ".agents/skills/laravel-best-practices/SKILL.md",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "management",
+      "path": ".agents/skills/laravel-best-practices/rules/advanced-queries.md",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "management",
+      "path": ".agents/skills/laravel-best-practices/rules/architecture.md",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "management",
+      "path": ".agents/skills/laravel-best-practices/rules/blade-views.md",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "management",
+      "path": ".agents/skills/laravel-best-practices/rules/caching.md",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "management",
+      "path": ".agents/skills/laravel-best-practices/rules/collections.md",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "management",
+      "path": ".agents/skills/laravel-best-practices/rules/config.md",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "management",
+      "path": ".agents/skills/laravel-best-practices/rules/db-performance.md",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "management",
+      "path": ".agents/skills/laravel-best-practices/rules/eloquent.md",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "management",
+      "path": ".agents/skills/laravel-best-practices/rules/error-handling.md",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "management",
+      "path": ".agents/skills/laravel-best-practices/rules/events-notifications.md",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "management",
+      "path": ".agents/skills/laravel-best-practices/rules/http-client.md",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "management",
+      "path": ".agents/skills/laravel-best-practices/rules/mail.md",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "management",
+      "path": ".agents/skills/laravel-best-practices/rules/migrations.md",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "management",
+      "path": ".agents/skills/laravel-best-practices/rules/queue-jobs.md",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "management",
+      "path": ".agents/skills/laravel-best-practices/rules/routing.md",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "management",
+      "path": ".agents/skills/laravel-best-practices/rules/scheduling.md",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "management",
+      "path": ".agents/skills/laravel-best-practices/rules/security.md",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "management",
+      "path": ".agents/skills/laravel-best-practices/rules/style.md",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "management",
+      "path": ".agents/skills/laravel-best-practices/rules/validation.md",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "management",
+      "path": ".agents/skills/tailwindcss-development/SKILL.md",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "management",
+      "path": ".agents/skills/testing-best-practices/SKILL.md",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "management",
+      "path": ".agents/skills/testing-best-practices/rules/assertions.md",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "management",
+      "path": ".agents/skills/testing-best-practices/rules/endpoint-tests.md",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "management",
+      "path": ".agents/skills/testing-best-practices/rules/finding-features.md",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "management",
+      "path": ".agents/skills/testing-best-practices/rules/isolation.md",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "management",
+      "path": ".agents/skills/testing-best-practices/rules/naming.md",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "management",
+      "path": ".agents/skills/testing-best-practices/rules/performance.md",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "management",
+      "path": ".agents/skills/testing-best-practices/rules/review.md",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "management",
+      "path": ".agents/skills/testing-best-practices/rules/security.md",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "management",
+      "path": ".agents/skills/testing-best-practices/rules/test-data.md",
+      "reason": "build binary, generated state, or agent-only instructions"
+    },
+    {
+      "scope": "management",
+      "path": "AGENTS.md",
+      "reason": "build binary, generated state, or agent-only instructions"
+    }
+  ],
+  "publication_changes": [
+    "Tests generate an ephemeral signing key instead of shipping the historical shared fixture private key.",
+    "Upstream engine source inputs are provided separately; compiled overlay binaries are excluded from source."
+  ],
+  "qualification": "See dev.14 candidate-specific acceptance record; dev.13 desktop screenshots remain labelled historical accepted baseline. No soak/capacity qualification inherited.",
+  "source_terms": "Public source viewing; no blanket new license grant for original NUR code. Applicable third-party licenses remain in force.",
+  "base_appliance": "immutable dev.13 (retained privately)",
+  "appliance_source_files": [
+    {
+      "path": "agent/go.mod",
+      "sha256": "c5103b9407d6d6795ebb6f863789e71157d71cb2804301ded83c26521fc65633"
+    },
+    {
+      "path": "agent/systemd/nur-safe-mode-watchdog.timer",
+      "sha256": "39abd8d84df7b988ec66997d5fd4b2ddc681faa94f27f4c2e87b468bfe3dc584"
+    },
+    {
+      "path": "agent/systemd/nur-agent.service",
+      "sha256": "13576f874bcfaef8f4e62eaad4588794ae5414b7756b03cefe7db8ce48ba75f2"
+    },
+    {
+      "path": "agent/systemd/nur-safe-mode-watchdog.service",
+      "sha256": "d3929f1acd686966ffc807022de4073e7461703d9080fd9279f5f0a6add232db"
+    },
+    {
+      "path": "agent/cmd/nur-brasctl/main.go",
+      "sha256": "e004dfb7f95a964ecc05564dbc22a5371efbce084b20b53aacb255396af70137"
+    },
+    {
+      "path": "agent/cmd/nur-agent/main.go",
+      "sha256": "00539a4dfc5d7c8a43725666436ef10276b62bbc1ccdb986a13d93f359d85a98"
+    },
+    {
+      "path": "agent/cmd/nur-accounting/main.go",
+      "sha256": "99d3fe540b06fdb323ae06a990074cd457c1cadbdc4402e4d89b35855d243321"
+    },
+    {
+      "path": "agent/cmd/nur-license-verify/main.go",
+      "sha256": "ddcb4b8d0340959a154262176d0d9dfc663d59c41de6c5003547525d93345510"
+    },
+    {
+      "path": "agent/internal/agent/routing_lab_test.go",
+      "sha256": "338d3cba6d84740a8896b6267e3d67373460a0abd42aca588fb4947ea71bddb3"
+    },
+    {
+      "path": "agent/internal/agent/server.go",
+      "sha256": "8972640198961536f72559a6bfe883a254efe7c809e1cdc69edfff50f8f5e59d"
+    },
+    {
+      "path": "agent/internal/agent/server_test.go",
+      "sha256": "5dd19c69b00f8f1629661e2844c8771bb582d9c7df335ca34e3dda287b299149"
+    },
+    {
+      "path": "agent/internal/bras/config_test.go",
+      "sha256": "73badae2838912aa27b14d829422db23eb00a63343caa33cf3d763a4fa922452"
+    },
+    {
+      "path": "agent/internal/bras/config.go",
+      "sha256": "a902a7806969060f73eb9f17d1dc0a50faff285e99899e38789b8bbde1948858"
+    },
+    {
+      "path": "agent/internal/accounting/queue_test.go",
+      "sha256": "3797bd96580169b6e6ddc94556bbb0d649d1ae5d67962a404b4f552de9a00837"
+    },
+    {
+      "path": "agent/internal/accounting/radius.go",
+      "sha256": "010db6d722cd9f13a2746cfd8c599eb19661fe8c19cdb323fd8764098db7abea"
+    },
+    {
+      "path": "agent/internal/accounting/queue.go",
+      "sha256": "961b20f4ef9c472235e3cbc1edc97bc367c8dffab43102424da09d8ca74d179a"
+    },
+    {
+      "path": "appliance/make-installer-iso.sh",
+      "sha256": "565b54779c4d0dc930032ea9ad0d8e9f5770017fc82839d617bf301ce3ca5092"
+    },
+    {
+      "path": "appliance/build-bras-engine.sh",
+      "sha256": "22dbb168eaa7a0bbac40b8efeef677451066db287a33b81411336bd1e1dc7a11"
+    },
+    {
+      "path": "appliance/bras-sources.sha256",
+      "sha256": "1ffe2a0070aa11520045da89d3b393da58994a6ba8e98db9d2d9be76ac1f64f1"
+    },
+    {
+      "path": "appliance/VERSION",
+      "sha256": "570a1f1ab04e1f308554dc7a7cdb5c32773f4e045640fb35e3c386d9721aea16"
+    },
+    {
+      "path": "appliance/make-images.sh",
+      "sha256": "5886e6fb7838f7df8e05e63dc5fe535fe3c268811a98a27942a5f5a341ebc64a"
+    },
+    {
+      "path": "appliance/installer/init",
+      "sha256": "80b35fd970898bf0026949b02a21d11e48912ecfe71f87dfe1a893c29079abe8"
+    },
+    {
+      "path": "appliance/installer/nur-devnodes",
+      "sha256": "7407de01e233ee4bccfad6dadbf8c060a85c75b993dd2151460f677ed680f736"
+    },
+    {
+      "path": "appliance/installer/VERSION",
+      "sha256": "570a1f1ab04e1f308554dc7a7cdb5c32773f4e045640fb35e3c386d9721aea16"
+    },
+    {
+      "path": "appliance/installer/nur-recover",
+      "sha256": "64c868b520d3c33eeb82519ecd9b653bc8c2708d743bf577de9f36393551d1fe"
+    },
+    {
+      "path": "appliance/installer/grub.cfg",
+      "sha256": "f5f29608c220a6580cceaedbe4a4b9b1dee7e6e551af1c37de4d1ea96245a3fc"
+    },
+    {
+      "path": "appliance/installer/nur-install",
+      "sha256": "8f360c2b01821705c96deb2657661b72c18b099f1be3d43d429bbbc19291102c"
+    },
+    {
+      "path": "appliance/patches/nur_accounting.h",
+      "sha256": "1039c5ad311e236f4bdeeabf555de88b09225e842e7646804e0c636bbe4ca900"
+    },
+    {
+      "path": "appliance/patches/0001-durable-accounting.patch",
+      "sha256": "c78f8e80fdd6cb5281c5f986bfa5c15cbf174af0c11366e87d47ceedb79fec87"
+    },
+    {
+      "path": "files/etc/banner",
+      "sha256": "9c58f8b87283781bdfd36b7fae45fa13a449fe117fb7454bde6a4f735a2aecc1"
+    },
+    {
+      "path": "files/etc/sysupgrade.conf",
+      "sha256": "1bc5e3129609abda7a16e48d5149ef81b63fdc5c0bfa8989fd94916b1d0e1f4f"
+    },
+    {
+      "path": "files/usr/sbin/nur-mgmt-ssh",
+      "sha256": "cf1ef7493e4c5557c27ee5f217e24fcfaaa7656ad59ec52fd8d048d9ad527afe"
+    },
+    {
+      "path": "files/usr/sbin/nur-runtimectl",
+      "sha256": "a83bfb6b8d92a539aad4c898aa6ebf428adc84be56294b4827f36a09f0f1078c"
+    },
+    {
+      "path": "files/usr/sbin/nur-console-enroll",
+      "sha256": "9d418cc7f18efe43b4de655555eee2bdb55b74f71108e0dc0343da3f30ba3e65"
+    },
+    {
+      "path": "files/usr/sbin/nur-neighborctl",
+      "sha256": "7db1585cff57cfe91d17f3cb6bc6ab5175d4c36533cc2198302300166307e512"
+    },
+    {
+      "path": "files/usr/sbin/nur-update",
+      "sha256": "41f664945fca14adf77d6391a6483eacbf8b4ab40cf3ba397e4032db365fc8d9"
+    },
+    {
+      "path": "files/usr/sbin/nur-mgmt-elev.c",
+      "sha256": "edff4bd752f97648f1ab04632cf439eb355fecd193e173ba45a3e8bdd29af208"
+    },
+    {
+      "path": "files/usr/sbin/nur-pppoe-shape",
+      "sha256": "85675ab2d27b72ea8fcc6e4469e2a986a59b1efe4a24cc8739ff2a85526e2bf2"
+    },
+    {
+      "path": "files/usr/sbin/nur-license-check",
+      "sha256": "23691f26d705cde3991071a2e6c47c4866deecba3c7103ec81956452946b2c6f"
+    },
+    {
+      "path": "files/usr/sbin/nur-license-verify.openssl",
+      "sha256": "61908ee0a0020da6d5b7aabd439c35c9a0409c0f26a8b018ffd7b637ed2b420c"
+    },
+    {
+      "path": "files/usr/sbin/nur-bras-admission",
+      "sha256": "7fe952d40528f42dfb246f435906ce0b74c44e1a9a9f956dcad1732b3b448ad2"
+    },
+    {
+      "path": "files/usr/sbin/nur-runtime-watchdog",
+      "sha256": "a964bc67caedb53a10029a85b76c453bd406d2d1196a0d154173738e42d1c54c"
+    },
+    {
+      "path": "files/usr/share/accel-ppp/radius/dictionary.rfc2869",
+      "sha256": "7ec6faf2131162c814d0106d69423f8fac513d571cfae7e9219f0b45219a3f4f"
+    },
+    {
+      "path": "files/usr/share/accel-ppp/radius/dictionary.rfc4072",
+      "sha256": "ae78322922d8f579d8a50ddcb6d2efa1670e0624674a019a58bbd2e3a5059bac"
+    },
+    {
+      "path": "files/usr/share/accel-ppp/radius/dictionary.microsoft",
+      "sha256": "dbb92defde517aba0c6b0455d66f818b3e0c66d305691b1e0075b74786ca8074"
+    },
+    {
+      "path": "files/usr/share/accel-ppp/radius/dictionary.rfc6911",
+      "sha256": "0abacce93188a6fe7d7448d183698a239704c3be39eb9449541d8da2aab26ec3"
+    },
+    {
+      "path": "files/usr/share/accel-ppp/radius/dictionary.rfc3576",
+      "sha256": "5cbd3fa536935821f09f46cdde051521dbbe0cc282895f3b41e56ef270581b0f"
+    },
+    {
+      "path": "files/usr/share/accel-ppp/radius/dictionary.rfc4679",
+      "sha256": "e19aaeb21b8598d211efb20e464c83342bc1a3b5e6638cf06e9284957e5e168c"
+    },
+    {
+      "path": "files/usr/share/accel-ppp/radius/dictionary.alcatel",
+      "sha256": "c9381cf091b5b6e5e7c39e5adbaf04d49b62bd593710b155748eacacd21c974d"
+    },
+    {
+      "path": "files/usr/share/accel-ppp/radius/dictionary.rfc2868",
+      "sha256": "85137b72f9dc8e64bac3992d0497f02c4eb23eedc41aaad003c6b6c6fe711eba"
+    },
+    {
+      "path": "files/usr/share/accel-ppp/radius/dictionary.rfc4818",
+      "sha256": "41902a59b7bdb824116a1dc9911baa6e71062c28af9610657e5b2afe93afad23"
+    },
+    {
+      "path": "files/usr/share/accel-ppp/radius/dictionary.rfc2867",
+      "sha256": "617d7200f33358272be5b34259a33cf77037fdae303f3384f876ad6a99c4d913"
+    },
+    {
+      "path": "files/usr/share/accel-ppp/radius/dictionary.rfc4675",
+      "sha256": "56a8cd40be23a551e7d0973df875b495571bd173ef09ef6eff1efeb611e71bda"
+    },
+    {
+      "path": "files/usr/share/accel-ppp/radius/dictionary",
+      "sha256": "886e68a99db973834272fa7ac21b27a3cd6840147a3f1d7988a50708bada4533"
+    },
+    {
+      "path": "files/usr/share/accel-ppp/radius/dictionary.rfc4849",
+      "sha256": "fb4c50ae71a9ca398c147da45291ab0bdd779b5a47613d35ffde1e79e4b87b29"
+    },
+    {
+      "path": "files/usr/share/accel-ppp/radius/dictionary.rfc5176",
+      "sha256": "19a8c828569e3cc5ad6c3ce497eb94d6a73d4426045731ec0f5e27d1e13a5380"
+    },
+    {
+      "path": "files/usr/share/accel-ppp/radius/dictionary.rfc2865",
+      "sha256": "15ba5e6054e5bf2883aa3f7b610f6bd6eba4b6e992bdd15c79f7d53a0bfa5b23"
+    },
+    {
+      "path": "files/usr/share/accel-ppp/radius/dictionary.rfc3580",
+      "sha256": "845248bb2d3ea24495518ea962e66b2b17d7a1f3f358ac6a00756bcf2b1fa841"
+    },
+    {
+      "path": "files/usr/share/accel-ppp/radius/dictionary.mikrotik",
+      "sha256": "1a0f37466d3851d5ac45b6d8fe7df83685c2f49f6f9c59263e2035b8893bf202"
+    },
+    {
+      "path": "files/usr/share/accel-ppp/radius/dictionary.rfc2866",
+      "sha256": "3a05a98e686484789beb53e5c7f31f96eadba057fd2bab50c7d1d86d5bcde787"
+    },
+    {
+      "path": "files/usr/share/accel-ppp/radius/dictionary.rfc4372",
+      "sha256": "579f3789e48cd702ab1b24091beb10d62c7aabed81723b9e8221cf58de2005f8"
+    },
+    {
+      "path": "files/usr/share/accel-ppp/radius/dictionary.cisco",
+      "sha256": "b5729d0b5827345a0c23124dbb216bbfefbb35a69532e8655b4f600009daada9"
+    },
+    {
+      "path": "files/usr/share/accel-ppp/radius/dictionary.dhcp",
+      "sha256": "60f48946c27e2068b7f8d1882b93f3aa190c9a2a644255209603ed3fc10919bf"
+    },
+    {
+      "path": "files/usr/share/accel-ppp/radius/dictionary.accel",
+      "sha256": "e8673ceb6da530094e7da04db46543ae93051526a926d75f93c8d3c3fc83b010"
+    },
+    {
+      "path": "files/usr/share/accel-ppp/radius/dictionary.rfc3162",
+      "sha256": "df02a43bbdc61f60352d60781b25c6f23268168018f2fd98d1885782fea04a7d"
+    },
+    {
+      "path": "files/etc/config/dropbear",
+      "sha256": "df7bc29df28942b5715cdc976cc0c035eb1af3e01d1e3b51aeff8c6027bf5e63"
+    },
+    {
+      "path": "files/etc/config/dhcp",
+      "sha256": "67525a023e2382a247d1fa3841d3bc15b2dd0c8333aa0f3b972eb196b434c034"
+    },
+    {
+      "path": "files/etc/config/firewall",
+      "sha256": "5240019bf301841297337676e7ac9c33a30afef959e81577b54eb6cd7519a89a"
+    },
+    {
+      "path": "files/etc/config/network",
+      "sha256": "7bf850081c46e8e1b738ca33a26437f3e354f69d27571b2244f11e2f98162f2d"
+    },
+    {
+      "path": "files/etc/nurrouter/bras.json",
+      "sha256": "7187d1e8e2a4d61b1dc5dfedb22d703a462df21470e0c145365b20fb3ed467c3"
+    },
+    {
+      "path": "files/etc/nurrouter/neighbors.json",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    {
+      "path": "files/etc/nurrouter/product-version",
+      "sha256": "570a1f1ab04e1f308554dc7a7cdb5c32773f4e045640fb35e3c386d9721aea16"
+    },
+    {
+      "path": "files/etc/nurrouter/update-public-keys.json",
+      "sha256": "ceea7e7c10ed7c39e76506ebff7e3337ba7082c33b3de5c7239e858a521bc0e1"
+    },
+    {
+      "path": "files/etc/nurrouter/license-public-keys.json",
+      "sha256": "b3188f29082f51d4b75b5b917098162ed589a6238cd9d6c54471ffb7d4e42626"
+    },
+    {
+      "path": "files/etc/init.d/nur-agent",
+      "sha256": "021fc671cba929b8b637add0ce0a89d66b40e6d4037d98de0556416b38ebb129"
+    },
+    {
+      "path": "files/etc/init.d/nur-bras",
+      "sha256": "f07bc4b3ac2831a2f64e7829a7ab8c33a632b3bbfbc678d12c3c79e0c1d2be18"
+    },
+    {
+      "path": "files/etc/init.d/nur-accounting",
+      "sha256": "c431a4b0e09ae77d6a76b4dd6023fe914f573a941172d1d0b6931f2e4be64889"
+    },
+    {
+      "path": "files/etc/init.d/nur-runtime-watchdog",
+      "sha256": "01c8053c02b0455f54e1345a1f7964188577f019bd1735a189130759885bec16"
+    },
+    {
+      "path": "files/etc/sysctl.d/99-nurrouteros.conf",
+      "sha256": "eb46331fd1b69dfe59dad9699217d1a7d38561b65889843edb360785c5d8fe57"
+    },
+    {
+      "path": "files/etc/sudoers.d/nur-mgmt",
+      "sha256": "1bc3397dce5796c8c0db97671caad32a4bfaf9ea7baccefd87cf018cc8e1f678"
+    },
+    {
+      "path": "files/etc/uci-defaults/98-nur-device-id",
+      "sha256": "8f2f32b4e5909b67547ed304711ec76c6b950a031c4ff4440ecec2a351274b7a"
+    },
+    {
+      "path": "files/etc/uci-defaults/99-nur-mgmt-user",
+      "sha256": "5ce9ba76451f168f74993ac42511e06d64bb12de450132ea7c2b912bdbb1942b"
+    },
+    {
+      "path": "files/etc/uci-defaults/99-nurrouteros",
+      "sha256": "e7f61dccc7b09105ad512907b2aee4c4a3d98676bfca490c1c74673608d70eb3"
+    },
+    {
+      "path": "files/etc/hotplug.d/iface/95-nur-shaping",
+      "sha256": "b98d8798b88bbf6be00bbd35b95fa8c8795b2ea84397e76e668614ae08b4fd7a"
+    },
+    {
+      "path": "VERSION",
+      "sha256": "570a1f1ab04e1f308554dc7a7cdb5c32773f4e045640fb35e3c386d9721aea16"
+    },
+    {
+      "path": "build.sh",
+      "sha256": "7bb2a674677da6bd57cc504563cfac58df7c559a163a00b3ca5cf9da40b1b166"
+    },
+    {
+      "path": "packages.txt",
+      "sha256": "a252d55f6c1c222741c1f1214f2051b9e145d8e46f26626c0129192fbd1b4e58"
+    }
+  ],
+  "excluded_generated_appliance_files": [
+    "files/usr/sbin/nur-brasctl",
+    "files/usr/sbin/nur-agent",
+    "files/usr/sbin/accel-pppd",
+    "files/usr/sbin/nur-mgmt-elev",
+    "files/usr/sbin/nur-accounting",
+    "files/usr/sbin/nur-license-verify",
+    "files/usr/lib/accel-ppp/libpppoe.so",
+    "files/usr/lib/accel-ppp/libucontext.so.1",
+    "files/usr/lib/accel-ppp/libconnlimit.so",
+    "files/usr/lib/accel-ppp/libradius.so",
+    "files/usr/lib/accel-ppp/libvlan-mon.so",
+    "files/usr/lib/accel-ppp/libtriton.so",
+    "files/usr/lib/accel-ppp/libauth_pap.so",
+    "files/usr/lib/accel-ppp/libchap-secrets.so",
+    "files/usr/lib/accel-ppp/libshaper.so",
+    "files/usr/lib/accel-ppp/libippool.so",
+    "files/usr/lib/accel-ppp/liblog_file.so",
+    "files/etc/nurrouter/overlay-manifest.json"
+  ],
+  "appliance_changes": [
+    "Removed baked-in lab PPPoE profile and credential from factory network configuration.",
+    "Removed historical public nur-lic-test verification trust from factory image.",
+    "Updated version stamps only; installed packages, engines, neighbor code and installer discovery unchanged."
+  ]
+}

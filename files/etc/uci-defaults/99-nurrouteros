@@ -150,4 +150,7 @@ EOF
 
 [ -f "${ENROLLED_MARKER}" ] || true
 
+[ ! -x /etc/init.d/nur-bras ] || /etc/init.d/nur-bras enable
+
+[ ! -x /etc/init.d/nur-accounting ] || /etc/init.d/nur-accounting enable
 exit 0

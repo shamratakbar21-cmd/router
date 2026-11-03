@@ -1,0 +1,57 @@
+{
+  "primary_source": "/srv/nurrouter/source-20261103",
+  "deployment_copy": "/opt/nur-wincontrol",
+  "deployed": false,
+  "source_origin": {
+    "archive": "/srv/nurrouter/uploads/NurRouter-management-source.tar.gz",
+    "archive_sha256": "35ce0398a972899531ba2223e819ad811b220143ceeff1592ea07fc52fd6d260",
+    "matching_pre_change_files": 137,
+    "different_pre_change_files": []
+  },
+  "pre_change_snapshot_sha256": "308297310f09665670bf872f407f8f5a1d10a21a27cb9c44c670358adee185fe",
+  "full_suite": {
+    "tool": "phpunit",
+    "result": "passed",
+    "tests": 137,
+    "passed": 136,
+    "assertions": 736,
+    "duration_ms": 6076,
+    "skipped": 1
+  },
+  "live_appliance_suite": {
+    "tool": "phpunit",
+    "result": "passed",
+    "tests": 1,
+    "passed": 1,
+    "assertions": 20,
+    "duration_ms": 251449
+  },
+  "browser": {
+    "status": "PASS",
+    "workflows": [
+      "login and authorized dashboard",
+      "desktop PPPoE creation with secret separation",
+      "desktop unrelated edit retains blank credential",
+      "authenticated backup export and preview",
+      "validated restore stages configuration",
+      "desktop explicit credential replace, clear, and profile deletion"
+    ],
+    "javascriptErrors": []
+  },
+  "build": "PASS: npm ci --ignore-scripts and production Vite build on Node 22.12.0",
+  "composer": "PASS: validate and platform requirements on PHP 8.3.6; existing lock unchanged",
+  "syntax": "PASS: PHP, JavaScript and shell",
+  "formatting": "PASS: Pint applied to changed files; --dirty unavailable because this source has no Git metadata",
+  "appliance_media_changed": false,
+  "dev8_iso_sha256": "fa3e65bf037e385c74d220b8ed5eb006f48b70b7c459cfdf92b5f5b494be62a9",
+  "qualification_source_and_evidence_untouched": true,
+  "remaining_limitations": [
+    "Kernel IPv4 forwarding=false is explicitly rejected with HTTP 422 by the immutable runtime overlay protocol; a future appliance protocol version is required.",
+    "Operation status absent/pruned on a runtime leaves ownership blocked for investigation; no unsafe retry is performed.",
+    "Secret-bearing backup portability requires the original or a trusted previous APP_KEY.",
+    "Deployment backup/rollback scripts support SQLite; other engines need a database-native consistent backup.",
+    "Physical installer-media discovery/boot-console issue remains unresolved by these management changes.",
+    "No new capacity, subscriber-migration, firmware A/B, production-readiness or release-publication claim."
+  ],
+  "deployment_and_rollback": "See CORRECTNESS-RECOVERY.md; helpers are prepared, not activated."
+}

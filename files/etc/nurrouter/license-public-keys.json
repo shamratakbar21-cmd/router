@@ -1,10 +1,1 @@
-{
-    "keys": [
-        {
-            "key_id": "nur-lic-test",
-            "public_key": "rLnyuOs0wmRZIxW+wwAY92OwBCsWbKUOxbLPY9d+JZ0=",
-            "algorithm": "ed25519"
-        }
-    ],
-    "updated_at": "2026-11-01T11:49:32+00:00"
-}
+{"keys":[]}

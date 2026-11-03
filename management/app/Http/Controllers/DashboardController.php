@@ -10,6 +10,8 @@ class DashboardController extends Controller
 {
     public function __invoke(): View
     {
+        $this->authorize('viewAny', RouterNode::class);
+
         return view('dashboard', [
             'routerNodeCount' => RouterNode::count(),
             'appliedRouterNodeCount' => RouterNode::where('status', 'applied')->count(),

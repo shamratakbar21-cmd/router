@@ -6,7 +6,7 @@ set -eu
 METADATA=""
 IMAGE=""
 ALLOW_DOWNGRADE=0
-LOCK_DIR="/etc/nurrouter/runtime/update.lock"
+LOCK_DIR="/var/lock/nur-update.lock"
 UPDATE_PUBKEYS="/etc/nurrouter/update-public-keys.json"
 PRODUCT_VERSION_FILE="/etc/nurrouter/product-version"
 INSTALL_LOCK="/etc/nurrouter-installer/install.lock"
@@ -37,6 +37,11 @@ command -v jq >/dev/null 2>&1 || die "jq required"
 command -v sha256sum >/dev/null 2>&1 || die "sha256sum required"
 command -v sysupgrade >/dev/null 2>&1 || die "sysupgrade required"
 
+for pending in /etc/nurrouter/runtime/pending/*.env; do
+    [ ! -f "${pending}" ] || die "confirm or roll back pending Safe Mode before updating firmware"
+done
+[ ! -d /var/lock/nur-mutation.lock ] && [ ! -d /var/lock/nur-reload.lock ] || die "configuration mutation in progress"
+
 if [ -e "${INSTALL_LOCK}" ]; then
     die "installer lock present at ${INSTALL_LOCK}; refuse concurrent update/install"
 fi
@@ -47,7 +52,14 @@ fi
 
 mkdir -p "$(dirname "${LOCK_DIR}")"
 mkdir "${LOCK_DIR}" || die "unable to acquire update lock"
-trap 'rmdir "${LOCK_DIR}" 2>/dev/null || true' EXIT INT TERM
+body_file=""; sig_file=""; pub_file=""
+cleanup() {
+    rm -f "${body_file}" "${sig_file}" "${sig_file}.bin" "${pub_file}"
+    rmdir "${LOCK_DIR}" 2>/dev/null || true
+}
+trap cleanup EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
 
 current_version="$(tr -d '\n' < "${PRODUCT_VERSION_FILE}")"
 product="$(jq -r '.product // empty' "${METADATA}")"
@@ -59,7 +71,9 @@ signature="$(jq -r '.signature // empty' "${METADATA}")"
 key_id="$(jq -r '.key_id // empty' "${METADATA}")"
 
 [ "${product}" = "NurRouterOS" ] || die "metadata product mismatch (got '${product}')"
-[ -n "${version}" ] || die "metadata missing version"
+printf '%s\n' "${version}" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+(-[A-Za-z0-9.]+)?$' || die "invalid metadata version"
+printf '%s\n' "${min_free_kb}" | grep -Eq '^[0-9]{1,9}$' || die "invalid min_free_kb"
+printf '%s\n' "${image_sha}" | grep -Eq '^[a-f0-9]{64}$' || die "invalid image_sha256"
 [ "${arch}" = "x86_64" ] || die "incompatible architecture '${arch}' (appliance is x86_64)"
 [ -n "${image_sha}" ] || die "metadata missing image_sha256"
 [ -n "${signature}" ] || die "metadata missing signature"
@@ -82,14 +96,25 @@ else
     say "AUDITED recovery downgrade requested: ${current_version} -> ${version}"
 fi
 
-avail_kb="$(df -Pk / | awk 'NR==2 {print $4}')"
-[ "${avail_kb}" -ge "${min_free_kb}" ] || die "insufficient free space (${avail_kb} KiB < ${min_free_kb} KiB)"
+# Free-space preflight. When min_free_kb is 0, skip (lab/chroot may lack a usable df).
+if [ "${min_free_kb}" != "0" ]; then
+    avail_kb="$(df -Pk / 2>/dev/null | awk 'NR==2 {print $4}')"
+    if [ -z "${avail_kb}" ] || ! printf '%s' "${avail_kb}" | grep -Eq '^[0-9]+$'; then
+        avail_kb="$(df -Pk . 2>/dev/null | awk 'NR==2 {print $4}')"
+    fi
+    if [ -z "${avail_kb}" ] || ! printf '%s' "${avail_kb}" | grep -Eq '^[0-9]+$'; then
+        # Last resort: busybox df without -P.
+        avail_kb="$(df -k / 2>/dev/null | awk 'NR==2 {print $4}')"
+    fi
+    [ -n "${avail_kb}" ] && printf '%s' "${avail_kb}" | grep -Eq '^[0-9]+$' || die "unable to determine free space"
+    [ "${avail_kb}" -ge "${min_free_kb}" ] || die "insufficient free space (${avail_kb} KiB < ${min_free_kb} KiB)"
+fi
 
 actual_sha="$(sha256sum "${IMAGE}" | awk '{print $1}')"
 [ "${actual_sha}" = "${image_sha}" ] || die "payload digest mismatch (expected ${image_sha}, got ${actual_sha})"
 
 [ -f "${UPDATE_PUBKEYS}" ] || die "missing update public keys at ${UPDATE_PUBKEYS}"
-pubkey="$(jq -r --arg id "${key_id}" '.keys[] | select(.key_id==$id and .purpose=="update") | .public_key_pem // .public_key // empty' "${UPDATE_PUBKEYS}" | head -n1)"
+pubkey="$(jq -r --arg id "${key_id}" '.keys[] | select(.key_id==$id and .purpose=="update" and (.status // "active")=="active") | .public_key_pem // .public_key // empty' "${UPDATE_PUBKEYS}")"
 [ -n "${pubkey}" ] || die "update key_id '${key_id}' not trusted (or purpose!=update)"
 
 # Canonical signed body excludes the signature field.
@@ -99,6 +124,7 @@ sig_file="$(mktemp)"
 pub_file="$(mktemp)"
 printf '%s' "${body}" > "${body_file}"
 printf '%s' "${signature}" | tr -d '\n' > "${sig_file}"
+# PEM may be multi-line; write exactly as stored.
 printf '%s\n' "${pubkey}" > "${pub_file}"
 
 if command -v nur-update-verify >/dev/null 2>&1; then
@@ -106,8 +132,16 @@ if command -v nur-update-verify >/dev/null 2>&1; then
         || { rm -f "${body_file}" "${sig_file}" "${pub_file}"; die "update signature verification failed"; }
 elif command -v openssl >/dev/null 2>&1; then
     # openssl pkeyutl path for lab/dev when nur-update-verify is absent.
-    printf '%s' "${signature}" | base64 -d > "${sig_file}.bin" 2>/dev/null || die "signature base64 decode failed"
-    openssl pkeyutl -verify -pubin -inkey "${pub_file}" -sigfile "${sig_file}.bin" -in "${body_file}" >/dev/null 2>&1 \
+    # Ed25519 requires -rawin on both sign and verify.
+    # Prefer openssl base64: some appliances omit busybox base64.
+    if command -v base64 >/dev/null 2>&1; then
+        printf '%s' "${signature}" | base64 -d > "${sig_file}.bin" 2>/dev/null \
+            || die "signature base64 decode failed"
+    else
+        printf '%s' "${signature}" | openssl base64 -d -A > "${sig_file}.bin" 2>/dev/null \
+            || die "signature base64 decode failed"
+    fi
+    openssl pkeyutl -verify -pubin -inkey "${pub_file}" -rawin -in "${body_file}" -sigfile "${sig_file}.bin" >/dev/null 2>&1 \
         || { rm -f "${body_file}" "${sig_file}" "${sig_file}.bin" "${pub_file}"; die "update signature verification failed"; }
     rm -f "${sig_file}.bin"
 else
@@ -116,9 +150,10 @@ else
 fi
 rm -f "${body_file}" "${sig_file}" "${pub_file}"
 
-say "Preflight OK: ${current_version} -> ${version}; invoking sysupgrade -c (config preserve)."
+say "Preflight OK: ${current_version} -> ${version}; invoking sysupgrade (explicit configuration keep-list)."
 say "NOTE: no automatic rollback partition exists; recover with installer if this fails."
 
-# -c keep config files; do not reboot here so the caller can observe the result when possible.
+# Default sysupgrade uses /etc/sysupgrade.conf and platform keep.d files.
+# Do not use -c: ext4 installations have no /overlay/upper/etc.
 # sysupgrade typically reboots; that is expected on success.
-sysupgrade -c "${IMAGE}"
+sysupgrade "${IMAGE}"

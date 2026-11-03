@@ -1,3 +1,4 @@
+<h3>WAN PPPoE client</h3>
 @if (($observed['pppoe_sessions'] ?? []) !== [])
     <table class="table">
         <thead>
@@ -28,5 +29,9 @@
         </tbody>
     </table>
 @else
-    <p class="muted">No observed PPPoE sessions.</p>
+    <p class="muted">No observed WAN PPPoE client sessions.</p>
 @endif
+
+<h3>PPPoE access server / BRAS (experimental)</h3>
+<a href="{{ route('routers.bras.edit', $routerNode) }}">Configure access server</a>
+<pre>{{ json_encode($observed['pppoe_server'] ?? [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) }}</pre>

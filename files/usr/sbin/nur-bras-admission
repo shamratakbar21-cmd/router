@@ -1,0 +1,5 @@
+#!/bin/sh
+# Re-evaluate signed admission limits; soft shutdown never kills existing sessions.
+while sleep 15; do
+    /usr/sbin/nur-brasctl reload >/dev/null 2>&1 || logger -t nur-bras 'Admission restricted or engine unavailable; inspect license and BRAS status.'
+done

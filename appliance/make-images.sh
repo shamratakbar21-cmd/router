@@ -44,6 +44,7 @@ require_command gzip
 require_command sha256sum
 require_command qemu-img
 require_command parted
+require_command sgdisk
 
 if [ ! -d "${SOURCE_DIR}" ]; then
     echo "Unable to locate the ImageBuilder output at ${SOURCE_DIR}." >&2
@@ -143,6 +144,14 @@ build_one() {
     bytes="$(stat -c%s "${raw_path}")"
     echo "  raw image: $(numfmt --to=iec "${bytes}" 2>/dev/null || echo "${bytes}")"
 
+    # ImageBuilder pads GPT disk images after writing the secondary header.
+    # Relocate it to the actual end, and mark the FAT boot partition as an ESP.
+    # Operate exclusively on the newly generated regular image file.
+    if [ "${firmware}" = uefi ]; then
+        sgdisk --move-second-header --typecode=1:ef00 "${raw_path}"
+        sgdisk --verify "${raw_path}"
+    fi
+
     # Structural check: the image must still contain a usable partition table.
     if ! parted -s "${raw_path}" print >/dev/null 2>&1; then
         echo "  the produced raw image has no readable partition table" >&2
@@ -214,6 +223,7 @@ done
 cat > "${APPLIANCE_DIR}/manifest.json" <<EOF
 {
   "product": "NurRouterOS",
+  "product_version": "$(tr -d '[:space:]' < "${ROOT_DIR}/VERSION")",
   "openwrt_version": "${OPENWRT_VERSION}",
   "profile": "${IMAGE_PREFIX}",
   "generated_at_utc": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",

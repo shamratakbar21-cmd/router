@@ -1,0 +1,13 @@
+#!/bin/sh
+# Reconcile persistent PPPoE rates after boot and after every link recreation.
+case "${ACTION:-}" in ifup|ifupdate) ;; *) exit 0 ;; esac
+[ -n "${INTERFACE:-}" ] || exit 0
+[ -f /etc/nurrouter/pppoe-shaping.json ] || exit 0
+if [ -f /etc/nurrouter/license-entitlements.json ]; then
+    jq -e '.features | index("shaping")' /etc/nurrouter/license-entitlements.json >/dev/null 2>&1 || exit 0
+fi
+row="$(jq -c --arg name "$INTERFACE" '.[] | select(.name==$name)' /etc/nurrouter/pppoe-shaping.json)"
+[ -n "$row" ] || exit 0
+device="$(ubus call "network.interface.${INTERFACE}" status | jq -r '.l3_device // empty')"
+[ -n "$device" ] || exit 0
+/usr/sbin/nur-pppoe-shape "$device" "$(printf '%s' "$row" | jq -r '.download_kbps // 0')" "$(printf '%s' "$row" | jq -r '.upload_kbps // 0')" || logger -t nur-shaping "failed to apply persistent rates for ${INTERFACE}"

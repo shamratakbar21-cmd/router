@@ -1,25 +1,25 @@
-# NUR RouterOS
+# NUR RouterOS and WinControl
 
-## 0.4.0-rc.4 — controlled-pilot candidate
+Current appliance: **0.5.0-dev.14**, OpenWrt 24.10.0 x86/64, isolated evaluation only. Current management: **candidate-10-desktop**, deployed with production configuration at https://admin.nurrouter.com/ . The management deployment does not qualify the router image for production.
 
-QEMU/KVM pilot release. **Not production-ready or bare-metal qualified.**
+## Supported and verified scope
 
-The reviewed source is browsable directly in this repository under `agent/`, `appliance/`, `files/`, `management/`, and `docs/`. The unchanged `nurrouteros-0.4.0-rc.4-source.zip` remains available in the rc.4 release. The 211 expanded files match the archive manifest hashes and executable modes; this expansion does not rebuild or replace the installer.
+The desktop provides floating windows, per-user/router browser workspaces, table column preferences, and selection/focus preservation on live refresh. ARP supports actual Linux neighbor observation and managed static CRUD, explicit enable/disable, comments, revisions, persistence, audit, and Safe Mode verification/rollback on a capable appliance. Unsupported panels and actions remain disabled or labelled.
 
-The archive derives from original source commit `53385154ecfb5e2c13adba4ca03cf6c12a2ee823`, with compiled executables and a generated lab overlay manifest excluded. Nine separately identified Go agent source/service files were captured from the existing working tree. They were untracked at the original commit. See `SOURCE-PROVENANCE.json` inside the archive for every file's origin, hash and mode.
+Appliance evidence covers BIOS/UEFI ext4 ISO installation in VMs, BIOS live ARP and recovery workflows, and UEFI boot/pinned-management smoke. Other bundled filesystem variants are built, not newly live qualified. No dev.14 soak/capacity result is inherited from dev.8.
 
-## Source availability and licensing
+## Limits
 
-The owner has authorized public source viewing **without granting a new source license** for original NUR code. Public availability is not an MIT, Apache or other open-source license grant. Existing third-party licenses and notices remain applicable; see `THIRD-PARTY-NOTICES.txt`. `LICENSING.md` describes product activation and enforcement, not a source license.
+Physical USB payload discovery remains unresolved. The modified physical dev.10 USB is not a qualified release and is not published. Bare-metal storage/NIC qualification, commercial activation, automatic firmware A/B rollback, and production subscriber migration are not accepted. The dev.14 factory image removes the baked-in lab PPPoE profile and public fixture licensing trust discovered in dev.13. No commercial trust chain is provisioned. dev.13 is preserved privately; it is not the public download. Production licensing signing credentials are not included.
 
-## Artifact provenance
+## Source provenance and licensing
 
-The existing distributed installer is available from https://nurrouter.com/releases/0.4.0-rc.4/nurrouteros-0.4.0-rc.4-installer.iso
+`PUBLICATION-PROVENANCE.json` ties every selected input to the immutable dev.13 baseline, new dev.14 input manifest and candidate-10 snapshot and lists publication-only exclusions. Runtime management source is unchanged. Its test harness now generates ephemeral signing keys instead of embedding the historical public fixture private key. Historical commits/archives remain unchanged and may contain that already-public test fixture.
 
-Size: 143470592 bytes. SHA-256: `3c8d9e70cfbfab1d4e6e7d3fcc1e176d1d0957b4ea817f00e119ae7feb000605`.
+Public source viewing remains authorized **without a new blanket source license for original NUR code**. Existing third-party terms remain applicable. `LICENSING.md` describes product activation, not copyright licensing. Preserve `THIRD-PARTY-NOTICES.txt`, upstream license files, and the terms applicable to third-party code and derivatives. See `source-inputs/README.md` and the release source index for upstream inputs. Do not treat this repository as a claimed complete corresponding-source compliance bundle or a bit-identical reproduction of the ISO.
 
-The server artifact hash was checked against the existing release notes and checksum file. **An exact reproducible source-to-ISO match has not been established.** The source snapshot omits built executables, and the added Go source was not tracked in the original commit. No installer was rebuilt or replaced for publication. The snapshot is not claimed to be a complete corresponding-source compliance bundle for all upstream packages in the ISO.
+## Build and deployment
 
-Build entry points: `build.sh`, `appliance/make-images.sh`, `appliance/make-installer-iso.sh`. These require external toolchains, OpenWrt 24.10.0 ImageBuilder and dependencies. Rebuildability of this sanitized snapshot was not tested during publication. Preserve executable modes when extracting. Deployment and recovery instructions are under `docs/`.
+Appliance entry points: `build.sh`, `appliance/build-bras-engine.sh`, `appliance/make-images.sh`, and `appliance/make-installer-iso.sh`. Generated binaries, private environments, databases, enrolled keys, raw private evidence and dependency vendor trees are excluded. Use `management/deploy/ubuntu/` for external WinControl deployment; preserve the destination APP_KEY and real database. The public guides at https://nurrouter.com/docs cover installation, external management, recovery and release limitations.
 
-No evidence/, lab/, output/, downloads/, dependency vendor directories, production credentials, usable private keys or generated executables are included. Dummy key strings in unit tests are nonfunctional fixtures. Current server working changes were preserved.
+Reviewed historical rc.4 source and its archive are retained in repository history. No tag or history is force-rewritten.

@@ -11,6 +11,8 @@ use InvalidArgumentException;
  */
 final class ApplianceSshOperation
 {
+    public const DIAGNOSE = 'diagnose';
+
     public const OBSERVE = 'observe';
 
     public const APPLY = 'apply';
@@ -26,9 +28,39 @@ final class ApplianceSshOperation
         public readonly string $name,
         public readonly array $arguments = [],
     ) {
-        if (! in_array($name, [self::OBSERVE, self::APPLY, self::CONFIRM, self::CLEANUP_OVERLAY], true)) {
+        if (! in_array($name, [self::OBSERVE, self::APPLY, self::CONFIRM, self::CLEANUP_OVERLAY, self::DIAGNOSE], true)) {
             throw new InvalidArgumentException("Unsupported appliance SSH operation [{$name}].");
         }
+    }
+
+    public static function diagnose(string $tool, string $target): self
+    {
+        self::assertDiagnostic($tool, $target);
+
+        return new self(self::DIAGNOSE, ['tool' => $tool, 'target' => $target]);
+    }
+
+    public static function assertDiagnostic(string $tool, string $target): void
+    {
+        $valid = in_array($tool, ['ping', 'traceroute', 'nslookup'], true) && strlen($target) <= 253 && $target !== '';
+        if ($valid && ! filter_var($target, FILTER_VALIDATE_IP)) {
+            $valid = ! preg_match('/^[0-9.]+$/D', $target);
+            foreach (explode('.', $target) as $label) {
+                $valid = $valid && strlen($label) <= 63 && preg_match('/^[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$/D', $label);
+            }
+        }
+        if (! $valid) {
+            throw new ApplianceTransportException(ApplianceTransportException::KIND_COMMAND_REJECTED, 'Enter a supported tool and a valid IP address or ASCII hostname.');
+        }
+    }
+
+    private function diagnosticCommand(): string
+    {
+        $tool = (string) ($this->arguments['tool'] ?? '');
+        $target = (string) ($this->arguments['target'] ?? '');
+        self::assertDiagnostic($tool, $target);
+
+        return '/usr/sbin/nur-runtimectl diagnose '.$tool.' '.$target;
     }
 
     public static function observe(): self
@@ -69,6 +101,7 @@ final class ApplianceSshOperation
     public function remoteCommand(): string
     {
         return match ($this->name) {
+            self::DIAGNOSE => $this->diagnosticCommand(),
             self::OBSERVE => '/usr/sbin/nur-runtimectl observe',
             // Paths/UUIDs are pre-validated by assertSafePath/assertOperationUuid.
             // Do not wrap in shell quotes: nur-mgmt-ssh allowlists unquoted overlay paths.
@@ -95,7 +128,7 @@ final class ApplianceSshOperation
 
     private static function assertOperationUuid(string $operationUuid): void
     {
-        if (! preg_match('/^[A-Za-z0-9._-]{8,128}$/', $operationUuid)) {
+        if (! preg_match('/^[A-Za-z0-9_-]{8,80}$/D', $operationUuid)) {
             throw new ApplianceTransportException(
                 ApplianceTransportException::KIND_COMMAND_REJECTED,
                 'Rejected unsafe operation identifier.',
@@ -106,10 +139,7 @@ final class ApplianceSshOperation
     private static function assertSafePath(string $path, string $label): void
     {
         if (
-            $path === ''
-            || str_contains($path, "\0")
-            || str_contains($path, '..')
-            || ! str_starts_with($path, '/tmp/nurrouter-overlay-')
+            ! preg_match('#^/tmp/nurrouter-overlay-[A-Za-z0-9_-]{8,80}$#D', $path)
         ) {
             throw new ApplianceTransportException(
                 ApplianceTransportException::KIND_COMMAND_REJECTED,

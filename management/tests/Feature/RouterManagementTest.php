@@ -88,6 +88,46 @@ class RouterManagementTest extends TestCase
         ]);
     }
 
+    public function test_admin_can_search_filter_sort_and_paginate_routers(): void
+    {
+        $user = User::factory()->admin()->create();
+        RouterNode::factory()->create([
+            'name' => 'Alpha Edge',
+            'namespace_name' => 'nur-alpha',
+            'status' => 'applied',
+            'management_cidr' => '192.0.2.10/24',
+        ]);
+        RouterNode::factory()->create([
+            'name' => 'Beta Core',
+            'namespace_name' => 'nur-beta',
+            'status' => 'draft',
+            'management_cidr' => '192.0.2.20/24',
+        ]);
+
+        $response = $this->actingAs($user)->get(route('routers.index', [
+            'q' => 'Alpha',
+            'status' => 'applied',
+            'sort' => 'name',
+            'direction' => 'asc',
+        ]));
+
+        $response->assertOk()
+            ->assertSee('Alpha Edge')
+            ->assertDontSee('Beta Core')
+            ->assertSee(__('wincontrol.search'));
+    }
+
+    public function test_locale_query_switches_wincontrol_strings(): void
+    {
+        $user = User::factory()->admin()->create();
+
+        $english = $this->actingAs($user)->get(route('routers.index', ['lang' => 'en']));
+        $english->assertOk()->assertSee('Router namespaces', false);
+
+        $bangla = $this->actingAs($user)->get(route('routers.index', ['lang' => 'bn']));
+        $bangla->assertOk()->assertSee(__('wincontrol.router_namespaces', locale: 'bn'), false);
+    }
+
     public function test_admin_can_view_desired_state_editor(): void
     {
         $user = User::factory()->admin()->create();

@@ -34,6 +34,8 @@ server {
 
     location ~ \.php$ {
         include snippets/fastcgi-php.conf;
+        # Router operations retain ownership across bounded appliance SSH/reload calls.
+        fastcgi_read_timeout 660s;
         fastcgi_pass unix:/run/php/php__PHP_VERSION__-fpm.sock;
         fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
         include fastcgi_params;

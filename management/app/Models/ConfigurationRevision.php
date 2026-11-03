@@ -12,6 +12,8 @@ class ConfigurationRevision extends Model
     /** @use HasFactory<ConfigurationRevisionFactory> */
     use HasFactory;
 
+    protected $hidden = ['desired_secret_configuration', 'applied_secret_configuration'];
+
     protected $fillable = [
         'router_node_id',
         'user_id',

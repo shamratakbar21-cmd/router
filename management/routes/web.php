@@ -6,7 +6,10 @@ use App\Http\Controllers\LicenseActivationController;
 use App\Http\Controllers\LicenseAdminController;
 use App\Http\Controllers\PasswordRotationController;
 use App\Http\Controllers\RouterBackupController;
+use App\Http\Controllers\RouterBrasController;
 use App\Http\Controllers\RouterDesiredStateController;
+use App\Http\Controllers\RouterDesktopMutationController;
+use App\Http\Controllers\RouterDiagnosticController;
 use App\Http\Controllers\RouterNodeController;
 use App\Http\Controllers\RouterRevisionController;
 use App\Http\Controllers\RouterStateController;
@@ -21,7 +24,7 @@ Route::get('/', function () {
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
-    Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('login.store');
+    Route::post('/login', [AuthenticatedSessionController::class, 'store'])->middleware('throttle:login')->name('login.store');
 });
 
 Route::middleware('auth')->group(function () {
@@ -33,11 +36,16 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'require-password-rotation'])->group(function () {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
     Route::resource('routers', RouterNodeController::class)->except(['destroy']);
+    Route::get('/routers/{router}/bras', [RouterBrasController::class, 'edit'])->name('routers.bras.edit');
+    Route::put('/routers/{router}/bras', [RouterBrasController::class, 'update'])->name('routers.bras.update');
     Route::get('/routers/{router}/configure', [RouterDesiredStateController::class, 'edit'])->name('routers.desired-state.edit');
     Route::get('/routers/{router}/desired-state', [RouterDesiredStateController::class, 'show'])->name('routers.desired-state.show');
     Route::put('/routers/{router}/desired-state', [RouterDesiredStateController::class, 'update'])->name('routers.desired-state.update');
+    Route::post('/routers/{router}/desktop-config', RouterDesktopMutationController::class)->name('routers.desktop.mutate');
+    Route::post('/routers/{router}/diagnostics', RouterDiagnosticController::class)->middleware('throttle:12,1')->name('routers.diagnostics');
     Route::get('/routers/{router}/state', RouterStateController::class)->name('routers.state.show');
     Route::post('/routers/{router}/apply', [RouterRevisionController::class, 'apply'])->name('routers.apply');
+    Route::post('/routers/{router}/safe-mode/recover', [RouterRevisionController::class, 'recover'])->name('routers.safe-mode.recover');
     Route::post('/routers/{router}/safe-mode/confirm', [RouterRevisionController::class, 'confirm'])
         ->name('routers.safe-mode.confirm');
     Route::post('/routers/{router}/revisions/{revision}/rollback', [RouterRevisionController::class, 'rollback'])

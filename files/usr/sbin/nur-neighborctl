@@ -1,0 +1,57 @@
+#!/bin/sh
+# Read/verify managed IPv4 neighbors. Mutations are netifd UCI configuration,
+# enclosed by nur-runtimectl's existing snapshot, Safe Mode and reload lock.
+set -eu
+CONFIG=/etc/nurrouter/neighbors.json
+validate() {
+    jq -e '
+      def digits: explode|all(.[]; .>=48 and .<=57);
+      def ipv4: type=="string" and (split(".")|length==4 and all(.[]; length>=1 and length<=3 and digits and (tonumber>=0 and tonumber<=255)));
+      def iface: type=="string" and length>=1 and length<=15 and (explode|all(.[]; (.>=65 and .<=90) or (.>=97 and .<=122) or (.>=48 and .<=57) or .==95 or .==46 or .==58 or .==45));
+      def mac: type=="string" and (split(":")|length==6 and all(.[]; length==2 and (explode|all(.[]; (.>=48 and .<=57) or (.>=65 and .<=70) or (.>=97 and .<=102)))));
+      type=="array" and length<=4096 and all(.[];
+        (.ip|ipv4) and (.interface|iface) and (.mac|mac)
+        and (.disabled|type=="boolean") and (.comment|type=="string" and length<=240 and (explode|all(.[]; .>=32 and .!=127))))
+      and (map(.ip+"/"+.interface)|length==(unique|length))
+' "$1" >/dev/null
+}
+load_state() {
+    valid=true
+    managed='[]'
+    if [ -f "$CONFIG" ]; then
+        if validate "$CONFIG"; then managed="$(cat "$CONFIG")"; else valid=false; fi
+    fi
+    available=true
+    if neighbors="$(ip -4 -j neigh show 2>/dev/null)" && printf '%s' "$neighbors" | jq -e 'type=="array"' >/dev/null; then :; else available=false; neighbors=null; fi
+}
+# Never translate a missing field into an invented observation.
+case "${1:-}" in
+ validate) validate "${2:?configuration path required}" ;;
+ observe|verify)
+    load_state
+    previous='[]'
+    if [ "${1}" = verify ] && [ -n "${2:-}" ] && [ -f "$2" ]; then validate "$2"; previous="$(cat "$2")"; fi
+    printf '%s\n' "$neighbors" "$managed" "$previous" |
+    jq -s --argjson available "$available" --argjson valid "$valid" '
+      .[0] as $neighbors | .[1] as $managed | .[2] as $previous |
+      def permanent($entry): any($neighbors[]?;
+        .dst==$entry.ip and .dev==$entry.interface and
+        ((.state // [])|index("PERMANENT"))!=null);
+      def matches($entry): any($neighbors[]?;
+        .dst==$entry.ip and .dev==$entry.interface and
+        ((.lladdr // "")|ascii_downcase)==($entry.mac|ascii_downcase) and
+        ((.state // [])|index("PERMANENT"))!=null);
+      ($available and $valid and all($managed[];
+        if .disabled then permanent(.)|not else matches(.) end)
+        and all($previous[]; . as $old |
+          if any($managed[]; .ip==$old.ip and .interface==$old.interface and (.disabled|not))
+          then true else permanent($old)|not end)) as $ok |
+      {neighbors:$neighbors,managed_neighbors:$managed,
+       neighbor_api:{schema_version:1,observation:$available,
+         operations:["observe","add","edit","delete","enable","disable","comment"],
+         disable_semantics:"remove-static-pin-allow-dynamic",persistence:"uci-network",
+         verification:"kernel-and-metadata"},
+       neighbor_verification:{ok:$ok,metadata_valid:$valid}}'
+    ;;
+ *) echo 'usage: nur-neighborctl {observe|verify [previous.json]|validate file}' >&2; exit 2 ;;
+esac

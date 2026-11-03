@@ -15,6 +15,8 @@ class RouterNode extends Model
     /** @use HasFactory<RouterNodeFactory> */
     use HasFactory;
 
+    protected $hidden = ['appliance_ssh_private_key', 'appliance_ssh_known_host', 'desired_secret_configuration', 'applied_secret_configuration'];
+
     protected $fillable = [
         'name',
         'namespace_name',

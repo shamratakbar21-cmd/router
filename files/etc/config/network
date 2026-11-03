@@ -1,4 +1,10 @@
-# Generated NUR WinControl network preview
+config interface 'loopback'
+    option device 'lo'
+    option proto 'static'
+    option ipaddr '127.0.0.1'
+    option netmask '255.0.0.0'
+
+# Factory isolated-evaluation management network; no WAN subscriber credentials
 config interface 'management'
     option proto 'static'
     option device 'eth0'
@@ -10,12 +16,3 @@ config interface 'eth1'
     option proto 'static'
     option ipaddr '10.10.10.1'
     option netmask '255.255.255.0'
-config interface 'wan_pppoe'
-    option proto 'pppoe'
-    option device 'eth2'
-    option username 'lab-user'
-    option password '***redacted***'
-    option service 'nur-isp'
-    option mtu '1492'
-    option defaultroute '1'
-

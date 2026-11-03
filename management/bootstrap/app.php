@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\RequirePasswordRotation;
+use App\Http\Middleware\SetLocale;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -13,11 +14,16 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->trimStrings(except: ['services.pppoe_clients.*.password', 'entry.password', 'entry.private_key', 'appliance_ssh_private_key']);
+        $middleware->web(append: [
+            SetLocale::class,
+        ]);
         $middleware->alias([
             'require-password-rotation' => RequirePasswordRotation::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
+        $exceptions->dontFlash(['password', 'password_confirmation', 'current_password', 'services', 'entry', 'backup_json', 'activation_key', 'appliance_ssh_private_key']);
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
